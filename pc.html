@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KBO 한국시리즈 티켓팅 — PC</title>
+    <meta name="description" content="KBO 한국시리즈 PC 예매 연습 화면" />
+    <style>
+      :root{
+        --bg:#0f172a;
+        --panel:#ffffff;
+        --text:#0b1223;
+        --muted:#6b7280;
+        --line:#e5e7eb;
+        --btn:#7c3aed;
+        --btn-hover:#6d28d9;
+        --btn-text:#fff;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        background:#f3f4f6;
+        font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Noto Sans KR,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+        color:var(--text);
+      }
+      .container{max-width:980px;margin:0 auto;padding:32px 20px 48px;}
+      header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px;}
+      h1{font-size:22px;margin:0;letter-spacing:-.02em;}
+      .toolbar{display:flex;align-items:center;gap:10px}
+      .tool-btn{appearance:none;border:1px solid var(--line);background:#fff;color:#111827;padding:8px 12px;border-radius:10px;font-weight:600;cursor:pointer}
+      .tool-btn:hover{background:#f3f4f6}
+      .cd{color:var(--muted);font-size:14px}
+      .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+      .row{display:grid;grid-template-columns:120px 1fr 1fr 160px;align-items:center;gap:12px;padding:18px 20px;}
+      .row + .row{border-top:1px solid var(--line);}
+      .head{background:#fafafa;color:#111827;font-weight:700;}
+      .round{color:#374151;font-weight:600;white-space:nowrap;}
+      .when{font-weight:700;letter-spacing:-.02em;}
+      .where{color:#6b7280;}
+      .btn{justify-self:end;appearance:none;border:none;cursor:pointer;background:var(--btn);color:var(--btn-text);padding:14px 22px;border-radius:14px;font-weight:800;letter-spacing:-.02em;box-shadow:0 4px 10px rgba(124,58,237,.25);transition:transform .06s ease,background .12s ease,box-shadow .12s ease;position:relative;}
+      .btn:hover{background:var(--btn-hover);transform:translateY(-1px);box-shadow:0 6px 14px rgba(124,58,237,.28);}
+      .btn:active{transform:translateY(0);}
+      .btn:disabled{background:#d1d5db;color:#6b7280;box-shadow:none;cursor:not-allowed;}
+      .btn span.timer{display:block;font-size:12px;font-weight:500;color:#374151;margin-top:4px;}
+      @media(max-width:860px){.row{grid-template-columns:100px 1fr 130px;grid-template-areas:"round when btn" "round where btn";gap:6px 10px;}.round{grid-area:round;}.when{grid-area:when;}.where{grid-area:where;}.btn{grid-area:btn;}}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="index.html"><h1>포도알줍줍</h1></a>
+        <div class="toolbar" role="group" aria-label="카운트다운 제어">
+          <button id="restart" class="tool-btn" type="button">카운트 새로고침</button>
+        </div>
+      </header>
+
+      <section class="card" aria-label="경기 리스트">
+        <div class="row head" role="row">
+          <div>라운드</div>
+          <div>일시</div>
+          <div>경기장</div>
+          <div style="text-align:right">액션</div>
+        </div>
+        <div class="row"><div class="round">KS 1차전</div><div class="when">10.18(토) 18:30</div><div class="where">서울 잠실야구장 (LG 홈)</div><button class="btn" data-game="G1" disabled>예매하기<span class="timer"></span></button></div>
+        <div class="row"><div class="round">KS 2차전</div><div class="when">10.19(일) 18:30</div><div class="where">서울 잠실야구장 (LG 홈)</div><button class="btn" data-game="G2" disabled>예매하기<span class="timer"></span></button></div>
+        <div class="row"><div class="round">KS 3차전</div><div class="when">10.21(화) 18:30</div><div class="where">대구 삼성라이온즈파크 (삼성 홈)</div><button class="btn" data-game="G3" disabled>예매하기<span class="timer"></span></button></div>
+        <div class="row"><div class="round">KS 4차전</div><div class="when">10.22(수) 18:30</div><div class="where">대구 삼성라이온즈파크 (삼성 홈)</div><button class="btn" data-game="G4" disabled>예매하기<span class="timer"></span></button></div>
+        <div class="row"><div class="round">KS 5차전</div><div class="when">10.24(금) 18:30</div><div class="where">대구 삼성라이온즈파크 (삼성 홈)</div><button class="btn" data-game="G5" disabled>예매하기<span class="timer"></span></button></div>
+        <div class="row"><div class="round">KS 6차전</div><div class="when">10.26(일) 18:30</div><div class="where">서울 잠실야구장 (LG 홈)</div><button class="btn" data-game="G6" disabled>예매하기<span class="timer"></span></button></div>
+        <div class="row"><div class="round">KS 7차전</div><div class="when">10.27(월) 18:30</div><div class="where">서울 잠실야구장 (LG 홈)</div><button class="btn" data-game="G7" disabled>예매하기<span class="timer"></span></button></div>
+      </section>
+      <p class="cd" style="margin-top:14px">표시된 날짜/시간은 연습용 더미 데이터입니다.</p>
+    </div>
+    <script>
+      const restartBtn=document.getElementById('restart');
+      const reserveButtons=document.querySelectorAll('.btn');
+      let timerId=null;
+      function startCountdown(sec=5){
+        if(timerId){clearInterval(timerId);timerId=null;}
+        reserveButtons.forEach(b=>{b.disabled=true;const tEl=b.querySelector('.timer');let t=sec;tEl.textContent=`(${t}s)`;});
+        timerId=setInterval(()=>{
+          let allDone=false;
+          reserveButtons.forEach(b=>{
+            const tEl=b.querySelector('.timer');
+            let t=parseInt(tEl.textContent.replace(/\D/g,''));
+            if(t>1){t-=1;tEl.textContent=`(${t}s)`;}else if(t===1){tEl.textContent='활성화됨';b.disabled=false;}
+          });
+        },1000);
+        setTimeout(()=>{clearInterval(timerId);timerId=null;},(sec+1)*1000);
+      }
+      restartBtn.addEventListener('click',()=>startCountdown(5));
+      startCountdown(5);
+      reserveButtons.forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          if(btn.disabled)return;
+          const id=btn.dataset.game;
+          window.location.href=`pc_seat.html?id=${id}`;
+        });
+      });
+    </script>
+  </body>
+</html>

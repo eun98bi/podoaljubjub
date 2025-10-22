@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>포도알 줍줍 - KBO 한국시리즈 티켓팅 연습</title>
+    <meta name="description" content="KBO 한국시리즈 티켓팅 연습 — PC/모바일 버전 선택" />
+    <style>
+  :root {
+    --bg: #f9fafb; /* 밝은 배경 */
+    --card: #ffffff;
+    --text: #111827; /* 진한 텍스트 */
+    --muted: #6b7280; /* 회색 보조 텍스트 */
+    --accent: #0ea5e9; /* 파랑 포인트 */
+    --accent-2: #2563eb;
+    --ring: rgba(147, 197, 253, 0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Apple SD Gothic Neo, "Malgun Gothic", sans-serif;
+    color: var(--text);
+    background: radial-gradient(1000px 600px at 80% -10%, #e0f2fe 0%, var(--bg) 45%) fixed,
+                linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%) fixed;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 720px;
+    background: color-mix(in oklab, var(--card) 95%, white 5%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  header { text-align: center; margin-bottom: 28px; }
+  .emoji { font-size: 40px; display: inline-block; margin-bottom: 8px; }
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(20px, 2.6vw, 28px);
+    letter-spacing: -0.02em;
+  }
+  p.sub { margin: 0; color: var(--muted); font-size: 14px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 520px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  a.btn {
+    --btn-bg: #ffffff;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    padding: 18px 20px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    outline: none;
+    min-height: 84px;
+  }
+
+  a.btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+  a.btn:focus-visible { box-shadow: 0 0 0 4px var(--ring); }
+
+  .btn .tag { 
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    background: rgba(14,165,233,0.1);
+    border: 1px solid rgba(37,99,235,0.25);
+    padding: 6px 10px; border-radius: 999px; 
+  }
+
+  .btn .big { font-size: 20px; letter-spacing: 0.2px; }
+
+  .pc { --btn-bg: linear-gradient(180deg, rgba(14,165,233,0.12), rgba(37,99,235,0.08)); }
+  .mobile { --btn-bg: linear-gradient(180deg, rgba(34,197,94,0.12), rgba(14,165,233,0.08)); }
+
+  footer { margin-top: 18px; text-align: center; color: var(--muted); font-size: 12px; }
+  footer a { color: inherit; }
+</style>
+
+  </head>
+  <body>
+    <main class="wrap" role="main">
+      <header>
+        <div class="emoji" aria-hidden="true">⚾️</div>
+        <h1>포도알 줍줍</h1>
+        <h2>KBO 한국시리즈 티켓팅 연습</h2>
+        <p class="sub">원하는 버전을 선택하세요</p>
+      </header>
+
+      <section class="grid" aria-label="버전 선택">
+        <a class="btn pc" href="pc.html" aria-label="PC 버전으로 이동">
+          <span class="big">PC 버전</span>
+          <span class="tag" aria-hidden="true">데스크탑 · 노트북</span>
+        </a>
+
+        <a class="btn mobile" href="mobile.html" aria-label="모바일 버전으로 이동">
+          <span class="big">모바일 버전</span>
+          <span class="tag" aria-hidden="true">스마트폰 · 태블릿</span>
+        </a>
+      </section>
+
+      <footer>
+        <p>이 페이지는 연습용으로 제작되었습니다. 실제 티켓팅 화면, 순서와 다릅니다.</p>
+      </footer>
+    </main>
+
+    <!-- 필요 시 간단한 JS를 추가할 수 있습니다. 현재는 링크만 제공합니다. -->
+    <script>
+      // 향후 공지 모달, 점검 배너 등 스크립트를 여기에 추가하세요.
+      // 접근성: 키보드 사용자도 자연스럽게 이동 가능 (a 링크 사용).
+    </script>
+  </body>
+</html>

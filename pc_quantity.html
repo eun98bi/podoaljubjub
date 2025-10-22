@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>수량 선택 · 잠실야구장</title>
+  <style>
+    :root{
+      --wrap-w: 50vw;           /* 요청: 최대창의 50% 사용 */
+      --line:#e6e6e6;
+      --bg:#111; --card:#fff;
+      --brand:#ef4444;          /* 레드 */
+    }
+    html,body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Pretendard,sans-serif;color:#222}
+
+    /* 앱 프레임 */
+    .app{width:var(--wrap-w);min-width:640px;max-width:1040px;margin:20px auto;background:var(--card);
+         border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    .header{display:flex;align-items:center;gap:10px;background:#222;color:#fff;padding:14px 16px}
+    .header .title{font-weight:800}
+    .header .meta{margin-left:auto;opacity:.85;font-size:.9rem}
+
+    /* 2단 레이아웃 */
+    .content{display:grid;grid-template-columns:2fr 1fr;min-height:520px}
+    .left{border-right:1px solid var(--line);padding:18px}
+    .right{padding:14px}
+
+    /* 가격표 테이블 */
+    .price-header{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;padding:10px 12px;background:#f7f7f7}
+    .tab{font-weight:700}
+    .table{border:1px solid var(--line);border-radius:0 0 8px 8px;overflow:hidden}
+    .row{display:grid;grid-template-columns:150px 1fr 140px;border-top:1px solid var(--line);padding:12px 14px}
+    .row:first-child{border-top:none}
+    .cell.muted{color:#666}
+    .price{text-align:right;padding-right:18px}
+    .qty{position:relative}
+    select{width:100%;height:36px;border:1px solid #cfcfcf;border-radius:6px;background:#fff;padding:0 10px;font-size:0.95rem}
+
+    /* 사이드 요약 */
+    .box{border:1px solid var(--line);border-radius:8px;padding:10px}
+    .box h3{margin:0 0 8px 0;font-size:1rem}
+    .kv{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px dashed #eee}
+    .kv:last-child{border-bottom:none}
+    .sum{display:flex;gap:10px;margin-top:10px}
+    .sum .big{font-weight:900;font-size:1.2rem}
+    .muted{color:#666}
+
+    .actions{display:flex;gap:10px;margin-top:12px}
+    .btn{flex:1;height:48px;border:none;border-radius:8px;color:#fff;font-weight:900;cursor:pointer}
+    .btn.prev{background:#374151}
+    .btn.next{background:var(--brand)}
+    .note{font-size:.85rem;color:#444;margin-top:6px}
+
+    @media (max-width:980px){
+      .content{grid-template-columns:1fr}
+      .left{border-right:none;border-bottom:1px solid var(--line)}
+    }
+  </style>
+</head>
+
+<header class="header">
+  <div class="sub" id="subInfo"></div>
+  <button onclick="location.href='index.html'" class="home-btn">
+    포도알줍줍
+  </button>
+</header>
+
+<style>
+  .header {
+    position: relative;
+    background: linear-gradient(#222, #1b1b1b);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: center; /* 중앙 정렬 핵심 */
+    align-items: center;
+  }
+
+  .home-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: -0.03em;
+  }
+</style>
+
+<body>
+  <div class="app">
+    <!-- 상단 바 -->
+    <div class="header">
+      <div class="title">2025 플레이오프 2차전 - 한화 vs 삼성</div>
+      <div class="meta">2025.10.18(토) 14:00 · 대전 한화생명볼파크</div>
+    </div>
+
+    <div class="content">
+      <!-- 좌측: 가격/수량 -->
+      <section class="left">
+        <div class="price-header">
+          <div class="tab">1루 1층 내야지정석B</div>
+          <div class="muted">|</div>
+          <div class="muted">가격</div>
+        </div>
+        <div class="table" role="table" aria-label="가격 선택">
+          <div class="row" role="row">
+            <div class="cell muted" role="cell">기본가</div>
+            <div class="cell" role="cell">일반</div>
+            <div class="cell qty" role="cell">
+              <select id="qtySelect" aria-label="수량 선택">
+                <option value="0">0매</option>
+                <option value="1">1매</option>
+                <option value="2">2매</option>
+                <option value="3">3매</option>
+                <option value="4">4매</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" role="row" style="background:#fafafa">
+            <div class="cell muted" role="cell">가격</div>
+            <div class="cell price" role="cell"><span id="unitPrice">50,000</span>원</div>
+            <div class="cell" role="cell"></div>
+          </div>
+        </div>
+
+        <div class="note">쿠폰할인(중복사용불가) · 가격 선택 후 사용 가능한 쿠폰을 조회합니다.</div>
+      </section>
+
+      <!-- 우측: 마이 예매정보 -->
+      <aside class="right">
+        <div class="box">
+          <h3>My예매정보</h3>
+          <div class="kv"><span>일시</span><span id="sumDate">2025년 10월 18일(토) 14:00</span></div>
+          <div class="kv"><span>선택좌석</span><span id="sumSeat" class="muted">자동배정</span></div>
+          <div class="kv"><span>수량</span><span id="sumQty">0석</span></div>
+          <div class="kv"><span>티켓금액</span><span id="sumTicket" class="muted">0원</span></div>
+          <div class="kv"><span>수수료</span><span class="muted">-</span></div>
+          <div class="kv"><span>배송료</span><span class="muted">-</span></div>
+          <div class="kv"><span>할인</span><span class="muted">-</span></div>
+          <div class="kv"><span>할인쿠폰</span><span class="muted">-</span></div>
+          <div class="kv"><span>취소기한</span><span class="muted">2025년 10월 18일(토) 09:00</span></div>
+          <div class="kv"><span>취소수수료</span><span class="muted">티켓금액의 0~10%</span></div>
+          <div class="sum">
+            <span>총 결제금액</span>
+            <span class="big" id="sumTotal">0 원</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn prev" id="btnPrev">이전단계</button>
+          <button class="btn next" id="btnNext">다음단계</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- 동작 스크립트 -->
+<script>
+  const unit = 50000;
+  const fmt = n => n.toLocaleString('ko-KR');
+  const $ = s => document.querySelector(s);
+  const qtySel = $('#qtySelect');
+  const unitPrice = $('#unitPrice');
+  const sumQty = $('#sumQty');
+  const sumTicket = $('#sumTicket');
+  const sumTotal = $('#sumTotal');
+
+  unitPrice.textContent = fmt(unit);
+
+  function sync(){
+    const q = parseInt(qtySel.value, 10) || 0;
+    sumQty.textContent = q + '석';
+    sumTicket.textContent = fmt(unit * q) + '원';
+    sumTotal.textContent = fmt(unit * q) + ' 원';
+  }
+  qtySel.addEventListener('change', sync);
+  sync();
+
+  // 이전 단계 버튼
+  $('#btnPrev').addEventListener('click', () => {
+    location.href = 'pc_select.html';
+  });
+
+  // 다음 단계 버튼
+  $('#btnNext').addEventListener('click', () => {
+    const q = parseInt(qtySel.value, 10) || 0;
+
+    // ✅ 수량이 0일 경우 경고창 띄우기
+    if (q === 0) {
+      alert('수량을 선택하세요.');
+      return; // 페이지 이동 막기
+    }
+
+    // 수량 저장
+    localStorage.setItem('ticket_qty', String(q));
+
+    // 좌석 정보 없을 때 자동배정 처리
+    if (!localStorage.getItem('selectedSeats')) {
+      const fallback = `자동배정 ${q}석`;
+      localStorage.setItem('selectedSeats', fallback);
+    }
+
+    // 결과 페이지 이동
+    location.href = 'pc_result.html';
+  });
+</script>
+
+
+  <!-- 페이지 하단 안내문 (고정) -->
+  <footer style="position:fixed;left:0;right:0;bottom:0;background:#000;color:#ef4444;text-align:center;padding:10px 0;font-weight:700;z-index:9999">
+    현재 페이지는 티켓팅 연습을 위한 모의 페이지입니다. 실제와 다를 수 있습니다.
+  </footer>
+</body>
+</html>

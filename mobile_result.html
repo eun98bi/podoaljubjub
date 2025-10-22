@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>모바일 · 결과</title>
+  <style>
+    :root{
+      --brand:#ef4444;
+      --violet:#7c3aed;
+      --ok:#10b981;
+      --line:#e5e7eb;
+      --text:#0b1223;
+      --bg:#111;
+      --card:#fff;
+      --app-w:420px;    /* 고정 폭 */
+      --footer-h:44px;
+      --safe:env(safe-area-inset-bottom, 0px);
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      background:var(--bg);
+      font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Noto Sans KR,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+      color:var(--text);
+    }
+
+    /* 고정 폭 앱 컨테이너 */
+    .app{
+      width:var(--app-w);
+      margin:0 auto;
+      min-height:100vh;
+      background:var(--card);
+      display:grid;
+      grid-template-rows:auto 1fr;
+      position:relative;
+    }
+
+    header{
+      padding:12px 16px;
+      border-bottom:1px solid var(--line);
+      background:#fafafa;
+    }
+    h1{margin:0;font-size:16px;font-weight:800}
+
+    main{
+      padding:24px 16px calc(var(--footer-h) + 100px);
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
+      text-align:center;
+    }
+    .badge{
+      display:inline-block;
+      padding:6px 12px;
+      border-radius:999px;
+      background:var(--ok);
+      color:#fff;
+      font-weight:900;
+    }
+    .big{font-size:20px;font-weight:900}
+    .kvs{
+      margin-top:8px;
+      border-top:1px dashed var(--line);
+      padding-top:10px;
+      color:#111;
+    }
+
+    /* 하단 버튼 바 */
+    .actions{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:calc(var(--footer-h) + var(--safe));
+      width:var(--app-w);
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      padding:12px;
+      border-top:1px solid var(--line);
+      background:#fff;
+      z-index:20;
+    }
+
+    .btn{
+      height:52px;
+      border:none;
+      border-radius:12px;
+      color:#fff;
+      font-weight:900;
+      letter-spacing:-.02em;
+      cursor:pointer;
+    }
+    .btn.home{background:#374151}
+    .btn.again{background:var(--violet)}
+
+    footer{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:0;
+      width:var(--app-w);
+      height:calc(var(--footer-h) + var(--safe));
+      background:#000;
+      color:#ef4444;
+      text-align:center;
+      padding:8px 6px;
+      font-weight:700;
+      z-index:10;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header><h1>예매 결과</h1></header>
+    <main>
+      <div class="card">
+        <span class="badge">SUCCESS</span>
+        <div class="big">티켓팅 성공!</div>
+        
+        
+      </div>
+    </main>
+  </div>
+
+  <div class="actions">
+    <button class="btn home" id="goHome">홈으로</button>
+    <button class="btn again" id="goAgain">다시 예매하기</button>
+  </div>
+
+  <footer>현재 페이지는 티켓팅 연습을 위한 모의 페이지입니다. 실제와 다를 수 있습니다.</footer>
+
+  <script>
+    const fmt = n => n.toLocaleString('ko-KR');
+    const unit = 50000;
+    const seats = localStorage.getItem('selectedSeats') || '(확보한 좌석 정보 없음)';
+    const qty = parseInt(localStorage.getItem('ticket_qty')||'0',10);
+
+  
+    document.getElementById('goHome').onclick = ()=> location.href = 'index.html';
+    document.getElementById('goAgain').onclick = ()=> location.href = 'mobile_seat.html';
+  </script>
+</body>
+</html>

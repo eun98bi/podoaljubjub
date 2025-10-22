@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>모바일 · 좌석선택</title>
+  <style>
+    :root{
+      --brand:#ef4444;
+      --line:#e9e9e9; --muted:#666; --text:#111; --card:#fff; --bg:#111;
+      --app-w:420px;           /* 고정 폭 */
+      --footer-h:44px;         /* 안내 높이 */
+      --actions-h:62px;        /* 버튼 바 높이 */
+      --safe:env(safe-area-inset-bottom, 0px);
+      --purple:#7c3aed;        /* 좌석(가능) */
+      --gray:#cfcfcf;          /* 좌석(불가) */
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,'Pretendard','Noto Sans KR',sans-serif;color:var(--text)}
+    .app{width:var(--app-w);margin:0 auto;background:var(--card);min-height:100vh;display:grid;grid-template-rows:auto 1fr;position:relative}
+    .header{background:linear-gradient(#222,#1b1b1b);color:#fff;padding:14px 16px;display:flex;gap:10px;align-items:center}
+    .badge{padding:4px 8px;border-radius:999px;background:#fff;color:#111;font-weight:800;font-size:.8rem}
+    .title{font-weight:800}
+    .sub{margin-left:auto;opacity:.85;font-size:.9rem}
+    .content{padding:12px;display:grid;gap:12px;padding-bottom:calc(var(--footer-h)+var(--actions-h)+20px+var(--safe))}
+    .panel{border:1px solid var(--line);border-radius:12px;padding:12px}
+    .panel h2{margin:0 0 6px;font-size:1rem}
+    .hint{font-size:.82rem;color:var(--muted)}
+    /* 좌석 그리드 */
+    .seat-wrap{display:grid;justify-content:center}
+    .stage{font-weight:800;text-align:center;margin-bottom:8px}
+    .grid {
+  display: grid;
+  grid-template-columns: repeat(20, 14px);
+  gap: 4px;
+  justify-content: center;
+  padding: 10px 6px;
+  background: #fafafa;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin: 0 auto;
+}
+
+.seat {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  background: var(--gray);
+  pointer-events: none;
+}
+
+    .seat.avail{background:var(--purple);pointer-events:auto;cursor:pointer;border-color:#5b21b6}
+    .seat.selected{outline:2px solid #111; outline-offset:2px}
+    .legend{display:flex;gap:12px;justify-content:center;margin-top:8px;color:#444;font-size:.85rem}
+    .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:middle}
+    .legend .ok i{background:var(--purple)}
+    .legend .no i{background:var(--gray)}
+    /* 선택 요약 */
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .chip{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;font-weight:700}
+    /* 하단 고정 */
+    .actions{
+      position:fixed;left:50%;transform:translateX(-50%);
+      bottom:calc(var(--footer-h)+var(--safe));width:var(--app-w);
+      display:grid;grid-template-columns:1fr 1fr;gap:10px;
+      padding:12px;border-top:1px solid var(--line);background:#fff;z-index:20;
+    }
+    .btn{height:48px;border:none;border-radius:12px;color:#fff;font-weight:900;cursor:pointer}
+    .btn.gray{background:#374151}
+    .btn.red{background:var(--brand)}
+    footer{
+      position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:var(--app-w);
+      height:calc(var(--footer-h)+var(--safe));padding-bottom:var(--safe);
+      display:flex;align-items:center;justify-content:center;
+      background:#000;color:#ef4444;text-align:center;font-weight:700;z-index:10;padding:0 8px;
+    }
+
+    /* === 버튼 안 보일 때 응급 패치 === */
+:root{
+  --app-w:420px;
+  --footer-h:44px;
+  --safe: env(safe-area-inset-bottom, 0px);
+}
+
+/* 푸터가 더 위로 올라오지 않게 */
+footer{
+  position: fixed !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: 0 !important;
+  width: min(var(--app-w), 100vw) !important;
+  height: calc(var(--footer-h) + var(--safe)) !important;
+  z-index: 998 !important;
+}
+
+/* 버튼 바를 푸터 바로 위에, 화면 폭에 맞춰 강제 표시 */
+.actions, #actions, .bottom-actions{
+  position: fixed !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: calc(var(--footer-h) + var(--safe)) !important;
+  width: min(var(--app-w), 100vw) !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  background: #fff !important;
+  border-top: 1px solid #e9e9e9 !important;
+  z-index: 999 !important;
+}
+
+/* 본문이 버튼/푸터에 가리지 않게 하단 여백 확보 */
+.content{
+  padding-bottom: calc(var(--footer-h) + 62px + 24px + var(--safe)) !important;
+}
+
+/* 버튼 기본 스타일(혹시 빠졌을 때 대비) */
+.btn{height:48px;border:0;border-radius:12px;color:#fff;font-weight:900;cursor:pointer}
+.btn.gray{background:#374151}
+.btn.red{background:#ef4444}
+
+  </style>
+</head>
+
+<header class="header">
+  <div class="sub" id="subInfo"></div>
+  <button onclick="location.href='index.html'" class="home-btn">
+    포도알줍줍
+  </button>
+</header>
+
+<style>
+  .header {
+    position: relative;
+    background: linear-gradient(#222, #1b1b1b);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: center; /* 중앙 정렬 핵심 */
+    align-items: center;
+  }
+
+  .home-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: -0.03em;
+  }
+</style>
+
+<body>
+  <div class="app">
+    <header class="header">
+      <span class="badge">SEAT</span>
+      <div class="title">좌석 선택</div>
+      <div class="sub" id="sectInfo">선택 최대 4석</div>
+    </header>
+
+    <main class="content">
+      <section class="panel">
+        <h2>구역 & 좌석</h2>
+        <div class="hint">보라색만 선택 가능 · 최대 4좌석</div>
+
+        <div class="seat-wrap">
+          <div class="stage">⚾ 그라운드</div>
+          <div id="seatGrid" class="grid" aria-label="좌석 그리드"></div>
+          <div class="legend">
+            <span class="ok"><i></i>선택가능</span>
+            <span class="no"><i></i>선택불가</span>
+          </div>
+        </div>
+
+        <div class="chips" id="chips"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 하단 고정 -->
+  <div class="actions" id="actions">
+  <button class="btn gray" id="btnBack">이전</button>
+  <button class="btn red" id="btnNext">다음단계</button>
+</div>
+  <footer>현재 페이지는 티켓팅 연습을 위한 모의 페이지입니다. 실제와 다를 수 있습니다.</footer>
+
+  <script>
+    // URL에서 섹션명 가져오기 (mobile_seat에서 넘겨준 seat 파라미터)
+    const params = new URLSearchParams(location.search);
+    const sectionName = params.get('seat') || '일반석';
+    document.getElementById('sectInfo').textContent = sectionName + ' · 최대 4석';
+
+    // 좌석 그리드 생성: 20%만 avail
+    const grid = document.getElementById('seatGrid');
+    const total = 20 * 15; // 300석 예시
+    const availIdx = new Set();
+    while (availIdx.size < Math.floor(total * 0.2)) {
+      availIdx.add(Math.floor(Math.random() * total));
+    }
+
+    const selected = new Set();
+    const chips = document.getElementById('chips');
+
+    function refreshChips(){
+      chips.innerHTML = '';
+      [...selected].forEach(id=>{
+        const el = document.createElement('span');
+        el.className = 'chip';
+        el.textContent = id;
+        chips.appendChild(el);
+      });
+    }
+
+    for (let i=0;i<total;i++){
+      const d = document.createElement('div');
+      d.className = 'seat' + (availIdx.has(i)?' avail':'');
+      d.dataset.sid = `${sectionName}-${i+1}`;
+      d.addEventListener('click', ()=>{
+        if (!d.classList.contains('avail')) return;
+        const id = d.dataset.sid;
+        if (selected.has(id)) {
+          selected.delete(id);
+          d.classList.remove('selected');
+        } else {
+          if (selected.size >= 4) { alert('최대 4좌석까지 선택 가능합니다.'); return; }
+          selected.add(id);
+          d.classList.add('selected');
+        }
+        refreshChips();
+      });
+      grid.appendChild(d);
+    }
+
+    document.getElementById('btnBack').onclick = ()=> history.back();
+    document.getElementById('btnNext').onclick = ()=>{
+      if (selected.size === 0) { alert('좌석을 선택해주세요.'); return; }
+      const list = encodeURIComponent([...selected].join(','));
+      location.href = `mobile_quantity.html?seat=${encodeURIComponent(sectionName)}&sel=${list}`;
+    };
+  </script>
+</body>
+</html>

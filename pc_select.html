@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>좌석 선택 · 잠실야구장</title>
+  <style>
+:root{
+  --wrap-w: 50vw;
+  --brand: #ef4444;
+  --bg: #111; --card:#fff; --muted:#666; --line:#e9e9e9;
+}
+html,body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,'Pretendard',sans-serif;color:#222}
+.app{
+  width: var(--wrap-w);
+  min-width: 640px; max-width: 1040px;
+  margin: 20px auto; background: var(--card);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  display: grid; grid-template-rows: auto 1fr;
+}
+.header{
+  background: linear-gradient(#222,#1b1b1b);
+  color:#fff; padding:14px 18px; display:flex; align-items:center; gap:12px;
+}
+.league-badge{padding:4px 8px;border-radius:999px;background:#fff;color:#111;font-weight:700;font-size:.8rem}
+.title{font-size:1.05rem;font-weight:700}
+.subtitle{margin-left:auto;font-size:.85rem;opacity:.8}
+.content{display:flex; min-height:520px;}
+.main{
+  flex:2; background:#fafafa; border-right:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center; padding:18px; position:relative;
+}
+.main .panel {
+  background:#fff; border:1px solid var(--line); padding:18px; border-radius:12px;
+  width:min(92%,780px);
+}
+.side{flex:1; display:flex; flex-direction:column; padding:16px 14px; gap:12px;}
+.side h2{font-size:1rem;margin:0 0 4px}
+.meta{font-size:.9rem;color:#444}
+.list{flex:1; overflow:auto; border:1px solid var(--line); border-radius:8px; padding:8px 10px;}
+.item{display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px dashed #efefef;}
+.item:last-child{border-bottom:none}
+.actions{display:flex; gap:8px}
+.btn{flex:1; padding:12px 10px; border:none; border-radius:8px; color:#fff; font-weight:800; cursor:pointer}
+.btn.secondary{background:#374151}
+.btn.primary{background:var(--brand)}
+.tag{display:inline-block; padding:2px 8px; border-radius:999px; background:#fee2e2; color:#991b1b; font-weight:700; font-size:.8rem}
+.qty-wrap{display:flex; align-items:center; gap:8px; margin:10px 0;}
+.qty-btn{width:38px; height:38px; border-radius:8px; border:none; background:#e5e7eb; cursor:pointer; font-size:20px; font-weight:800;}
+.qty-input{width:60px; text-align:center; height:38px; border:1px solid #ddd; border-radius:8px; font-size:16px;}
+@media (max-width:980px){
+  .content{flex-direction:column}
+  .main{border-right:none; border-bottom:1px solid var(--line)}
+}
+</style>
+</head>
+
+<header class="header">
+  <div class="sub" id="subInfo"></div>
+  <button onclick="location.href='index.html'" class="home-btn">
+    포도알줍줍
+  </button>
+</header>
+
+<style>
+  .header {
+    position: relative;
+    background: linear-gradient(#222, #1b1b1b);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: center; /* 중앙 정렬 핵심 */
+    align-items: center;
+  }
+
+  .home-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: -0.03em;
+  }
+</style>
+
+<body>
+  <div class="app">
+    <div class="header">
+      <span class="league-badge">POST SEASON</span>
+      <div class="title" id="gameTitle">2025 플레이오프 4차전 - 삼성 vs 한화</div>
+      <div class="subtitle" id="venueDate">잠실야구장 · 2025-10-22(수) 18:30</div>
+    </div>
+    <div class="content">
+      <div class="main">
+        <div class="panel">
+          <h2>세부 좌석 선택</h2>
+          <p class="meta">선택한 구역: <span id="pickedSeat" class="tag">-</span></p>
+          <div style="height:360px; display:flex; align-items:center; justify-content:center; border:1px dashed #ddd; border-radius:12px; background:#fafafa;">
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+<div id="seat-map" style="
+  display: grid;
+  grid-template-columns: repeat(50, 1fr);
+  gap: 2px;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 5 / 3; /* 50:30 비율 유지 */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 4px;
+  background: #f5f5f5;
+  border-radius: 8px;
+">
+</div>
+
+<script>
+  const seatMap = document.getElementById("seat-map");
+  const totalSeats = 1500; // 50x30 좌석
+  const clickableCount = Math.floor(totalSeats * 0.2); // 20% 클릭 가능
+  const clickableIndices = new Set();
+  const selectedSeats = new Set();
+  const MAX_SELECT = 4; // 최대 4석 선택 가능
+
+  while (clickableIndices.size < clickableCount) {
+    clickableIndices.add(Math.floor(Math.random() * totalSeats));
+  }
+
+  for (let i = 0; i < totalSeats; i++) {
+    const seat = document.createElement("div");
+    seat.className = "seat";
+    if (clickableIndices.has(i)) {
+      seat.classList.add("active");
+      seat.addEventListener("click", () => toggleSeat(i, seat));
+    }
+    seatMap.appendChild(seat);
+  }
+
+  function toggleSeat(index, seatElement) {
+    const seatId = `S${index + 1}`;
+    if (selectedSeats.has(seatId)) {
+      selectedSeats.delete(seatId);
+      seatElement.classList.remove("selected");
+    } else {
+      if (selectedSeats.size >= MAX_SELECT) {
+        alert(`좌석은 최대 ${MAX_SELECT}매까지 선택 가능합니다.`);
+        return;
+      }
+      selectedSeats.add(seatId);
+      seatElement.classList.add("selected");
+    }
+    updateSeatDisplay();
+  }
+
+  function updateSeatDisplay() {
+    const picked = [...selectedSeats].join(", ") || "-";
+    document.getElementById("pickedSeat").textContent = picked;
+    document.getElementById("sideSeat").textContent = picked;
+  }
+</script>
+
+<style>
+  .seat {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 2px;
+    background: #d1d5db; /* 회색 비활성 */
+    transition: 0.15s;
+    cursor: default;
+  }
+  .seat.active {
+    background: #a855f7; /* 보라색 (클릭 가능) */
+    cursor: pointer;
+  }
+  .seat.active:hover {
+    background: #9333ea;
+    transform: scale(1.2);
+  }
+  .seat.selected {
+    background: #22c55e; /* 선택된 좌석은 초록색 */
+  }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+          
+        </div>
+      </div>
+      <aside class="side">
+        <div>
+          <h2>선택 정보</h2>
+          <div class="list">
+            <div class="item"><span>구역</span><span id="sideSeat">-</span></div>
+            <div class="item"><span>날짜</span><span>2025-10-22 18:30</span></div>
+            <div class="item"><span>장소</span><span>잠실야구장</span></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" id="goBack">좌석도(전체)</button>
+          <button class="btn primary" id="goQty">수량 선택</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <script>
+    function getParam(k){ 
+      return new URLSearchParams(location.search).get(k) || ""; 
+    }
+    const seat = getParam('seat') || '미지정';
+    document.getElementById('pickedSeat').textContent = seat;
+    document.getElementById('sideSeat').textContent = seat;
+
+    document.getElementById('goBack').addEventListener('click',()=>{ 
+      location.href = 'pc_seat.html'; 
+    });
+    document.getElementById('goQty').addEventListener('click',()=>{ 
+      location.href = 'pc_quantity.html?seat=' + encodeURIComponent(seat); 
+    });
+  </script>
+</body>
+
+<!-- 페이지 하단 안내문 -->
+<footer style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #000;
+  color: #ef4444;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 9999;
+">
+  현재 페이지는 티켓팅 연습을 위한 모의 페이지입니다. 실제와 다를 수 있습니다.
+</footer>
+
+</html>

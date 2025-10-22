@@ -127,6 +127,21 @@
         
         
       </div>
+
+      <!-- ✅ 반응형 쿠팡 광고: 컨테이너 폭에 맞춰 100%로 렌더 -->
+        <div id="coupang-ad" style="width:100%; max-width:420px; margin:0 auto;">
+          <script src="https://ads-partners.coupang.com/g.js"></script>
+          <script>
+            new PartnersCoupang.G({
+              "id": 935037,
+              "trackingCode": "AF9566167",
+              "subId": null,
+              "template": "carousel",
+              "width": "100%",   // 반응형
+              "height": "140"
+            });
+          </script>
+        </div>
     </main>
   </div>
 
@@ -135,7 +150,11 @@
     <button class="btn again" id="goAgain">다시 예매하기</button>
   </div>
 
-  <footer>현재 페이지는 티켓팅 연습을 위한 모의 페이지입니다. 실제와 다를 수 있습니다.</footer>
+  <footer>현재 페이지는 티켓팅 연습을 위한 모의 페이지입니다. 실제와 다를 수 있습니다.
+
+
+    
+  </footer>
 
   <script>
     const fmt = n => n.toLocaleString('ko-KR');

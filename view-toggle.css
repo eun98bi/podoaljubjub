@@ -1,0 +1,185 @@
+/* ================================================================
+   포도알줍줍 — PC/모바일 뷰 전환 공통 스타일
+   모든 플랫폼 파일에서 공유 사용
+================================================================ */
+
+/* ── 뷰 토글 바 ── */
+.view-toggle-bar {
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 0 16px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  flex-shrink: 0;
+}
+.vtb-label {
+  font-size: 11px;
+  color: #888;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.vtb-divider {
+  width: 1px;
+  height: 16px;
+  background: #333;
+  flex-shrink: 0;
+}
+.vtb-btn-group {
+  display: flex;
+  gap: 2px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  padding: 2px;
+}
+.vtb-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 5px;
+  border: none;
+  background: none;
+  color: #888;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.vtb-btn:hover { color: #ccc; }
+.vtb-btn.active {
+  background: #fff;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+.vtb-btn svg {
+  flex-shrink: 0;
+}
+.vtb-tip {
+  margin-left: auto;
+  font-size: 10px;
+  color: #555;
+  white-space: nowrap;
+}
+.vtb-tip strong { color: #888; }
+
+/* ── 모바일 프레임 래퍼 ── */
+/* PC 모드: 정상 렌더링 */
+body.view-pc .mobile-frame-outer { display: none !important; }
+body.view-pc .pc-content { display: block !important; }
+
+/* 모바일 모드 */
+body.view-mobile .pc-content { display: none !important; }
+body.view-mobile .mobile-frame-outer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 20px 40px;
+  background: #111;
+  min-height: calc(100vh - 40px);
+}
+
+/* 폰 프레임 */
+.mobile-frame {
+  width: 390px;
+  min-height: 844px;
+  background: #fff;
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 10px #1a1a1a,
+    0 0 0 12px #2a2a2a,
+    0 40px 80px rgba(0,0,0,0.8);
+  flex-shrink: 0;
+}
+
+/* 폰 노치 */
+.mobile-frame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: #1a1a1a;
+  border-radius: 0 0 20px 20px;
+  z-index: 1000;
+}
+
+/* 상태바 (노치 아래) */
+.mobile-status-bar {
+  height: 44px;
+  background: #fff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 24px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-family: -apple-system, 'Noto Sans KR', sans-serif;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+.mobile-status-bar.dark {
+  background: #1a1a1a;
+  color: #fff;
+}
+.msb-time { font-size: 13px; font-weight: 700; }
+.msb-icons { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+
+/* 폰 프레임 내 스크롤 영역 */
+.mobile-frame-scroll {
+  height: calc(844px - 44px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-frame-scroll::-webkit-scrollbar { display: none; }
+
+/* 앱/웹 차이 안내 배너 (모바일 프레임 내부) */
+.app-diff-banner {
+  background: #1a1a2e;
+  border-bottom: 2px solid #6c5ce7;
+  padding: 8px 14px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.app-diff-banner .adb-icon { font-size: 12px; flex-shrink: 0; }
+.app-diff-banner strong { color: #a29bfe; }
+
+/* 반응형: 좁은 화면에서 프레임 축소 */
+@media (max-width: 500px) {
+  .mobile-frame-outer { padding: 12px 0 !important; background: #000 !important; }
+  .mobile-frame {
+    width: 100vw;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .mobile-frame::before { display: none; }
+  .mobile-status-bar { height: 36px; }
+}
+
+/* ── PC 모드에서 기존 sticky 헤더 top 보정 ── */
+body.view-pc .main-hd,
+body.view-pc .y-header,
+body.view-pc .m-header,
+body.view-pc .n-header {
+  top: 40px !important;
+}
+body.view-pc .sport-sub {
+  top: 100px !important;
+}

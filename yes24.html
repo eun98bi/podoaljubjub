@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YES24 티켓 연습 — 포도알줍줍</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --red:#e22228;--red-lt:#fff0f0;--red-dk:#b71c1c;
+  --gray:#888;--border:#ddd;--bg:#f5f5f5;
+  --text:#1a1a1a;--green:#1a8f5a;
+}
+html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;}
+.screen{display:none;} .screen.active{display:block;}
+
+/* ── 공통 헤더 ── */
+.y-header{
+  background:#fff;border-bottom:2px solid var(--red);
+  padding:0 20px;height:54px;
+  display:flex;align-items:center;gap:20px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 4px rgba(0,0,0,0.07);
+}
+.y-logo{font-size:22px;font-weight:900;color:var(--red);letter-spacing:-0.03em;text-decoration:none;}
+.y-logo span{color:#333;font-weight:300;}
+.y-gnb{display:flex;gap:0;list-style:none;}
+.y-gnb-item{padding:0 14px;height:54px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.y-gnb-item:hover{color:var(--red);}
+.y-gnb-item.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
+.y-header-right{margin-left:auto;display:flex;gap:8px;}
+.y-btn-sm{background:none;border:1px solid #ccc;color:#555;font-size:12px;padding:4px 12px;border-radius:2px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* ── 연습 배너 ── */
+.practice-bar{background:#fff8e1;border-bottom:2px solid #fbbf24;padding:7px 20px;font-size:11px;color:#78350f;display:flex;align-items:center;gap:6px;}
+.practice-badge{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,0.72);color:#fff;font-size:11px;font-weight:600;padding:7px 13px;border-radius:100px;z-index:9999;backdrop-filter:blur(8px);}
+
+/* ══════════════════════
+   SCREEN 0: 공연 상세
+══════════════════════ */
+.y-product-wrap{max-width:960px;margin:0 auto;padding:24px 20px;}
+.y-product-top{display:flex;gap:24px;margin-bottom:24px;}
+.y-poster{
+  width:180px;flex-shrink:0;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+  border-radius:4px;overflow:hidden;min-height:240px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;text-align:center;padding:20px 14px;position:relative;
+}
+.y-poster-badge{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;}
+.y-poster-title{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px;}
+.y-poster-sub{font-size:11px;opacity:0.65;}
+.y-product-info{flex:1;}
+.y-genre-tag{display:inline-block;border:1px solid var(--red);color:var(--red);font-size:11px;padding:1px 8px;border-radius:2px;margin-bottom:8px;}
+.y-product-title{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.3;}
+.y-info-table{border-collapse:collapse;width:100%;font-size:13px;}
+.y-info-table td{padding:6px 0;vertical-align:top;border-bottom:1px solid #f5f5f5;}
+.y-info-table td:first-child{width:80px;color:#888;font-weight:500;}
+.y-info-table td.price-cell{color:var(--red);font-weight:700;font-size:14px;}
+
+/* 예매하기 버튼 영역 */
+.y-booking-box{background:#fff;border:1px solid #e0e0e0;border-radius:4px;padding:18px 20px;margin-bottom:20px;}
+.y-booking-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.y-booking-title{font-size:14px;font-weight:700;}
+.y-server-time{font-size:12px;color:#888;}
+.y-server-time span{color:var(--red);font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* 새로고침 안내 */
+.y-refresh-notice{
+  background:#fff3f3;border:1px solid #ffcdd2;border-radius:4px;
+  padding:10px 14px;margin-bottom:12px;
+  font-size:12px;color:#c62828;
+  display:flex;align-items:center;gap:8px;line-height:1.6;
+}
+.y-btn-reserve{
+  width:100%;height:50px;
+  background:var(--red);color:#fff;
+  font-size:16px;font-weight:700;border:none;border-radius:3px;
+  cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+  transition:background 0.15s;letter-spacing:-0.01em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.y-btn-reserve:hover{background:var(--red-dk);}
+.y-btn-reserve:disabled{background:#ccc;cursor:not-allowed;}
+.y-btn-reserve.open-now{animation:openPulse 1.2s ease-in-out infinite;}
+@keyframes openPulse{0%,100%{box-shadow:0 0 0 0 rgba(226,34,40,0.4);}50%{box-shadow:0 0 0 8px rgba(226,34,40,0);}}
+
+/* 탭 */
+.y-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:0;}
+.y-tab{padding:10px 20px;font-size:13px;font-weight:500;color:#888;border-bottom:2px solid transparent;cursor:pointer;}
+.y-tab.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
+.y-tab-content{background:#fff;border:1px solid var(--border);border-top:none;padding:18px 20px;font-size:13px;line-height:1.85;color:#444;}
+
+/* ══════════════════════
+   SCREEN 1: 날짜 선택 달력 팝업
+══════════════════════ */
+.y-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:500;}
+.y-popup{background:#fff;border-radius:4px;width:480px;max-width:95vw;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.y-popup-head{background:var(--red);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.y-popup-title{font-size:15px;font-weight:700;}
+.y-popup-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;opacity:0.7;}
+.y-popup-close:hover{opacity:1;}
+.y-popup-body{padding:20px;}
+
+/* 달력 */
+.y-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.y-cal-month{font-size:14px;font-weight:700;}
+.y-cal-arrow{background:none;border:1px solid var(--border);width:26px;height:26px;border-radius:3px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.y-cal-head{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+.y-cal-dn{text-align:center;font-size:11px;font-weight:600;color:#999;padding:4px 0;}
+.y-cal-dn:first-child{color:var(--red);}
+.y-cal-dn:last-child{color:#1565c0;}
+.y-cal-dates{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.y-cal-d{
+  aspect-ratio:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:3px;cursor:pointer;font-size:13px;
+  border:1.5px solid transparent;position:relative;
+}
+.y-cal-d:hover:not(.disabled):not(.empty){background:#fff0f0;border-color:#ffcdd2;}
+.y-cal-d.avail{font-weight:700;}
+.y-cal-d.avail::after{content:'●';position:absolute;bottom:2px;font-size:5px;color:var(--red);}
+.y-cal-d.selected{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important;font-weight:700;}
+.y-cal-d.selected::after{color:rgba(255,255,255,0.6);}
+.y-cal-d.disabled,.y-cal-d.empty{cursor:default;color:#ddd;}
+.y-cal-d.sun{color:var(--red);}
+.y-cal-d.sat{color:#1565c0;}
+.y-cal-d.selected.sun,.y-cal-d.selected.sat{color:#fff;}
+
+/* 회차 선택 */
+.y-session-area{margin-top:16px;}
+.y-session-label{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.y-session-label::before{content:'';width:3px;height:14px;background:var(--red);border-radius:2px;}
+.y-session-list{display:flex;flex-direction:column;gap:5px;}
+.y-session-item{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--border);border-radius:3px;padding:10px 14px;cursor:pointer;transition:all 0.15s;}
+.y-session-item:hover{border-color:var(--red);background:#fff5f5;}
+.y-session-item.sel{border-color:var(--red);background:#fff0f0;}
+.y-session-time{font-size:14px;font-weight:700;}
+.y-session-avail{font-size:11px;font-weight:600;}
+.avail-ok{color:var(--green);}
+.avail-few{color:orange;}
+
+.y-popup-foot{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.y-btn-cancel{background:#fff;border:1px solid var(--border);color:#555;font-size:13px;padding:9px 20px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.y-btn-next{background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;padding:9px 26px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.y-btn-next:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   SCREEN 2: 포도알 좌석 선택
+══════════════════════ */
+.grape-screen{min-height:100vh;background:#fff;}
+.grape-header{background:var(--red);color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;}
+.grape-header-title{font-size:13px;font-weight:700;}
+.grape-header-sub{font-size:11px;opacity:0.75;margin-top:2px;}
+.grape-header-right{display:flex;gap:10px;font-size:12px;}
+
+/* 5분 홀딩 타이머바 */
+.holding-bar{
+  background:#fff3e0;border-bottom:2px solid #ff9800;
+  padding:7px 18px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;
+}
+.holding-bar.urgent{background:#fce4ec;border-bottom-color:var(--red);}
+.holding-label{color:#e65c00;font-weight:600;}
+.holding-bar.urgent .holding-label{color:var(--red);}
+.holding-timer{font-size:18px;font-weight:700;color:#e65c00;font-variant-numeric:tabular-nums;}
+.holding-bar.urgent .holding-timer{color:var(--red);}
+
+/* 구역 미니맵 + 안내 */
+.grape-layout{display:flex;overflow:hidden;height:calc(100vh - 90px);}
+.grape-main{flex:1;overflow-y:auto;padding:16px 20px;}
+.grape-right{width:240px;flex-shrink:0;border-left:1px solid var(--border);background:#fafafa;display:flex;flex-direction:column;}
+
+/* 구역 선택 탭 */
+.grape-zone-bar{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);background:#fff;padding:0 16px;margin-bottom:16px;}
+.grape-zone-item{padding:0 13px;height:36px;display:flex;align-items:center;font-size:12px;font-weight:500;color:#888;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;margin-bottom:-1px;}
+.grape-zone-item:hover{color:var(--red);}
+.grape-zone-item.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
+
+/* 포도알 그리드 컨테이너 */
+.grape-section{margin-bottom:24px;}
+.grape-section-title{font-size:12px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;}
+.grape-section-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.grape-section-grid{
+  display:flex;flex-wrap:wrap;gap:5px;
+  padding:12px;background:#f8f8f8;border-radius:6px;
+  min-height:60px;
+}
+/* 포도알 (원형 좌석) */
+.grape{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;font-weight:700;cursor:pointer;
+  transition:all 0.1s;position:relative;
+  flex-shrink:0;
+}
+.grape.avail{
+  background:#27ae60;color:#fff;
+  box-shadow:0 1px 3px rgba(39,174,96,0.3);
+}
+.grape.avail:hover{
+  transform:scale(1.25);z-index:5;
+  box-shadow:0 2px 8px rgba(39,174,96,0.5);
+}
+.grape.taken{
+  background:#e0e0e0;color:#bbb;cursor:not-allowed;
+}
+.grape.holding{
+  background:#ff9800;color:#fff;
+  animation:holdPulse 0.8s ease-in-out infinite;
+}
+@keyframes holdPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.grape.my-select{
+  background:var(--red);color:#fff;
+  box-shadow:0 2px 8px rgba(226,34,40,0.5);
+  transform:scale(1.1);z-index:5;
+}
+/* 툴팁 */
+.grape:hover::after{
+  content:attr(data-seat);
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  background:#1a1a1a;color:#fff;font-size:9px;
+  padding:3px 6px;border-radius:3px;white-space:nowrap;z-index:10;
+  pointer-events:none;
+}
+
+/* 이결좌 알림 팝업 */
+.conflict-popup{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:#fff;border:2px solid var(--red);border-radius:6px;
+  padding:20px 24px;width:300px;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:600;
+}
+.conflict-popup.hidden{display:none;}
+.conflict-popup-icon{font-size:32px;margin-bottom:8px;}
+.conflict-popup-title{font-size:15px;font-weight:700;color:var(--red);margin-bottom:6px;}
+.conflict-popup-desc{font-size:12px;color:#555;line-height:1.7;margin-bottom:14px;}
+.btn-conflict-ok{background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;padding:9px 28px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* 우측 패널 */
+.grape-panel-head{background:var(--red);color:#fff;padding:10px 13px;font-size:12px;font-weight:700;}
+.grape-panel-body{flex:1;padding:12px 13px;overflow-y:auto;}
+.grape-panel-lbl{font-size:10px;font-weight:700;color:#aaa;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:7px;}
+.grape-sel-list{min-height:60px;border:1px dashed #ddd;border-radius:4px;padding:7px;margin-bottom:12px;}
+.grape-sel-empty{font-size:11px;color:#bbb;text-align:center;padding:8px 0;}
+.grape-sel-item{display:flex;align-items:center;justify-content:space-between;background:#fff0f0;border:1px solid #ffcdd2;border-radius:3px;padding:4px 8px;margin-bottom:4px;}
+.grape-sel-txt{font-size:11px;color:var(--red);font-weight:500;}
+.grape-sel-del{background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;line-height:1;}
+.grape-sel-del:hover{color:var(--red);}
+.grape-price-box{border-top:1px solid #eee;padding:10px 13px;}
+.grape-price-row{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:5px;}
+.grape-price-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #eee;padding-top:8px;margin-top:4px;}
+.grape-price-amt{color:var(--red);}
+.grape-panel-foot{padding:10px 13px;border-top:1px solid #eee;}
+.btn-grape-next{width:100%;height:42px;background:var(--red);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-grape-next:hover{background:var(--red-dk);}
+.btn-grape-next:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   SCREEN 3: 결제
+══════════════════════ */
+.y-pay-wrap{max-width:680px;margin:0 auto;padding:22px 20px;}
+.y-pay-sec{margin-bottom:18px;}
+.y-pay-sec-title{font-size:14px;font-weight:700;border-left:3px solid var(--red);padding-left:10px;margin-bottom:11px;}
+.y-pay-card{background:#fff;border:1px solid #e0e0e0;border-radius:4px;padding:15px 17px;}
+.y-pay-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.y-pay-tbl td{padding:7px 0;border-bottom:1px solid #f5f5f5;}
+.y-pay-tbl tr:last-child td{border-bottom:none;}
+.y-pay-tbl td:first-child{width:88px;color:#888;font-weight:500;}
+.y-pay-hl{color:var(--red);font-weight:700;}
+.y-pm-list{display:flex;flex-direction:column;gap:5px;}
+.y-pm{display:flex;align-items:center;gap:10px;border:1.5px solid #e0e0e0;border-radius:4px;padding:9px 13px;cursor:pointer;transition:all 0.15s;}
+.y-pm:hover{border-color:var(--red);}
+.y-pm.on{border-color:var(--red);background:#fff5f5;}
+.y-pm input[type=radio]{accent-color:var(--red);}
+.y-pm-nm{font-size:13px;font-weight:700;}
+.y-pm-dc{font-size:11px;color:#aaa;}
+.y-price-sum{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:14px 16px;margin-bottom:14px;}
+.y-ps-row{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px;}
+.y-ps-tot{display:flex;justify-content:space-between;font-size:17px;font-weight:700;border-top:1px solid #ddd;padding-top:11px;margin-top:4px;}
+.y-ps-amt{color:var(--red);}
+.y-agree{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#555;margin-bottom:13px;}
+.y-agree input{accent-color:var(--red);margin-top:1px;flex-shrink:0;}
+.y-btn-pay{width:100%;height:50px;background:var(--red);color:#fff;font-size:17px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.y-btn-pay:hover{background:var(--red-dk);}
+.y-btn-pay:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   SCREEN 4: 완료
+══════════════════════ */
+.y-done-wrap{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:40px 20px;}
+.y-done-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:36px 28px;max-width:420px;width:100%;text-align:center;}
+.y-done-ico{font-size:44px;margin-bottom:14px;}
+.y-done-h{font-size:21px;font-weight:700;color:var(--green);margin-bottom:6px;}
+.y-done-sub{font-size:13px;color:#888;line-height:1.7;margin-bottom:22px;}
+.y-done-tkt{background:#f8f8f8;border:1px solid #eee;border-radius:6px;padding:14px;margin-bottom:16px;text-align:left;}
+.y-dt-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px dashed #eee;}
+.y-dt-row:last-child{border-bottom:none;}
+.y-dt-l{color:#aaa;}
+.y-dt-v{font-weight:700;}
+.y-stats{background:#fff0f0;border:1px solid #ffcdd2;border-radius:6px;padding:13px;margin-bottom:16px;text-align:left;}
+.y-stats-h{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.y-sr{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#c62828;}
+.y-sr .tv{font-weight:700;}
+.y-done-btns{display:flex;gap:8px;}
+.btn-y-retry{flex:1;height:42px;background:#fff;border:1px solid #ddd;color:#333;font-size:13px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-y-home{flex:1;height:42px;background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* 레전드 */
+.grape-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.gl{display:flex;align-items:center;gap:5px;font-size:11px;color:#666;}
+.gl-dot{width:14px;height:14px;border-radius:50%;}
+
+/* ══ 홈 목록 화면 (sc0) ══ */
+/* 유틸바 */
+.y-util-bar{background:#fff;border-bottom:1px solid #f0f0f0;height:32px;display:flex;align-items:center;padding:0 20px;font-size:11px;color:#aaa;gap:0;}
+.y-util-link{color:#888;padding:0 10px;border-left:1px solid #eee;cursor:pointer;font-size:11px;}
+.y-util-link:first-child{border-left:none;padding-left:0;}
+.y-util-link:hover{color:var(--red);}
+.y-util-right{margin-left:auto;display:flex;}
+
+/* 장르 서브탭 */
+.y-genre-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.y-genre-bar::-webkit-scrollbar{display:none;}
+.y-genre-item{padding:0 14px;height:42px;display:flex;align-items:center;font-size:13px;font-weight:500;color:#555;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-2px;transition:all 0.12s;}
+.y-genre-item:hover{color:var(--red);}
+.y-genre-item.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
+
+/* 홈 배너 */
+.y-banner{position:relative;background:#111;height:300px;overflow:hidden;cursor:pointer;}
+.y-banner-slide{height:100%;display:flex;align-items:flex-end;padding:30px 40px;color:#fff;position:relative;}
+.y-banner-slide::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.1) 65%);}
+.y-banner-content{position:relative;z-index:1;max-width:480px;}
+.y-banner-label{display:inline-block;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:2px;margin-bottom:10px;}
+.y-banner-title{font-size:24px;font-weight:700;line-height:1.3;margin-bottom:8px;letter-spacing:-0.02em;}
+.y-banner-sub{font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:16px;line-height:1.6;}
+.y-banner-btn{background:var(--red);border:none;color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.y-banner-dots{position:absolute;bottom:14px;right:16px;display:flex;gap:5px;}
+.y-bdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);cursor:pointer;}
+.y-bdot.on{background:#fff;width:16px;border-radius:3px;}
+.y-banner-arrows{position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;gap:5px;}
+.y-barrow{width:32px;height:32px;background:rgba(0,0,0,0.45);border:none;border-radius:50%;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* 홈 바디 */
+.y-home-body{max-width:1100px;margin:0 auto;padding:24px 20px;}
+.y-home-sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.y-home-sec-title{font-size:16px;font-weight:700;letter-spacing:-0.02em;display:flex;align-items:center;gap:7px;}
+.y-home-sec-title::before{content:'';width:3px;height:18px;background:var(--red);border-radius:2px;}
+.y-home-sec-more{font-size:12px;color:#aaa;cursor:pointer;}
+.y-home-sec-more:hover{color:#555;}
+
+/* 공연 카드 그리드 — 포스터형 */
+.y-card-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:36px;}
+.y-card{cursor:pointer;}
+.y-card:hover .y-card-poster{transform:scale(1.02);box-shadow:0 6px 20px rgba(0,0,0,0.13);}
+.y-card-poster{width:100%;aspect-ratio:3/4;border-radius:4px;overflow:hidden;position:relative;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;}
+.y-card-poster-icon{font-size:32px;line-height:1;margin-bottom:8px;}
+.y-card-poster-name{font-size:11px;font-weight:700;text-align:center;padding:0 8px;line-height:1.4;}
+.y-card-badges{position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:2px;}
+.y-cbadge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;color:#fff;}
+.y-cbadge.open{background:var(--red);}
+.y-cbadge.hot{background:#e65c00;}
+.y-cbadge.new{background:#1565c0;}
+.y-cbadge.soon{background:#555;}
+.y-card-wish{position:absolute;bottom:6px;right:6px;width:26px;height:26px;background:rgba(0,0,0,0.45);border-radius:50%;border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.y-card-info{padding:9px 2px 0;}
+.y-card-title{font-size:12px;font-weight:700;line-height:1.4;margin-bottom:3px;color:#1a1a1a;letter-spacing:-0.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.y-card-meta{font-size:11px;color:#888;margin-bottom:2px;}
+.y-card-price{font-size:11px;color:#aaa;}
+
+/* 랭킹 */
+.y-rank-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:36px;}
+.y-rank-num{position:absolute;top:6px;left:6px;width:22px;height:22px;background:rgba(0,0,0,0.65);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+
+/* 브레드크럼 */
+.y-breadcrumb{font-size:12px;color:#aaa;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.y-bc-link{color:#888;cursor:pointer;text-decoration:none;}
+.y-bc-link:hover{color:var(--red);}
+.y-bc-sep{color:#ccc;}
+.y-bc-current{color:#555;}
+
+/* 별점 */
+.y-star-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.y-stars{color:#fbbf24;font-size:14px;letter-spacing:1px;}
+.y-rating-num{font-size:13px;font-weight:700;color:#555;}
+.y-review-cnt{font-size:12px;color:#aaa;}
+
+/* F5 상태별 버튼 */
+.y-btn-reserve.disabled{background:#ccc;color:#888;cursor:not-allowed;animation:none;}
+.y-btn-reserve.waiting{background:#888;color:#fff;cursor:not-allowed;animation:none;}
+.y-f5-guide{
+  background:#f0f7ff;border:1px solid #bfdbfe;border-radius:4px;
+  padding:10px 14px;margin-bottom:10px;
+  font-size:12px;color:#1e40af;display:flex;align-items:center;gap:8px;line-height:1.6;
+}
+
+/* 반응형 */
+@media(max-width:900px){.y-card-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:640px){.y-card-grid{grid-template-columns:repeat(3,1fr);}.y-rank-grid{grid-template-columns:repeat(3,1fr);}.y-util-bar{display:none;}.y-home-body{padding:14px 12px;}.y-banner{height:220px;}}
+@media(max-width:420px){.y-card-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body class="view-pc">
+
+<!-- ══ 뷰 전환 토글바 ══ -->
+<div id="viewToggleBar" style="background:#111;border-bottom:1px solid #2a2a2a;padding:0 16px;height:40px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:9999;font-family:'Noto Sans KR',sans-serif;">
+  <span style="font-size:11px;font-weight:700;color:#6c5ce7;">🍇 포도알줍줍</span>
+  <span style="width:1px;height:16px;background:#2a2a2a;display:inline-block;flex-shrink:0;"></span>
+  <div style="display:flex;gap:2px;background:#222;border-radius:6px;padding:2px;flex-shrink:0;">
+    <button id="vtbPc" onclick="setView('pc')" class="vtb-active" style="padding:4px 12px;border-radius:5px;border:none;background:#fff;color:#1a1a1a;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">🖥 PC</button>
+    <button id="vtbMob" onclick="setView('mobile')" style="padding:4px 12px;border-radius:5px;border:none;background:none;color:#666;font-size:11px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📱 모바일</button>
+  </div>
+  <span id="vtbTip" style="margin-left:auto;font-size:10px;color:#555;white-space:nowrap;overflow:hidden;">TIP</span>
+</div>
+
+<!-- ══ 모바일 프레임 ══ -->
+<div id="mobileOuter" style="display:none;justify-content:center;align-items:flex-start;padding:24px 20px 40px;background:#0d0d0d;min-height:calc(100vh - 40px);">
+  <div style="width:390px;min-height:844px;background:#f5f5f5;border-radius:44px;overflow:hidden;position:relative;box-shadow:0 0 0 10px #1a1a1a,0 0 0 12px #2a2a2a,0 40px 80px rgba(0,0,0,0.85);flex-shrink:0;">
+    <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#1a1a1a;border-radius:0 0 20px 20px;z-index:1000;"></div>
+    <div style="height:44px;background:#fff;color:#1a1a1a;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 8px;font-size:12px;font-weight:700;position:relative;z-index:100;flex-shrink:0;">
+      <span id="mfTime">10:00</span><span>▐▐▐ ≋ 🔋</span>
+    </div>
+    <div style="background:#1a1a2e;padding:8px 14px;font-size:10px;color:rgba(255,255,255,0.7);line-height:1.65;display:flex;align-items:flex-start;gap:5px;border-bottom:2px solid #6c5ce7;">
+      <span>ℹ</span><span>예스24 앱·모바일웹: 레이아웃 동일. 한 기기 집중. 포도알이 더 크게 표시됨.</span>
+    </div>
+    <div id="mfScroll" style="height:calc(844px - 44px - 50px - 50px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative;"></div>
+    <div id="mfTabBar" style="height:50px;background:#fff;border-top:1px solid #e0e0e0;display:flex;align-items:center;color:#888;font-family:Noto Sans KR,sans-serif;flex-shrink:0;"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🏠</span><span style="font-size:9px;font-weight:500;">홈</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🎫</span><span style="font-size:9px;font-weight:500;">티켓</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🔍</span><span style="font-size:9px;font-weight:500;">검색</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">❤️</span><span style="font-size:9px;font-weight:500;">찜</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">👤</span><span style="font-size:9px;font-weight:500;">MY</span></div></div>
+
+  </div>
+</div>
+<!-- ══ PC 콘텐츠 ══ -->
+<div class="pc-wrap">
+<div class="practice-badge">🍇 포도알줍줍 연습</div>
+
+<!-- ══════ SCREEN 0: 홈 / 공연 목록 ══════ -->
+<div class="screen active" id="sc0">
+  <!-- 유틸바 -->
+  <div class="y-util-bar">
+    <span class="y-util-link" onclick="location.href='index.html'">← 포도알줍줍 홈</span>
+    <div class="y-util-right">
+      <span class="y-util-link">고객센터</span>
+      <span class="y-util-link">1:1문의</span>
+      <span class="y-util-link">예매내역</span>
+    </div>
+  </div>
+  <!-- 메인 헤더 -->
+  <header class="y-header">
+    <a href="index.html" class="y-logo">YES<span>24</span></a>
+    <ul class="y-gnb">
+      <li class="y-gnb-item on">콘서트</li>
+      <li class="y-gnb-item">뮤지컬</li>
+      <li class="y-gnb-item">클래식·오페라</li>
+      <li class="y-gnb-item">연극</li>
+      <li class="y-gnb-item">전시·행사</li>
+      <li class="y-gnb-item">스포츠</li>
+    </ul>
+    <div class="y-header-right">
+      <button class="y-btn-sm">로그인</button>
+      <button class="y-btn-sm">회원가입</button>
+    </div>
+  </header>
+  <div class="practice-bar">⚡ <strong>연습 모드:</strong> 예스24 티켓 화면을 재현했습니다. 실제 티켓은 발급되지 않습니다.</div>
+
+  <!-- 배너 슬라이더 -->
+  <div class="y-banner" id="y-banner">
+    <div class="y-banner-slide" id="yBannerSlide">
+      <div class="y-banner-content">
+        <div class="y-banner-label">예스24 단독</div>
+        <div class="y-banner-title" id="yBannerTitle">에스파 SOLO CONCERT<br>'SYNK: PARALLEL LINE'</div>
+        <div class="y-banner-sub" id="yBannerSub">2026.05.09(토)~05.10(일) · KSPO돔<br>예매 오픈 중 — 5분 홀딩 주의!</div>
+        <button class="y-banner-btn" onclick="goToDetail('aespa')">예매하기</button>
+      </div>
+    </div>
+    <div class="y-banner-arrows">
+      <button class="y-barrow" onclick="prevBanner()">‹</button>
+      <button class="y-barrow" onclick="nextBanner()">›</button>
+    </div>
+    <div class="y-banner-dots" id="yBannerDots"></div>
+  </div>
+
+  <div class="y-home-body">
+    <!-- 실시간 랭킹 -->
+    <div class="y-home-sec-head">
+      <div class="y-home-sec-title">실시간 예매 랭킹</div>
+      <div class="y-home-sec-more" onclick="/* 전체보기 */">전체보기 ›</div>
+    </div>
+    <div class="y-rank-grid" id="yRankGrid"></div>
+
+    <!-- 지금 예매 가능 -->
+    <div class="y-home-sec-head">
+      <div class="y-home-sec-title">지금 예매 가능</div>
+      <div class="y-home-sec-more">전체보기 ›</div>
+    </div>
+    <div class="y-card-grid" id="yCardGrid"></div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 1: 공연 상세 ══════ -->
+<div class="screen" id="sc1">
+  <div class="y-util-bar">
+    <span class="y-util-link" onclick="sc(0)">← 공연 목록</span>
+    <div class="y-util-right">
+      <span class="y-util-link">고객센터</span>
+      <span class="y-util-link">예매내역</span>
+    </div>
+  </div>
+  <header class="y-header">
+    <a href="index.html" class="y-logo">YES<span>24</span></a>
+    <ul class="y-gnb">
+      <li class="y-gnb-item on">콘서트</li>
+      <li class="y-gnb-item">뮤지컬</li>
+      <li class="y-gnb-item">클래식·오페라</li>
+      <li class="y-gnb-item">연극</li>
+      <li class="y-gnb-item">전시·행사</li>
+      <li class="y-gnb-item">스포츠</li>
+    </ul>
+    <div class="y-header-right">
+      <button class="y-btn-sm">로그인</button>
+      <button class="y-btn-sm">회원가입</button>
+    </div>
+  </header>
+  <div class="practice-bar">⚡ <strong>예스24 핵심</strong> — 오픈 시각에 <strong>F5(새로고침)</strong> 후 예매하기 버튼이 활성화됩니다. 팝업 차단 해제 필수.</div>
+
+  <div class="y-product-wrap">
+    <!-- 브레드크럼 -->
+    <div class="y-breadcrumb">
+      <a class="y-bc-link" onclick="sc(0)">홈</a>
+      <span class="y-bc-sep">›</span>
+      <a class="y-bc-link" onclick="sc(0)">콘서트</a>
+      <span class="y-bc-sep">›</span>
+      <span class="y-bc-current" id="bcTitle">공연명</span>
+    </div>
+
+    <div class="y-product-top">
+      <div class="y-poster" id="detailPoster">
+        <div class="y-poster-badge" id="detailBadge">OPEN</div>
+        <div class="y-poster-title" id="detailPosterTitle">공연명</div>
+        <div class="y-poster-sub" id="detailPosterSub"></div>
+      </div>
+      <div class="y-product-info">
+        <div class="y-genre-tag" id="detailGenre">콘서트</div>
+        <div class="y-product-title" id="detailTitle">공연명</div>
+        <!-- 별점 -->
+        <div class="y-star-row">
+          <span class="y-stars" id="detailStars">★★★★★</span>
+          <span class="y-rating-num" id="detailRating">9.8</span>
+          <span class="y-review-cnt" id="detailReviews">(리뷰 1,234개)</span>
+        </div>
+        <table class="y-info-table" id="detailTable">
+          <tr><td>기간</td><td id="dDate">—</td></tr>
+          <tr><td>장소</td><td id="dPlace">—</td></tr>
+          <tr><td>시간</td><td id="dTime">—</td></tr>
+          <tr><td>주최</td><td id="dHost">—</td></tr>
+          <tr><td>가격</td><td class="price-cell" id="dPrice">—</td></tr>
+          <tr><td>관람연령</td><td>전체 관람가 (7세 이상)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="y-booking-box">
+      <div class="y-booking-top">
+        <span class="y-booking-title">온라인 예매</span>
+        <div class="y-server-time">서버시간: <span id="serverTime">--:--:--</span></div>
+      </div>
+      <!-- F5 상태 안내 (오픈 전) -->
+      <div class="y-f5-guide" id="f5GuideOpen">
+        ⏱ <div>예매 오픈까지 <strong id="openCountdown">00:05</strong> — 오픈 시각에 <strong>F5(새로고침)</strong>를 누르면 예매하기 버튼이 활성화됩니다.</div>
+      </div>
+      <div class="y-refresh-notice" id="f5GuideReady" style="display:none;">
+        ✅ <div>예매 오픈! <strong>F5를 눌러주세요</strong> — 버튼이 활성화됩니다.</div>
+      </div>
+      <button class="y-btn-reserve waiting" id="btnReserve" disabled onclick="openCalendar()">
+        예매하기 (오픈 전)
+      </button>
+    </div>
+
+    <div class="y-tabs">
+      <div class="y-tab on">공연정보</div>
+      <div class="y-tab">좌석안내</div>
+      <div class="y-tab">예매안내</div>
+      <div class="y-tab">관람안내</div>
+    </div>
+    <div class="y-tab-content" id="detailTabContent">
+      <p><strong>■ 공연 소개</strong></p>
+      <p id="detailDesc">공연 소개가 표시됩니다.</p>
+      <br>
+      <p><strong>■ 유의사항</strong></p>
+      <p>• 1인당 최대 4매 구매 가능합니다.<br>
+      • 좌석 선택 후 <strong>5분 이내</strong> 결제를 완료하지 않으면 좌석 선택이 취소됩니다.<br>
+      • 한 기기·한 브라우저에서만 접속하세요. 다중 접속 시 오류가 발생할 수 있습니다.<br>
+      • 취소 환불: 관람일 7일 전까지 100%, 3일 전까지 90% 환불</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 1: 날짜/회차 팝업 ══════ -->
+<div class="screen" id="sc2">
+  <header class="y-header">
+    <a href="index.html" class="y-logo">YES<span>24</span></a>
+  </header>
+  <div style="filter:blur(2px);opacity:0.4;pointer-events:none;background:var(--bg);min-height:200px;padding:20px;">
+    <div style="background:#fff;height:100px;border-radius:4px;border:1px solid var(--border);"></div>
+  </div>
+  <div class="y-popup-overlay">
+    <div class="y-popup">
+      <div class="y-popup-head">
+        <span class="y-popup-title">날짜 및 회차 선택</span>
+        <button class="y-popup-close" onclick="sc(1)">×</button>
+      </div>
+      <div class="y-popup-body">
+        <div class="y-cal-nav">
+          <button class="y-cal-arrow" onclick="moveMonth(-1)">‹</button>
+          <span class="y-cal-month" id="calMonth">2026년 05월</span>
+          <button class="y-cal-arrow" onclick="moveMonth(1)">›</button>
+        </div>
+        <div class="y-cal-head">
+          <div class="y-cal-dn">일</div><div class="y-cal-dn">월</div><div class="y-cal-dn">화</div>
+          <div class="y-cal-dn">수</div><div class="y-cal-dn">목</div><div class="y-cal-dn">금</div>
+          <div class="y-cal-dn">토</div>
+        </div>
+        <div class="y-cal-dates" id="calDates"></div>
+        <div class="y-session-area" id="sessionArea" style="display:none;">
+          <div class="y-session-label">회차 선택</div>
+          <div class="y-session-list" id="sessionList"></div>
+        </div>
+      </div>
+      <div class="y-popup-foot">
+        <button class="y-btn-cancel" onclick="sc(1)">취소</button>
+        <button class="y-btn-next" id="btnNext" disabled onclick="goToGrape()">다음</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 2: 포도알 좌석 선택 ══════ -->
+<div class="screen" id="sc3">
+  <div class="holding-bar" id="holdingBar">
+    <span class="holding-label">⏱ 좌석 홀딩 시간</span>
+    <span class="holding-timer" id="holdingTimer">05:00</span>
+    <span style="font-size:11px;color:#aaa;">시간 초과 시 선택이 취소됩니다</span>
+  </div>
+  <div class="grape-header">
+    <div>
+      <div class="grape-header-title" id="grapeTitle">에스파 SOLO CONCERT — 좌석 선택</div>
+      <div class="grape-header-sub" id="grapeSubTitle">KSPO돔 | 2026.05.09(토) 18:00</div>
+    </div>
+    <div class="grape-header-right">
+      <span>우측 공연장 미니맵을 눌러 원하는 구역을 선택하세요</span>
+    </div>
+  </div>
+
+  <!-- 이결좌 알림 -->
+  <div class="conflict-popup hidden" id="conflictPopup">
+    <div class="conflict-popup-icon">⚠️</div>
+    <div class="conflict-popup-title">다른 고객이 결제 중인 좌석입니다</div>
+    <div class="conflict-popup-desc">
+      선택하신 좌석을 다른 고객이 먼저 결제 중입니다.<br>
+      다른 좌석을 선택해 주세요.
+    </div>
+    <button class="btn-conflict-ok" onclick="closeConflict()">확인</button>
+  </div>
+
+  <div class="grape-layout">
+    <div class="grape-main">
+      <!-- 범례 -->
+      <div class="grape-legend">
+        <div class="gl"><div class="gl-dot" style="background:#27ae60;"></div>예매 가능</div>
+        <div class="gl"><div class="gl-dot" style="background:#e0e0e0;"></div>매진</div>
+        <div class="gl"><div class="gl-dot" style="background:#ff9800;"></div>결제 중 (이결좌)</div>
+        <div class="gl"><div class="gl-dot" style="background:var(--red);"></div>내가 선택</div>
+      </div>
+
+      <!-- 구역 탭 -->
+      <div class="grape-zone-bar">
+        <div class="grape-zone-item on" onclick="setGrapeZone(this,'all')">전체보기</div>
+        <div class="grape-zone-item" onclick="setGrapeZone(this,'floor')">스탠딩 (Floor)</div>
+        <div class="grape-zone-item" onclick="setGrapeZone(this,'a')">A구역</div>
+        <div class="grape-zone-item" onclick="setGrapeZone(this,'b')">B구역</div>
+        <div class="grape-zone-item" onclick="setGrapeZone(this,'c')">C구역</div>
+      </div>
+
+      <!-- 포도알 섹션들 -->
+      <div id="grapeSections"></div>
+    </div>
+
+    <!-- 우측 패널 -->
+    <div class="grape-right">
+      <div class="grape-panel-head">선택 정보 (최대 4매)</div>
+      <div class="grape-panel-body">
+        <div class="grape-panel-lbl">선택한 좌석</div>
+        <div class="grape-sel-list" id="grapeSelList">
+          <div class="grape-sel-empty">포도알을 클릭해 선택하세요</div>
+        </div>
+        <div class="grape-panel-lbl">경기 정보</div>
+        <div style="font-size:11px;color:#555;line-height:1.8;" id="grapeGameInfo"></div>
+      </div>
+      <div class="grape-price-box">
+        <div class="grape-price-row"><span>티켓 금액</span><span id="gpTkt">0원</span></div>
+        <div class="grape-price-row"><span>예매 수수료</span><span id="gpFee">0원</span></div>
+        <div class="grape-price-total"><span>합계</span><span class="grape-price-amt" id="gpTot">0원</span></div>
+      </div>
+      <div class="grape-panel-foot">
+        <button class="btn-grape-next" id="btnGrapeNext" disabled onclick="goToPay()">선택 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 3: 결제 ══════ -->
+<div class="screen" id="sc4">
+  <header class="y-header"><a href="index.html" class="y-logo">YES<span>24</span></a><span style="font-size:13px;color:#888;margin-left:12px;">결제하기</span></header>
+  <div class="y-pay-wrap">
+    <div style="font-size:12px;color:#bbb;margin-bottom:14px;">STEP 3/3 — 결제</div>
+    <div class="y-pay-sec"><div class="y-pay-sec-title">주문 정보</div>
+      <div class="y-pay-card">
+        <table class="y-pay-tbl">
+          <tr><td>공연명</td><td id="pTitle">—</td></tr>
+          <tr><td>일시</td><td id="pDate">—</td></tr>
+          <tr><td>장소</td><td>KSPO돔 (올림픽체조경기장)</td></tr>
+          <tr><td>좌석</td><td class="y-pay-hl" id="pSeat">—</td></tr>
+          <tr><td>매수</td><td id="pCnt">—</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="y-pay-sec"><div class="y-pay-sec-title">결제 수단</div>
+      <div class="y-pay-card">
+        <div class="y-pm-list">
+          <label class="y-pm on" onclick="selPm(this)"><input type="radio" name="pm" checked><div><div class="y-pm-nm">신용·체크카드</div><div class="y-pm-dc">국내 전체 카드</div></div></label>
+          <label class="y-pm" onclick="selPm(this)"><input type="radio" name="pm"><div><div class="y-pm-nm">카카오페이</div><div class="y-pm-dc">카카오페이 결제</div></div></label>
+          <label class="y-pm" onclick="selPm(this)"><input type="radio" name="pm"><div><div class="y-pm-nm">네이버페이</div><div class="y-pm-dc">네이버페이 포인트</div></div></label>
+          <label class="y-pm" onclick="selPm(this)"><input type="radio" name="pm"><div><div class="y-pm-nm">YES포인트</div><div class="y-pm-dc">YES24 포인트 사용</div></div></label>
+        </div>
+      </div>
+    </div>
+    <div class="y-price-sum">
+      <div class="y-ps-row"><span>티켓 금액</span><span id="ppTkt">0원</span></div>
+      <div class="y-ps-row"><span>예매 수수료</span><span id="ppFee">0원</span></div>
+      <div class="y-ps-tot"><span>총 결제 금액</span><span class="y-ps-amt" id="ppTot">0원</span></div>
+    </div>
+    <div class="y-agree"><input type="checkbox" id="agreeChk" onchange="togglePay()"><label for="agreeChk">주문 내용을 확인하였으며 결제에 동의합니다. (필수)</label></div>
+    <button class="y-btn-pay" id="btnPay" disabled onclick="goToDone()">결제하기</button>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 4: 완료 ══════ -->
+<div class="screen" id="sc5">
+  <header class="y-header"><a href="index.html" class="y-logo">YES<span>24</span></a></header>
+  <div class="y-done-wrap">
+    <div class="y-done-card">
+      <div class="y-done-ico">✅</div>
+      <div class="y-done-h">연습 완료!</div>
+      <div class="y-done-sub">예스24 포도알 예매 전 과정을 완료했습니다!<br>이결좌를 경험하셨나요? 실전 감각을 익히셨길 바랍니다.</div>
+      <div class="y-done-tkt">
+        <div class="y-dt-row"><span class="y-dt-l">공연</span><span class="y-dt-v" id="doneGame">—</span></div>
+        <div class="y-dt-row"><span class="y-dt-l">일시</span><span class="y-dt-v" id="doneDate">—</span></div>
+        <div class="y-dt-row"><span class="y-dt-l">좌석</span><span class="y-dt-v" id="doneSeat">—</span></div>
+        <div class="y-dt-row"><span class="y-dt-l">결제금액</span><span class="y-dt-v" style="color:var(--red);" id="donePrice">—</span></div>
+      </div>
+      <div class="y-stats">
+        <div class="y-stats-h">⏱ 소요 시간 분석</div>
+        <div class="y-sr"><span>날짜 선택</span><span class="tv" id="stCal">—</span></div>
+        <div class="y-sr"><span>포도알 선택</span><span class="tv" id="stGrape">—</span></div>
+        <div class="y-sr"><span>이결좌 발생</span><span class="tv" id="stConflict">—</span></div>
+        <div class="y-sr"><span>결제 완료</span><span class="tv" id="stPay">—</span></div>
+        <div class="y-sr" style="border-top:1px solid #ffcdd2;padding-top:5px;margin-top:4px;font-weight:700;"><span>총 소요</span><span class="tv" id="stTot">—</span></div>
+      </div>
+      <div class="y-done-btns">
+        <button class="btn-y-retry" onclick="restartAll()">다시 연습</button>
+        <button class="btn-y-home" onclick="location.href='index.html'">홈으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 상태 ── */
+const S={date:null,session:null,seats:[],t:{}};
+const FEE=1000;
+const SESSIONS={
+  '05.09':[{time:'18:00',avail:'많음'}],
+  '05.10':[{time:'17:00',avail:'적음'}],
+};
+const PRICES={floor:143000,a:110000,b:99000,c:88000};
+
+const ZONES=[
+  {key:'floor',name:'스탠딩 Floor',badge:'VIP',badgeColor:'#7b1fa2',rows:['F1','F2','F3','F4'],cols:18,takenRate:0.55,holdRate:0.08},
+  {key:'a',name:'A구역 (1층)',badge:'A',badgeColor:'#1565c0',rows:['A1','A2','A3','A4','A5','A6'],cols:20,takenRate:0.45,holdRate:0.06},
+  {key:'b',name:'B구역 (2층)',badge:'B',badgeColor:'#2e7d32',rows:['B1','B2','B3','B4','B5'],cols:22,takenRate:0.40,holdRate:0.05},
+  {key:'c',name:'C구역 (3층)',badge:'C',badgeColor:'#e65c00',rows:['C1','C2','C3','C4'],cols:24,takenRate:0.30,holdRate:0.04},
+];
+
+/* 좌석 상태 맵 */
+let seatMap={};
+function initSeatMap(){
+  seatMap={};
+  ZONES.forEach(z=>z.rows.forEach(r=>{
+    for(let c=1;c<=z.cols;c++){
+      const id=`${z.key}-${r}-${c}`;
+      const rnd=Math.random();
+      seatMap[id]=rnd<z.takenRate?'taken':rnd<z.takenRate+z.holdRate?'holding':'avail';
+    }
+  }));
+}
+
+let holdingIv=null, holdSec=300;
+let conflictCount=0;
+const T=S.t;
+
+function sc(n){
+  document.querySelectorAll('.pc-wrap .screen').forEach(s=>s.classList.remove('active'));
+  const target=document.getElementById('sc'+n);
+  if(target) target.classList.add('active');
+  window.scrollTo(0,0);
+  const clone=document.getElementById('mfClone');
+  if(clone){
+    const pcScs=Array.from(document.querySelectorAll('.pc-wrap .screen'));
+    const idx=pcScs.findIndex(s=>s.id==='sc'+n);
+    clone.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const clScs=clone.querySelectorAll('.screen');
+    if(idx>=0&&clScs[idx]) clScs[idx].classList.add('active');
+    const mfs=document.getElementById('mfScroll');
+    if(mfs) mfs.scrollTo(0,0);
+  }
+}
+
+/* 서버 시간 카운터 */
+(function tick(){
+  const el=document.getElementById('serverTime');
+  if(el){const n=new Date();el.textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;}
+  setTimeout(tick,1000);
+})();
+
+/* ── SCREEN 1: 달력 ── */
+let calY=2026,calM=4; // 0-indexed May
+
+function openCalendar(){
+  T.start=Date.now();T.calStart=Date.now();
+  buildCal();sc(2);
+}
+
+function buildCal(){
+  const m=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('calMonth').textContent=`${calY}년 ${m[calM]}`;
+  const dates=document.getElementById('calDates');dates.innerHTML='';
+  const first=new Date(calY,calM,1).getDay();
+  const last=new Date(calY,calM+1,0).getDate();
+  const avail=calM===4?[9,10]:[];
+  for(let i=0;i<first;i++){const d=document.createElement('div');d.className='y-cal-d empty';dates.appendChild(d);}
+  for(let d=1;d<=last;d++){
+    const el=document.createElement('div');
+    const dow=(first+d-1)%7;
+    let cls='y-cal-d'+(dow===0?' sun':dow===6?' sat':'');
+    const key=`${String(calM+1).padStart(2,'0')}.${String(d).padStart(2,'0')}`;
+    if(avail.includes(d)) cls+=' avail';
+    else cls+=' disabled';
+    el.className=cls;el.textContent=d;
+    if(avail.includes(d)) el.onclick=()=>selectDate(key,el);
+    dates.appendChild(el);
+  }
+}
+function moveMonth(d){calM=Math.max(4,Math.min(11,calM+d));buildCal();}
+
+function selectDate(key,el){
+  document.querySelectorAll('.y-cal-d.selected').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  S.date=key;S.session=null;
+  document.getElementById('btnNext').disabled=true;
+  const ses=SESSIONS[key];
+  const area=document.getElementById('sessionArea');
+  const list=document.getElementById('sessionList');
+  list.innerHTML='';
+  ses.forEach(s=>{
+    const item=document.createElement('div');
+    item.className='y-session-item';
+    item.innerHTML=`<span class="y-session-time">${s.time}</span><span class="y-session-avail ${s.avail==='많음'?'avail-ok':'avail-few'}">잔여 ${s.avail}</span>`;
+    item.onclick=()=>{
+      document.querySelectorAll('.y-session-item').forEach(i=>i.classList.remove('sel'));
+      item.classList.add('sel');S.session=s;
+      document.getElementById('btnNext').disabled=false;
+    };
+    list.appendChild(item);
+  });
+  area.style.display='block';
+}
+
+/* ── SCREEN 2: 포도알 ── */
+function goToGrape(){
+  T.calEnd=Date.now();T.grapeStart=Date.now();
+  conflictCount=0;
+  initSeatMap();
+  S.seats=[];
+  document.getElementById('grapeTitle').textContent=`에스파 SOLO CONCERT — 좌석 선택`;
+  document.getElementById('grapeSubTitle').textContent=`KSPO돔 | 2026.${S.date}(${S.date==='05.09'?'토':'일'}) ${S.session.time}`;
+  document.getElementById('grapeGameInfo').innerHTML=`에스파 SOLO CONCERT<br>KSPO돔 | 2026.${S.date} ${S.session.time}`;
+  buildGrapeSections('all');
+  updateGrapePanel();
+  startHolding();
+  sc(3);
+}
+
+function setGrapeZone(el,key){
+  document.querySelectorAll('.grape-zone-item').forEach(z=>z.classList.remove('on'));
+  el.classList.add('on');
+  buildGrapeSections(key);
+}
+
+function buildGrapeSections(zoneKey){
+  const wrap=document.getElementById('grapeSections');
+  wrap.innerHTML='';
+  const filtered=zoneKey==='all'?ZONES:ZONES.filter(z=>z.key===zoneKey);
+  filtered.forEach(zone=>{
+    const sec=document.createElement('div');
+    sec.className='grape-section';
+    const badge=`<span class="grape-section-badge" style="background:${zone.badgeColor}20;color:${zone.badgeColor};">${PRICES[zone.key].toLocaleString()}원</span>`;
+    sec.innerHTML=`<div class="grape-section-title"><span>${zone.name}</span>${badge}</div>`;
+    const grid=document.createElement('div');
+    grid.className='grape-section-grid';
+    zone.rows.forEach(row=>{
+      for(let c=1;c<=zone.cols;c++){
+        const id=`${zone.key}-${row}-${c}`;
+        const state=seatMap[id];
+        const isMysel=S.seats.some(s=>s.id===id);
+        const g=document.createElement('div');
+        g.className=`grape ${isMysel?'my-select':state}`;
+        g.dataset.seat=`${row} ${c}번`;
+        g.title=`${row} ${c}번`;
+        if(state==='avail'&&!isMysel){
+          g.onclick=()=>clickGrape(id,zone.key,row,c,g);
+        }
+        grid.appendChild(g);
+      }
+    });
+    sec.appendChild(grid);
+    wrap.appendChild(sec);
+  });
+}
+
+function clickGrape(id,zoneKey,row,col,el){
+  /* 이결좌 시뮬레이션 (30% 확률) */
+  if(Math.random()<0.3 && S.seats.length===0 && conflictCount<2){
+    conflictCount++;
+    T.conflictTime=Date.now();
+    seatMap[id]='holding';
+    el.className='grape holding';
+    document.getElementById('conflictPopup').classList.remove('hidden');
+    setTimeout(()=>{
+      seatMap[id]='taken';
+      el.className='grape taken';
+    },2000);
+    return;
+  }
+  const idx=S.seats.findIndex(s=>s.id===id);
+  if(idx>=0){
+    S.seats.splice(idx,1);seatMap[id]='avail';el.className='grape avail';
+  } else {
+    if(S.seats.length>=4){alert('최대 4매까지 선택 가능합니다.');return;}
+    S.seats.push({id,zone:zoneKey,row,col,price:PRICES[zoneKey]});
+    seatMap[id]='mysel';el.className='grape my-select';
+  }
+  updateGrapePanel();
+}
+
+function closeConflict(){document.getElementById('conflictPopup').classList.add('hidden');}
+
+function updateGrapePanel(){
+  const list=document.getElementById('grapeSelList');
+  if(!S.seats.length){list.innerHTML='<div class="grape-sel-empty">포도알을 클릭해 선택하세요</div>';}
+  else{
+    list.innerHTML='';
+    S.seats.forEach((s,i)=>{
+      const item=document.createElement('div');item.className='grape-sel-item';
+      item.innerHTML=`<span class="grape-sel-txt">${s.row} ${s.col}번</span><button class="grape-sel-del" onclick="removeGrape(${i})">×</button>`;
+      list.appendChild(item);
+    });
+  }
+  const tkt=S.seats.reduce((a,s)=>a+s.price,0);
+  const fee=S.seats.length*FEE;
+  document.getElementById('gpTkt').textContent=tkt.toLocaleString()+'원';
+  document.getElementById('gpFee').textContent=fee.toLocaleString()+'원';
+  document.getElementById('gpTot').textContent=(tkt+fee).toLocaleString()+'원';
+  document.getElementById('btnGrapeNext').disabled=S.seats.length===0;
+}
+function removeGrape(i){
+  const s=S.seats[i];seatMap[s.id]='avail';S.seats.splice(i,1);
+  buildGrapeSections(document.querySelector('.grape-zone-item.on')?.dataset?.zone||'all');
+  updateGrapePanel();
+}
+
+/* 홀딩 타이머 */
+function startHolding(){
+  holdSec=300;
+  const bar=document.getElementById('holdingBar');
+  holdingIv=setInterval(()=>{
+    holdSec--;
+    const m=Math.floor(holdSec/60),s=holdSec%60;
+    document.getElementById('holdingTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(holdSec<=60)bar.classList.add('urgent');
+    if(holdSec<=0){clearInterval(holdingIv);alert('홀딩 시간이 초과되었습니다. 좌석 선택이 취소됩니다.');restartAll();}
+  },1000);
+}
+
+/* ── SCREEN 3: 결제 ── */
+function goToPay(){
+  T.grapeEnd=Date.now();T.payStart=Date.now();
+  clearInterval(holdingIv);
+  const tkt=S.seats.reduce((a,s)=>a+s.price,0);
+  const fee=S.seats.length*FEE;
+  const seatLabel=S.seats.map(s=>`${s.row} ${s.col}번`).join(', ');
+  document.getElementById('pTitle').textContent='에스파 SOLO CONCERT \'SYNK: PARALLEL LINE\'';
+  document.getElementById('pDate').textContent=`2026.${S.date}(${S.date==='05.09'?'토':'일'}) ${S.session.time}`;
+  document.getElementById('pSeat').textContent=seatLabel;
+  document.getElementById('pCnt').textContent=S.seats.length+'매';
+  document.getElementById('ppTkt').textContent=tkt.toLocaleString()+'원';
+  document.getElementById('ppFee').textContent=fee.toLocaleString()+'원';
+  document.getElementById('ppTot').textContent=(tkt+fee).toLocaleString()+'원';
+  sc(4);
+}
+function selPm(el){el.closest('.y-pm-list').querySelectorAll('.y-pm').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function togglePay(){document.getElementById('btnPay').disabled=!document.getElementById('agreeChk').checked;}
+
+/* ── SCREEN 4: 완료 ── */
+function goToDone(){
+  T.payEnd=Date.now();
+  const tkt=S.seats.reduce((a,s)=>a+s.price,0);
+  const fee=S.seats.length*FEE;
+  const seatLabel=S.seats.map(s=>`${s.row} ${s.col}번`).join(', ');
+  document.getElementById('doneGame').textContent=(S.currentShow&&SHOWS_Y24[S.currentShow])?SHOWS_Y24[S.currentShow].title.substring(0,20)+'...':'에스파 SOLO CONCERT';
+  document.getElementById('doneDate').textContent=`2026.${S.date} ${S.session?.time}`;
+  document.getElementById('doneSeat').textContent=seatLabel;
+  document.getElementById('donePrice').textContent=(tkt+fee).toLocaleString()+'원';
+  const fmt=ms=>{if(!ms||ms<0)return '—';const s=Math.floor(ms/1000);return s<60?`${s}초`:`${Math.floor(s/60)}분 ${s%60}초`;};
+  document.getElementById('stCal').textContent=fmt(T.calEnd-T.calStart);
+  document.getElementById('stGrape').textContent=fmt(T.grapeEnd-T.grapeStart);
+  document.getElementById('stConflict').textContent=conflictCount>0?`${conflictCount}회 발생`:'없음';
+  document.getElementById('stPay').textContent=fmt(T.payEnd-T.payStart);
+  document.getElementById('stTot').textContent=fmt(T.payEnd-T.start);
+  sc(5);
+}
+
+function restartAll(){
+  S.date=null;S.session=null;S.seats=[];S.t={};S.currentShow=null;
+  conflictCount=0;holdSec=300;
+  clearInterval(holdingIv);
+  clearInterval(f5Interval);
+  document.getElementById('holdingBar').classList.remove('urgent');
+  document.getElementById('agreeChk').checked=false;
+  document.getElementById('btnPay').disabled=true;
+  sc(0);
+}
+
+/* ══ 홈 화면 데이터 & 렌더링 ══ */
+const SHOWS_Y24 = {
+  aespa: {
+    title:"에스파 SOLO CONCERT 'SYNK: PARALLEL LINE'",
+    genre:'콘서트', icon:'🎤',
+    bg:'background:linear-gradient(150deg,#0d1b2e,#1a3a6e)',
+    date:'2026.05.09(토) ~ 05.10(일)', place:'KSPO돔 (올림픽체조경기장)',
+    time:'토 18:00 / 일 17:00', host:'SM엔터테인먼트',
+    price:'88,000원 ~ 143,000원', rating:'9.8', reviews:'2,341',
+    badges:['OPEN','단독'],
+    desc:'에스파(aespa) 단독 콘서트 \'SYNK: PARALLEL LINE\'. 서울 KSPO돔 2일간 진행.',
+    sessions:{'05.09':[{time:'18:00',avail:'많음'}],'05.10':[{time:'17:00',avail:'적음'}]},
+  },
+  bts: {
+    title:"BTS 2026 PERMISSION TO DANCE AGAIN",
+    genre:'콘서트', icon:'💜',
+    bg:'background:linear-gradient(150deg,#1a0030,#4a148c)',
+    date:'2026.09.19(토) ~ 09.21(월)', place:'서울월드컵경기장',
+    time:'19:00 / 18:00 / 17:00', host:'BIGHIT MUSIC',
+    price:'99,000원 ~ 143,000원', rating:'9.9', reviews:'5,892',
+    badges:['HOT','단독'],
+    desc:'BTS 2026 월드투어 서울 공연.',
+    sessions:{'09.19':[{time:'19:00',avail:'많음'}],'09.20':[{time:'18:00',avail:'많음'}],'09.21':[{time:'17:00',avail:'적음'}]},
+  },
+  iu: {
+    title:"IU CONCERT 'HEREH WORLD TOUR'",
+    genre:'콘서트', icon:'🎵',
+    bg:'background:linear-gradient(150deg,#3d0030,#880e4f)',
+    date:'2026.08.01(토) ~ 08.02(일)', place:'KSPO돔',
+    time:'토 19:00 / 일 18:00', host:'EDAM엔터테인먼트',
+    price:'88,000원 ~ 143,000원', rating:'9.7', reviews:'3,104',
+    badges:['OPEN'],
+    desc:'IU 단독 콘서트 HEREH WORLD TOUR 서울 공연.',
+    sessions:{'08.01':[{time:'19:00',avail:'많음'}],'08.02':[{time:'18:00',avail:'적음'}]},
+  },
+  musical1: {
+    title:"뮤지컬 〈레미제라블〉 2026 내한공연",
+    genre:'뮤지컬', icon:'🎭',
+    bg:'background:linear-gradient(150deg,#b71c1c,#e53935)',
+    date:'2026.05.01(금) ~ 07.31(금)', place:'블루스퀘어 신한카드홀',
+    time:'평일 19:30 / 주말 14:00, 18:00', host:'공연기획',
+    price:'60,000원 ~ 130,000원', rating:'9.5', reviews:'1,204',
+    badges:['예스24단독'],
+    desc:'세계 최장 공연 기록 뮤지컬 레미제라블 2026 내한공연.',
+    sessions:{'05.01':[{time:'19:30',avail:'많음'}],'05.02':[{time:'14:00',avail:'많음'}],'05.03':[{time:'14:00',avail:'적음'}]},
+  },
+  musical2: {
+    title:"뮤지컬 〈위키드〉 Korea Tour 2026",
+    genre:'뮤지컬', icon:'🧙',
+    bg:'background:linear-gradient(150deg,#1b5e20,#388e3c)',
+    date:'2026.04.11(토) ~ 06.28(일)', place:'샤롯데씨어터',
+    time:'화~금 19:30 / 토·일 14:00, 18:30', host:'샤롯데씨어터',
+    price:'55,000원 ~ 110,000원', rating:'9.4', reviews:'876',
+    badges:['OPEN'],
+    desc:'브로드웨이 뮤지컬 위키드 한국 투어 2026.',
+    sessions:{'04.11':[{time:'14:00',avail:'많음'}],'04.12':[{time:'14:00',avail:'적음'}]},
+  },
+  sports1: {
+    title:"2026 KBO 삼성 라이온즈 홈경기",
+    genre:'스포츠', icon:'⚾',
+    bg:'background:linear-gradient(150deg,#002060,#1a3a8f)',
+    date:'2026.05.01(금) ~ 09.30(수)', place:'대구 삼성라이온즈파크',
+    time:'평일 18:30 / 주말 14:00', host:'삼성 라이온즈',
+    price:'8,000원 ~ 50,000원', rating:'9.2', reviews:'4,567',
+    badges:['OPEN'],
+    desc:'2026 KBO 리그 삼성 라이온즈 홈경기.',
+    sessions:{'05.09':[{time:'18:30',avail:'많음'}],'05.10':[{time:'14:00',avail:'많음'}]},
+  },
+};
+
+const BANNERS_Y24 = [
+  { key:'aespa',  bg:'background:linear-gradient(135deg,#080d1a 0%,#0d1b2e 60%,#0a1020 100%)',
+    label:'예스24 단독', title:"에스파 SOLO CONCERT<br>'SYNK: PARALLEL LINE'",
+    sub:'2026.05.09(토)~05.10(일) · KSPO돔<br>F5 새로고침 후 예매 버튼 활성화!' },
+  { key:'bts',    bg:'background:linear-gradient(135deg,#0d0018 0%,#2a0060 60%,#0d0018 100%)',
+    label:'HOT', title:"BTS 2026<br>PERMISSION TO DANCE AGAIN",
+    sub:'2026.09.19(토)~09.21(월) · 서울월드컵경기장<br>예스24 단독 예매' },
+  { key:'musical1', bg:'background:linear-gradient(135deg,#1a0000 0%,#7f0000 60%,#1a0000 100%)',
+    label:'예스24 단독', title:"뮤지컬 〈레미제라블〉<br>2026 내한공연",
+    sub:'2026.05.01(금) ~ 07.31(금) · 블루스퀘어 신한카드홀' },
+];
+
+let bannerIdx=0, bannerTimer;
+const RANK_KEYS = ['bts','aespa','iu','musical1','sports1'];
+const GRID_KEYS = ['aespa','bts','iu','musical1','musical2','sports1'];
+
+/* 배너 */
+function renderBannerDots() {
+  const dotsEl = document.getElementById('yBannerDots');
+  if(!dotsEl) return;
+  dotsEl.innerHTML = '';
+  BANNERS_Y24.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'y-bdot' + (i===bannerIdx?' on':'');
+    d.onclick = () => setBanner(i);
+    dotsEl.appendChild(d);
+  });
+}
+function setBanner(i) {
+  bannerIdx = i;
+  const b = BANNERS_Y24[i];
+  const slide = document.getElementById('yBannerSlide');
+  if(!slide) return;
+  slide.style.cssText = b.bg + ';height:100%;display:flex;align-items:flex-end;padding:30px 40px;color:#fff;position:relative;';
+  document.getElementById('yBannerTitle').innerHTML = b.title;
+  document.getElementById('yBannerSub').innerHTML = b.sub;
+  document.querySelector('.y-banner-label').textContent = b.label;
+  renderBannerDots();
+}
+function nextBanner() { setBanner((bannerIdx+1) % BANNERS_Y24.length); }
+function prevBanner() { setBanner((bannerIdx-1+BANNERS_Y24.length) % BANNERS_Y24.length); }
+
+function initBanner() {
+  setBanner(0);
+  bannerTimer = setInterval(nextBanner, 4000);
+  document.getElementById('y-banner')?.addEventListener('mouseenter', () => clearInterval(bannerTimer));
+  document.getElementById('y-banner')?.addEventListener('mouseleave', () => { bannerTimer = setInterval(nextBanner, 4000); });
+}
+
+/* 공연 카드 */
+function makeBadge(label) {
+  const cls = label==='OPEN'?'open': label==='HOT'?'hot': label.includes('단독')?'open':'soon';
+  return `<span class="y-cbadge ${cls}">${label}</span>`;
+}
+function renderHomeCards() {
+  // 랭킹
+  const rg = document.getElementById('yRankGrid');
+  if(rg) {
+    rg.innerHTML = '';
+    RANK_KEYS.forEach((k,i) => {
+      const s = SHOWS_Y24[k];
+      const minP = s.price.split('원')[0].replace(/[^0-9]/g,'');
+      const card = document.createElement('div');
+      card.className = 'y-card';
+      card.onclick = () => goToDetail(k);
+      card.innerHTML = `
+        <div class="y-card-poster" style="${s.bg}">
+          <div class="y-card-poster-icon">${s.icon}</div>
+          <div class="y-card-poster-name">${s.title.substring(0,18)}</div>
+          <div class="y-card-badges"><span class="y-rank-num">${i+1}</span>${s.badges.map(makeBadge).join('')}</div>
+          <button class="y-card-wish" onclick="event.stopPropagation()">♡</button>
+        </div>
+        <div class="y-card-info">
+          <div class="y-card-title">${s.title}</div>
+          <div class="y-card-meta">${s.date.split('~')[0].trim()}</div>
+          <div class="y-card-price">${s.price.split('~')[0].trim()}~</div>
+        </div>`;
+      rg.appendChild(card);
+    });
+  }
+  // 그리드
+  const gg = document.getElementById('yCardGrid');
+  if(gg) {
+    gg.innerHTML = '';
+    GRID_KEYS.forEach(k => {
+      const s = SHOWS_Y24[k];
+      const card = document.createElement('div');
+      card.className = 'y-card';
+      card.onclick = () => goToDetail(k);
+      card.innerHTML = `
+        <div class="y-card-poster" style="${s.bg}">
+          <div class="y-card-poster-icon">${s.icon}</div>
+          <div class="y-card-poster-name">${s.title.substring(0,20)}</div>
+          <div class="y-card-badges">${s.badges.map(makeBadge).join('')}</div>
+          <button class="y-card-wish" onclick="event.stopPropagation()">♡</button>
+        </div>
+        <div class="y-card-info">
+          <div class="y-card-title">${s.title}</div>
+          <div class="y-card-meta">${s.place}</div>
+          <div class="y-card-price">${s.price.split('~')[0].trim()}~</div>
+        </div>`;
+      gg.appendChild(card);
+    });
+  }
+}
+
+/* 공연 상세 진입 */
+let f5Interval = null;
+function goToDetail(key) {
+  const show = SHOWS_Y24[key];
+  if(!show) return;
+  S.currentShow = key;
+  S.t.start = Date.now();
+
+  // 포스터
+  const poster = document.getElementById('detailPoster');
+  if(poster) poster.style.cssText = show.bg + ';width:180px;flex-shrink:0;border-radius:4px;overflow:hidden;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px 14px;position:relative;';
+  const ptitle = document.getElementById('detailPosterTitle');
+  if(ptitle) ptitle.textContent = show.title.substring(0,30);
+  const psub = document.getElementById('detailPosterSub');
+  if(psub) psub.textContent = show.genre;
+  const badge = document.getElementById('detailBadge');
+  if(badge) badge.textContent = show.badges[0] || 'OPEN';
+
+  // 브레드크럼
+  const bc = document.getElementById('bcTitle');
+  if(bc) bc.textContent = show.title.substring(0,20)+'...';
+
+  // 텍스트 정보
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('detailTitle', show.title);
+  setEl('detailGenre', show.genre);
+  setEl('detailStars', '★'.repeat(Math.round(parseFloat(show.rating))));
+  setEl('detailRating', show.rating);
+  setEl('detailReviews', `(리뷰 ${show.reviews}개)`);
+  setEl('dDate', show.date);
+  setEl('dPlace', show.place);
+  setEl('dTime', show.time);
+  setEl('dHost', show.host);
+  setEl('dPrice', show.price);
+  setEl('detailDesc', show.desc);
+
+  // SESSIONS 업데이트 (달력에서 사용)
+  Object.assign(SESSIONS, show.sessions);
+  calM = parseInt(Object.keys(show.sessions)[0].split('.')[0]) - 1;
+
+  // F5 흐름 시작
+  startF5Flow();
+  sc(1);
+}
+
+/* F5 새로고침 흐름 — 실제 예스24 핵심 */
+let f5Sec = 5;
+function startF5Flow() {
+  clearInterval(f5Interval);
+  f5Sec = 5;
+  const btn = document.getElementById('btnReserve');
+  const guideOpen = document.getElementById('f5GuideOpen');
+  const guideReady = document.getElementById('f5GuideReady');
+  if(btn) { btn.className='y-btn-reserve waiting'; btn.disabled=true; btn.textContent='예매하기 (오픈 전)'; }
+  if(guideOpen) guideOpen.style.display='flex';
+  if(guideReady) guideReady.style.display='none';
+
+  f5Interval = setInterval(() => {
+    f5Sec--;
+    const cd = document.getElementById('openCountdown');
+    if(cd) cd.textContent = `00:0${Math.max(0,f5Sec)}`;
+
+    if(f5Sec <= 0) {
+      clearInterval(f5Interval);
+      // 오픈! F5 유도 상태로 전환
+      if(guideOpen) guideOpen.style.display='none';
+      if(guideReady) guideReady.style.display='flex';
+      if(btn) {
+        btn.className='y-btn-reserve open-now';
+        btn.disabled=false;
+        btn.textContent='예매하기 (F5 새로고침 후 활성화됨!)';
+        btn.onclick = openCalendar;
+      }
+    }
+  }, 1000);
+}
+
+/* 초기 렌더링 */
+initBanner();
+renderHomeCards();
+const MOB_CSS_Y24 = `
+  /* 팝업/오버레이: 모바일 프레임 안에 표시 */
+  #mfClone .y-popup-overlay,
+  #mfClone .m-popup-overlay,
+  #mfClone .n-pop-overlay,
+  #mfClone .zone-popup-overlay,
+  #mfClone .device-modal,
+  #mfClone .conflict-popup{
+    position:absolute!important;
+    top:0!important;left:0!important;right:0!important;bottom:0!important;
+    height:auto!important;
+  }
+  #mfClone .conflict-popup{
+    top:50%!important;left:50%!important;
+    transform:translate(-50%,-50%)!important;
+    right:auto!important;bottom:auto!important;
+    width:88%!important;
+  }
+  #mfClone .practice-badge{display:none!important;}
+  #mfClone .holding-bar{position:sticky!important;top:0!important;}
+  #mfClone .tbar{position:sticky!important;top:0!important;}
+  #mfClone .n-timer-bar{position:sticky!important;top:48px!important;}
+  /* 클론 내 화면 전환 */
+  #mfClone .screen{display:none;}
+  #mfClone .screen.active{display:block;}
+
+  #mfClone .y-header{height:48px!important;padding:0 12px!important;}
+  #mfClone .y-logo{font-size:18px!important;}
+  #mfClone .y-gnb{display:none!important;}
+  #mfClone .y-header-right{display:none!important;}
+  #mfClone .practice-bar{font-size:10px!important;padding:5px 10px!important;}
+  /* 공연 상세 */
+  #mfClone .y-product-wrap{padding:12px 12px!important;}
+  #mfClone .y-product-top{flex-direction:column!important;gap:12px!important;}
+  #mfClone .y-poster{width:100%!important;min-height:140px!important;border-radius:8px!important;}
+  #mfClone .y-product-title{font-size:17px!important;}
+  #mfClone .y-booking-box{padding:14px 12px!important;}
+  #mfClone .y-server-time{font-size:11px!important;}
+  #mfClone .y-btn-reserve{height:46px!important;font-size:15px!important;}
+  /* 달력 팝업 */
+  #mfClone .y-popup-overlay{position:fixed!important;}
+  #mfClone .y-popup{width:95vw!important;max-width:360px!important;}
+  /* 포도알 좌석 - 모바일: 더 크게, 좌우 분할 없음 */
+  #mfClone .grape-layout{flex-direction:column!important;height:auto!important;}
+  #mfClone .grape-main{padding:12px 10px!important;}
+  #mfClone .grape-right{width:100%!important;border-left:none!important;border-top:1px solid #ddd!important;}
+  /* 포도알 크기 모바일 더 크게 */
+  #mfClone .grape{width:28px!important;height:28px!important;}
+  #mfClone .grape-section-grid{gap:6px!important;padding:10px!important;}
+  #mfClone .grape-section-title{font-size:13px!important;}
+  #mfClone .holding-bar{position:sticky!important;top:48px!important;z-index:100!important;font-size:11px!important;}
+  #mfClone .holding-timer{font-size:16px!important;}
+  /* 결제 */
+  #mfClone .y-pay-wrap{padding:12px 10px!important;max-width:100%!important;}
+  /* 완료 */
+    /* mfClone 스크린 height auto (모바일 스크롤 핵심) */
+  #mfClone .screen.active{height:auto!important;min-height:auto!important;}
+  #mfClone .seat-sc,#mfClone .grape-layout,#mfClone .m-seat-body,#mfClone .n-seat-screen{overflow:visible!important;}
+#mfClone .y-done-wrap{padding:20px 10px!important;}
+  #mfClone .y-done-card{padding:22px 14px!important;}
+  /* 하단 고정 버튼 */
+  #mfClone .grape-panel-foot{
+    position:sticky!important;bottom:0!important;
+    background:#fff!important;z-index:50!important;
+    border-top:1px solid #ddd!important;
+    padding:10px!important;
+  }
+  /* 달력/팝업 내 모바일 */
+  #mfClone .y-popup-foot{padding:10px 14px!important;}
+  #mfClone .y-session-item{padding:8px 12px!important;}
+  /* 홈 화면 모바일 */
+  #mfClone .y-util-bar{display:none!important;}
+  #mfClone .y-banner{height:180px!important;}
+  #mfClone .y-banner-slide{padding:20px 16px!important;}
+  #mfClone .y-banner-title{font-size:16px!important;}
+  #mfClone .y-banner-sub{font-size:10px!important;margin-bottom:10px!important;}
+  #mfClone .y-banner-btn{font-size:11px!important;padding:7px 12px!important;}
+  #mfClone .y-home-body{padding:12px 10px!important;}
+  #mfClone .y-card-grid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;}
+  #mfClone .y-rank-grid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;}
+  #mfClone .y-card-poster-icon{font-size:22px!important;}
+  #mfClone .y-card-poster-name{font-size:10px!important;}
+  #mfClone .y-card-title{font-size:10px!important;}
+  #mfClone .y-card-meta, #mfClone .y-card-price{font-size:9px!important;}
+  #mfClone .y-home-sec-title{font-size:13px!important;}
+  #mfClone .y-breadcrumb{font-size:11px!important;margin-bottom:8px!important;}
+  /* 공연 헤더 모바일 */
+  #mfClone .y-header{height:48px!important;padding:0 12px!important;}
+  #mfClone .y-logo{font-size:18px!important;}
+  #mfClone .y-gnb{display:none!important;}
+  #mfClone .y-header-right{display:none!important;}
+  #mfClone .practice-bar{font-size:10px!important;padding:5px 10px!important;}
+  /* 공연 상세 */
+  #mfClone .y-product-wrap{padding:12px 12px!important;}
+  #mfClone .y-product-top{flex-direction:column!important;gap:12px!important;}
+  #mfClone .y-poster{width:100%!important;min-height:140px!important;border-radius:8px!important;}
+  #mfClone .y-product-title{font-size:17px!important;}
+  #mfClone .y-booking-box{padding:14px 12px!important;}
+  #mfClone .y-server-time{font-size:11px!important;}
+  #mfClone .y-btn-reserve{height:46px!important;font-size:15px!important;}
+  /* 달력 팝업 */
+  #mfClone .y-popup-overlay{position:absolute!important;top:0!important;left:0!important;right:0!important;bottom:0!important;}
+  #mfClone .y-popup{width:95%!important;max-width:360px!important;}
+  /* 포도알 */
+  #mfClone .grape-layout{flex-direction:column!important;height:auto!important;overflow:visible!important;}
+  #mfClone .grape-main{padding:12px 10px!important;}
+  #mfClone .grape-right{width:100%!important;border-left:none!important;border-top:1px solid #ddd!important;}
+  #mfClone .grape{width:28px!important;height:28px!important;}
+  #mfClone .grape-section-grid{gap:6px!important;padding:10px!important;}
+  #mfClone .holding-bar{position:sticky!important;top:48px!important;z-index:100!important;font-size:11px!important;}
+  #mfClone .holding-timer{font-size:16px!important;}
+  /* 결제·완료 */
+  #mfClone .y-pay-wrap{padding:12px 10px!important;max-width:100%!important;}
+  #mfClone .screen.active{height:auto!important;min-height:auto!important;}
+  #mfClone .grape-layout{overflow:visible!important;}
+  #mfClone .y-done-wrap{padding:20px 10px!important;}
+  #mfClone .y-done-card{padding:22px 14px!important;}
+  #mfClone .grape-panel-foot{position:sticky!important;bottom:0!important;background:#fff!important;z-index:50!important;border-top:1px solid #ddd!important;padding:10px!important;}
+  #mfClone .y-popup-foot{padding:10px 14px!important;}
+  #mfClone .y-session-item{padding:8px 12px!important;}
+  #mfClone .conflict-popup{position:absolute!important;width:88%!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;}
+  #mfClone .practice-badge{display:none!important;}
+`;
+const VTB_TIP_PC_Y = '💻 PC: F5 새로고침 후 예매버튼 활성화 · 한 기기 집중';
+const VTB_TIP_MOB_Y = '📱 앱=모바일웹 동일 레이아웃 · 당겨서 새로고침 가능';
+function setView(mode){
+  const isM = mode === 'mobile';
+  document.body.className = isM ? 'view-mobile' : 'view-pc';
+  const pc = document.getElementById('vtbPc');
+  const mob = document.getElementById('vtbMob');
+  const active = 'padding:4px 12px;border-radius:5px;border:none;background:#fff;color:#1a1a1a;font-size:11px;font-weight:700;cursor:pointer;font-family:Noto Sans KR,sans-serif;';
+  const inactive = 'padding:4px 12px;border-radius:5px;border:none;background:none;color:#666;font-size:11px;font-weight:500;cursor:pointer;font-family:Noto Sans KR,sans-serif;';
+  pc.style.cssText = isM ? inactive : active;
+  mob.style.cssText = isM ? active : inactive;
+  document.getElementById('vtbTip').textContent = isM ? VTB_TIP_MOB_Y : VTB_TIP_PC_Y;
+  const mo = document.getElementById('mobileOuter');
+  const pw = document.querySelector('.pc-wrap');
+  if(isM){
+    mo.style.display = 'flex'; pw.style.display = 'none';
+    const sc = document.getElementById('mfScroll');
+    if(!sc.hasChildNodes()){
+      // CSS 주입
+      if(!document.getElementById('mob-css-y24')){
+        const st=document.createElement('style');
+        st.id='mob-css-y24';st.textContent=MOB_CSS_Y24;
+        document.head.appendChild(st);
+      }
+      // 모바일 고유 안내 배너
+      const tip=document.createElement('div');
+      tip.style.cssText='background:#1a1a2e;padding:8px 12px;font-size:10px;color:rgba(255,255,255,0.75);line-height:1.65;border-bottom:2px solid #e22228;display:flex;gap:6px;';
+      tip.innerHTML='<span>📱</span><span><b style="color:#fca5a5;">예스24 모바일:</b> 앱·모바일웹 레이아웃 동일. 포도알이 PC보다 크게 표시됨. 한 기기 집중 원칙 동일.</span>';
+      sc.appendChild(tip);
+      // PC 콘텐츠 클론
+      const clone=pw.cloneNode(true);
+      clone.classList.remove('pc-wrap');clone.id='mfClone';
+      // 클론 내 ID 제거 (PC와 중복 방지), onclick은 글로벌 함수라 유지됨
+      clone.querySelectorAll('[id]').forEach(el=>{ el.removeAttribute('id'); });
+      sc.appendChild(clone);
+      // 클론 초기화: 첫 번째 active 화면 동기화
+      const initActive = document.querySelector('.pc-wrap .screen.active');
+      if(initActive){
+        const pcScs = Array.from(document.querySelectorAll('.pc-wrap .screen'));
+        const initIdx = pcScs.indexOf(initActive);
+        const clScs = clone.querySelectorAll('.screen');
+        clScs.forEach(s=>s.classList.remove('active'));
+        if(initIdx>=0 && clScs[initIdx]) clScs[initIdx].classList.add('active');
+      }
+    }
+  } else {
+    mo.style.display = 'none'; pw.style.display = 'block';
+  }
+  const n = new Date();
+  const el = document.getElementById('mfTime');
+  if(el) el.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  try{ localStorage.setItem('podoal_view', mode); }catch(e){}
+}
+setInterval(()=>{ const n=new Date(); const el=document.getElementById('mfTime'); if(el) el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }, 30000);
+try{ const s = localStorage.getItem('podoal_view'); if(s) setView(s); else setView('pc'); }catch(e){ setView('pc'); }
+</script>
+</div><!-- /pc-wrap -->
+</body>
+</html>

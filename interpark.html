@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOL 티켓 연습 — 포도알줍줍</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --nol:#ff6100;--nol-dk:#e05500;--nol-lt:#fff8f4;
+  --blue:#1565c0;--border:#e0e0e0;--bg:#f5f5f5;--text:#1a1a1a;
+}
+html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;}
+.screen{display:none;}.screen.active{display:block;}
+
+/* ── 공통 헤더 ── */
+.n-header{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:60px;display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.n-logo{display:flex;align-items:center;gap:4px;text-decoration:none;}
+.n-logo-nol{font-size:22px;font-weight:900;color:var(--nol);letter-spacing:-0.03em;}
+.n-logo-ticket{font-size:14px;font-weight:500;color:#888;margin-left:3px;}
+.n-gnb{display:flex;list-style:none;}
+.n-gnb-item{padding:0 13px;height:60px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#888;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.n-gnb-item:hover{color:var(--text);}
+.n-gnb-item.on{color:var(--text);border-bottom-color:var(--nol);font-weight:700;}
+.n-header-right{margin-left:auto;display:flex;gap:8px;}
+.n-btn-sm{background:none;border:1px solid #ccc;color:#555;font-size:12px;padding:4px 12px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.n-btn-sm.orange{background:var(--nol);border-color:var(--nol);color:#fff;font-weight:600;}
+
+/* 카테고리 바 */
+.n-cat-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;overflow-x:auto;}
+.n-cat-item{padding:0 14px;height:42px;display:flex;align-items:center;font-size:13px;font-weight:500;color:#888;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-1px;}
+.n-cat-item:hover{color:var(--nol);}
+.n-cat-item.on{color:var(--nol);border-bottom-color:var(--nol);font-weight:700;}
+
+.practice-bar{background:#fff8e1;border-bottom:2px solid #fbbf24;padding:7px 20px;font-size:11px;color:#78350f;display:flex;align-items:center;gap:6px;}
+.practice-badge{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,0.72);color:#fff;font-size:11px;font-weight:600;padding:7px 13px;border-radius:100px;z-index:9999;backdrop-filter:blur(8px);}
+
+/* 단일기기 경고 모달 */
+.device-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:800;}
+.device-modal.hidden{display:none;}
+.device-modal-box{background:#fff;border-radius:6px;width:340px;padding:28px 26px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.22);}
+.device-modal-icon{font-size:40px;margin-bottom:12px;}
+.device-modal-title{font-size:16px;font-weight:700;color:var(--nol);margin-bottom:8px;}
+.device-modal-desc{font-size:13px;color:#555;line-height:1.7;margin-bottom:18px;}
+.device-modal-btn{background:var(--nol);border:none;color:#fff;font-size:13px;font-weight:700;padding:10px 32px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* ══════════════════════
+   SCREEN 0: 공연 목록 (뮤지컬/콘서트)
+══════════════════════ */
+.n-main-body{max-width:1000px;margin:0 auto;padding:24px 20px;}
+.n-section-head{font-size:16px;font-weight:700;letter-spacing:-0.02em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.n-section-head::before{content:'';width:4px;height:20px;background:var(--nol);border-radius:2px;}
+.n-show-list{display:flex;flex-direction:column;gap:0;background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:28px;}
+
+/* 공연 행 (인터파크 스타일) */
+.n-show-row{display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.1s;}
+.n-show-row:hover{background:#fafafa;}
+.n-show-row:last-child{border-bottom:none;}
+.n-show-thumb{width:68px;height:90px;border-radius:4px;flex-shrink:0;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;}
+.n-show-info{flex:1;}
+.n-show-genre-tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:2px;margin-bottom:5px;color:#fff;}
+.n-show-title{font-size:14px;font-weight:700;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.4;}
+.n-show-date-place{font-size:12px;color:#888;line-height:1.7;}
+.n-show-right{flex-shrink:0;text-align:right;}
+.n-show-price{font-size:12px;color:#555;margin-bottom:6px;}
+.n-show-price strong{color:var(--nol);font-weight:700;}
+.n-show-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;}
+.n-badge-open{background:var(--nol-lt);color:var(--nol);border:1px solid #ffcba4;}
+.n-badge-exclusive{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;}
+.n-badge-soon{background:#f3f4f6;color:#888;border:1px solid #e0e0e0;}
+
+/* ══════════════════════
+   SCREEN 1: 공연 상세
+══════════════════════ */
+.n-detail-body{max-width:960px;margin:0 auto;padding:24px 20px;}
+.n-detail-top{display:flex;gap:24px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:20px;}
+.n-detail-poster{width:160px;flex-shrink:0;border-radius:4px;overflow:hidden;min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:16px 12px;}
+.n-detail-poster .ep-icon{font-size:52px;margin-bottom:8px;}
+.n-detail-poster .ep-title{font-size:14px;font-weight:700;line-height:1.4;}
+.n-detail-title{font-size:20px;font-weight:900;letter-spacing:-0.02em;margin-bottom:12px;line-height:1.3;}
+.n-detail-table{font-size:12px;border-collapse:collapse;width:100%;}
+.n-detail-table td{padding:5px 0;border-bottom:1px solid #f5f5f5;}
+.n-detail-table td:first-child{width:70px;color:#888;font-weight:500;}
+.n-detail-price{color:var(--nol);font-weight:700;font-size:14px;}
+
+/* 예매하기 영역 */
+.n-book-area{background:#fff;border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:20px;}
+.n-book-title{font-size:14px;font-weight:700;margin-bottom:12px;}
+/* 단일기기 경고 박스 */
+.n-single-device-notice{
+  background:#fff3e0;border:1px solid #ffe0b2;border-radius:4px;
+  padding:10px 14px;margin-bottom:12px;
+  font-size:12px;color:#e65c00;display:flex;align-items:flex-start;gap:7px;line-height:1.65;
+}
+/* 타이머 카운트다운 버튼 (인터파크 핵심) */
+.n-timer-btn-wrap{position:relative;margin-bottom:10px;}
+.n-timer-track{height:4px;background:#e0e0e0;border-radius:2px;overflow:hidden;margin-bottom:8px;}
+.n-timer-fill{height:100%;background:var(--nol);border-radius:2px;transition:width 0.3s ease;}
+.n-btn-timer{
+  width:100%;height:52px;border-radius:4px;border:none;cursor:pointer;
+  font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all 0.2s;position:relative;overflow:hidden;
+}
+.n-btn-timer.counting{background:#e0e0e0;color:#888;cursor:not-allowed;}
+.n-btn-timer.open-now{background:var(--nol);color:#fff;animation:nolPulse 1.2s ease-in-out infinite;}
+@keyframes nolPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,97,0,0.4);}50%{box-shadow:0 0 0 10px rgba(255,97,0,0);}}
+.n-btn-timer .countdown-num{
+  font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;
+  color:var(--nol);background:#fff;border-radius:4px;padding:2px 10px;
+  min-width:60px;text-align:center;
+}
+.n-btn-timer.open-now .countdown-num{display:none;}
+.n-book-notice{font-size:12px;color:#888;line-height:1.7;margin-top:10px;}
+.n-book-notice strong{color:#333;}
+
+/* ══════════════════════
+   SCREEN 2: 회차 선택 팝업
+══════════════════════ */
+.n-pop-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:500;}
+.n-popup{background:#fff;width:500px;max-width:95vw;border-radius:5px;overflow:hidden;box-shadow:0 10px 36px rgba(0,0,0,0.22);}
+.n-pop-head{background:var(--nol);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.n-pop-title{font-size:15px;font-weight:700;}
+.n-pop-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;opacity:0.7;}
+.n-pop-close:hover{opacity:1;}
+.n-pop-body{padding:20px;}
+.n-pop-step-label{font-size:12px;font-weight:700;color:var(--nol);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.n-pop-step-label::before{content:'';width:3px;height:14px;background:var(--nol);border-radius:2px;}
+.n-date-list{display:flex;flex-direction:column;gap:5px;}
+.n-date-item{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--border);border-radius:4px;padding:11px 14px;cursor:pointer;transition:all 0.15s;}
+.n-date-item:hover{border-color:var(--nol);background:var(--nol-lt);}
+.n-date-item.sel{border-color:var(--nol);background:var(--nol-lt);}
+.n-date-main{font-size:14px;font-weight:700;}
+.n-date-sub{font-size:12px;color:#888;margin-top:2px;}
+.n-date-avail{font-size:11px;font-weight:600;}
+.n-session-section{margin-top:16px;}
+.n-session-list{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.n-session-item{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:4px;padding:9px 13px;cursor:pointer;transition:all 0.12s;}
+.n-session-item:hover{border-color:var(--nol);}
+.n-session-item.sel{border-color:var(--nol);background:var(--nol-lt);}
+.n-session-time{font-size:13px;font-weight:700;}
+.n-session-avail{font-size:11px;font-weight:600;}
+.avail-ok{color:var(--nol);}
+.avail-few{color:#888;}
+.n-pop-foot{padding:13px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.n-btn-cancel{background:#fff;border:1px solid var(--border);color:#555;font-size:13px;padding:9px 20px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.n-btn-pop-next{background:var(--nol);border:none;color:#fff;font-size:13px;font-weight:700;padding:9px 26px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.n-btn-pop-next:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   SCREEN 3: 대기열
+══════════════════════ */
+.n-queue-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:36px 20px;}
+.n-queue-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:34px 28px;max-width:460px;width:100%;text-align:center;}
+.n-queue-icon{width:72px;height:72px;background:var(--nol-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;animation:nolSpin 2s linear infinite;}
+@keyframes nolSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.n-queue-title{font-size:19px;font-weight:700;margin-bottom:6px;}
+.n-queue-sub{font-size:13px;color:#888;line-height:1.7;margin-bottom:22px;}
+.n-queue-num-box{background:var(--nol-lt);border:1px solid #ffcba4;border-radius:8px;padding:20px;margin-bottom:12px;}
+.n-queue-num-label{font-size:11px;color:#c06400;font-weight:600;margin-bottom:3px;}
+.n-queue-num{font-size:52px;font-weight:900;color:var(--nol);letter-spacing:-0.04em;line-height:1;font-variant-numeric:tabular-nums;}
+.n-queue-unit{font-size:14px;color:#c06400;margin-top:2px;}
+.n-queue-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.n-queue-stat{background:#f5f5f5;border-radius:6px;padding:10px 12px;}
+.n-queue-stat-l{font-size:11px;color:#aaa;margin-bottom:3px;}
+.n-queue-stat-v{font-size:15px;font-weight:700;}
+.n-queue-bar{height:5px;background:#ffe0cc;border-radius:3px;overflow:hidden;margin-bottom:5px;}
+.n-queue-bar-fill{height:100%;background:var(--nol);border-radius:3px;transition:width 0.8s ease;}
+.n-queue-bar-txt{font-size:11px;color:#aaa;text-align:right;margin-bottom:14px;}
+.n-queue-notice{background:#fff8f4;border:1px solid #ffcba4;border-radius:6px;padding:12px 14px;font-size:12px;color:#c06400;line-height:1.7;text-align:left;}
+
+/* ══════════════════════
+   SCREEN 4: 좌석 선택
+══════════════════════ */
+.n-seat-screen{display:flex;height:calc(100vh - 60px);overflow:hidden;}
+.n-seat-left{flex:1;overflow-y:auto;background:#fff;border-right:1px solid var(--border);}
+.n-seat-right{width:240px;flex-shrink:0;background:#fafafa;display:flex;flex-direction:column;}
+.n-seat-top{background:var(--nol);color:#fff;padding:10px 16px;}
+.n-seat-top-t{font-size:13px;font-weight:700;}
+.n-seat-top-s{font-size:11px;opacity:0.75;margin-top:2px;}
+.n-seat-toolbar{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:#f8f8f8;border-bottom:1px solid #eee;font-size:12px;color:#555;}
+.n-seat-toolbar strong{color:var(--nol);}
+.n-zone-bar{display:flex;overflow-x:auto;border-bottom:1px solid #eee;padding:0 16px;}
+.n-zone-item{padding:0 12px;height:36px;display:flex;align-items:center;font-size:12px;font-weight:500;color:#888;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;margin-bottom:-1px;}
+.n-zone-item:hover{color:var(--nol);}
+.n-zone-item.on{color:var(--nol);border-bottom-color:var(--nol);font-weight:700;}
+.n-stage-bar{background:#444;color:#fff;text-align:center;font-size:11px;font-weight:700;padding:7px;margin:12px 16px;border-radius:3px;letter-spacing:0.1em;}
+.n-seat-section{padding:10px 16px 6px;}
+.n-seat-sec-hd{font-size:12px;font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;justify-content:space-between;}
+.n-gpill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.n-seat-rows{margin-bottom:10px;}
+.n-seat-row{display:flex;align-items:center;gap:3px;margin-bottom:3px;}
+.n-seat-rn{width:18px;font-size:9px;color:#bbb;text-align:center;flex-shrink:0;}
+.n-sbtn{width:18px;height:18px;border-radius:2px;border:1.5px solid transparent;cursor:pointer;font-size:0;display:inline-block;transition:all 0.1s;}
+.n-sbtn.avail{background:#fff;}
+.n-sbtn.avail.nv{border-color:#ff6100;background:#fff8f4;}
+.n-sbtn.avail.nr{border-color:#e53935;background:#fff5f5;}
+.n-sbtn.avail.np{border-color:#1565c0;background:#f0f5ff;}
+.n-sbtn.avail.ns{border-color:#2e7d32;background:#f0fbf0;}
+.n-sbtn.avail:hover{transform:scale(1.3);z-index:5;}
+.n-sbtn.avail.nv:hover{background:#ff6100;}
+.n-sbtn.avail.nr:hover{background:#e53935;}
+.n-sbtn.avail.np:hover{background:#1565c0;}
+.n-sbtn.avail.ns:hover{background:#2e7d32;}
+.n-sbtn.taken{background:#eee;border-color:#e0e0e0;cursor:not-allowed;}
+.n-sbtn.mysel{background:var(--nol)!important;border-color:var(--nol)!important;transform:scale(1.1);z-index:5;}
+.n-seat-legend{padding:10px 16px 14px;display:flex;flex-wrap:wrap;gap:8px;}
+.n-leg{display:flex;align-items:center;gap:4px;font-size:10px;color:#666;}
+.n-lsw{width:12px;height:12px;border-radius:2px;border:1.5px solid transparent;}
+/* 패널 */
+.n-ph{background:var(--nol);color:#fff;padding:10px 13px;font-size:12px;font-weight:700;}
+.n-pb{flex:1;padding:11px 13px;overflow-y:auto;}
+.n-pb-lbl{font-size:10px;font-weight:700;color:#bbb;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:7px;}
+.n-sellist{min-height:60px;border:1px dashed #ddd;border-radius:4px;padding:6px;margin-bottom:10px;}
+.n-nosel{font-size:12px;color:#bbb;text-align:center;padding:8px 0;}
+.n-selitem{display:flex;align-items:center;justify-content:space-between;background:var(--nol-lt);border:1px solid #ffcba4;border-radius:3px;padding:4px 8px;margin-bottom:3px;}
+.n-selitem-txt{font-size:11px;color:var(--nol);font-weight:500;}
+.n-seldel{background:none;border:none;color:#aaa;cursor:pointer;font-size:13px;line-height:1;}
+.n-seldel:hover{color:var(--nol);}
+.n-pp{border-top:1px solid #eee;padding:10px 13px;}
+.n-pp-row{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:4px;}
+.n-pp-tot{display:flex;justify-content:space-between;font-size:14px;font-weight:700;border-top:1px solid #eee;padding-top:7px;margin-top:3px;}
+.n-pp-amt{color:var(--nol);}
+.n-pf{padding:10px 13px;border-top:1px solid #eee;}
+.n-btn-conf{width:100%;height:40px;background:var(--nol);color:#fff;font-size:13px;font-weight:700;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.n-btn-conf:disabled{background:#ccc;cursor:not-allowed;}
+
+/* 7분 홀딩 */
+.n-timer-bar{position:fixed;top:60px;left:0;right:0;background:#fff8f4;border-bottom:2px solid var(--nol);padding:6px 18px;display:flex;align-items:center;justify-content:space-between;font-size:12px;z-index:200;}
+.n-timer-bar.hidden{display:none;}
+.n-timer-bar.urgent{background:#fce4ec;border-bottom-color:#e53935;}
+.n-timer-val{font-size:15px;font-weight:700;color:var(--nol);font-variant-numeric:tabular-nums;}
+.n-timer-bar.urgent .n-timer-val{color:#e53935;}
+
+/* ══════════════════════
+   SCREEN 5: 결제 / SCREEN 6: 완료
+══════════════════════ */
+.n-pay-wrap{max-width:680px;margin:0 auto;padding:22px 20px;}
+.n-pay-sec-title{font-size:14px;font-weight:700;border-left:3px solid var(--nol);padding-left:10px;margin-bottom:10px;}
+.n-pay-card{background:#fff;border:1px solid var(--border);border-radius:4px;padding:14px 16px;margin-bottom:16px;}
+.n-pay-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.n-pay-tbl td{padding:7px 0;border-bottom:1px solid #f5f5f5;}
+.n-pay-tbl tr:last-child td{border-bottom:none;}
+.n-pay-tbl td:first-child{width:88px;color:#888;font-weight:500;}
+.n-pay-hl{color:var(--nol);font-weight:700;}
+.n-pm-list{display:flex;flex-direction:column;gap:5px;}
+.n-pm{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:4px;padding:9px 12px;cursor:pointer;transition:all 0.15s;}
+.n-pm:hover{border-color:var(--nol);}
+.n-pm.on{border-color:var(--nol);background:var(--nol-lt);}
+.n-pm input[type=radio]{accent-color:var(--nol);}
+.n-pm-nm{font-size:13px;font-weight:700;}
+.n-pm-dc{font-size:11px;color:#aaa;}
+.n-price-sum{background:#f9f9f9;border:1px solid var(--border);border-radius:4px;padding:14px 16px;margin-bottom:12px;}
+.n-ps-row{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px;}
+.n-ps-tot{display:flex;justify-content:space-between;font-size:17px;font-weight:700;border-top:1px solid #e0e0e0;padding-top:11px;margin-top:4px;}
+.n-ps-amt{color:var(--nol);}
+.n-agree{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#555;margin-bottom:12px;}
+.n-agree input{accent-color:var(--nol);margin-top:1px;flex-shrink:0;}
+.n-btn-pay{width:100%;height:50px;background:var(--nol);color:#fff;font-size:17px;font-weight:700;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.n-btn-pay:disabled{background:#ccc;cursor:not-allowed;}
+/* 완료 */
+.n-done-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:40px 20px;}
+.n-done-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:36px 28px;max-width:420px;width:100%;text-align:center;}
+.n-done-ico{font-size:44px;margin-bottom:14px;}
+.n-done-h{font-size:21px;font-weight:700;color:var(--nol);margin-bottom:6px;}
+.n-done-sub{font-size:13px;color:#888;line-height:1.7;margin-bottom:20px;}
+.n-done-tkt{background:#f8f8f8;border:1px solid #eee;border-radius:6px;padding:14px;margin-bottom:14px;text-align:left;}
+.n-dt-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px dashed #eee;}
+.n-dt-row:last-child{border-bottom:none;}
+.n-dt-l{color:#aaa;}.n-dt-v{font-weight:700;}
+.n-stats{background:var(--nol-lt);border:1px solid #ffcba4;border-radius:6px;padding:13px;margin-bottom:14px;text-align:left;}
+.n-stats-h{font-size:12px;font-weight:700;color:var(--nol);margin-bottom:8px;}
+.n-sr{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#c06400;}
+.n-sr .tv{font-weight:700;}
+.n-done-btns{display:flex;gap:8px;}
+.btn-n-retry{flex:1;height:42px;background:#fff;border:1px solid #ddd;color:#333;font-size:13px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-n-home{flex:1;height:42px;background:var(--nol);border:none;color:#fff;font-size:13px;font-weight:700;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+</style>
+</head>
+<body class="view-pc">
+
+<!-- ══ 뷰 전환 토글바 ══ -->
+<div id="viewToggleBar" style="background:#111;border-bottom:1px solid #2a2a2a;padding:0 16px;height:40px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:9999;font-family:'Noto Sans KR',sans-serif;">
+  <span style="font-size:11px;font-weight:700;color:#6c5ce7;">🍇 포도알줍줍</span>
+  <span style="width:1px;height:16px;background:#2a2a2a;display:inline-block;flex-shrink:0;"></span>
+  <div style="display:flex;gap:2px;background:#222;border-radius:6px;padding:2px;flex-shrink:0;">
+    <button id="vtbPc" onclick="setView('pc')" class="vtb-active" style="padding:4px 12px;border-radius:5px;border:none;background:#fff;color:#1a1a1a;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">🖥 PC</button>
+    <button id="vtbMob" onclick="setView('mobile')" style="padding:4px 12px;border-radius:5px;border:none;background:none;color:#666;font-size:11px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📱 모바일</button>
+  </div>
+  <span id="vtbTip" style="margin-left:auto;font-size:10px;color:#555;white-space:nowrap;overflow:hidden;">TIP</span>
+</div>
+
+<!-- ══ 모바일 프레임 ══ -->
+<div id="mobileOuter" style="display:none;justify-content:center;align-items:flex-start;padding:24px 20px 40px;background:#0d0d0d;min-height:calc(100vh - 40px);">
+  <div style="width:390px;min-height:844px;background:#f5f5f5;border-radius:44px;overflow:hidden;position:relative;box-shadow:0 0 0 10px #1a1a1a,0 0 0 12px #2a2a2a,0 40px 80px rgba(0,0,0,0.85);flex-shrink:0;">
+    <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#1a1a1a;border-radius:0 0 20px 20px;z-index:1000;"></div>
+    <div style="height:44px;background:#fff;color:#1a1a1a;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 8px;font-size:12px;font-weight:700;position:relative;z-index:100;flex-shrink:0;">
+      <span id="mfTime">10:00</span><span>▐▐▐ ≋ 🔋</span>
+    </div>
+    <div style="background:#1a1a2e;padding:8px 14px;font-size:10px;color:rgba(255,255,255,0.7);line-height:1.65;display:flex;align-items:flex-start;gap:5px;border-bottom:2px solid #6c5ce7;">
+      <span>ℹ</span><span>앱과 모바일웹 UI 동일. 단일기기 제한은 앱·웹 동일하게 적용됨. 앱이 알림 수신에 유리.</span>
+    </div>
+    <div id="mfScroll" style="height:calc(844px - 44px - 50px - 50px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative;"></div>
+    <div id="mfTabBar" style="height:50px;background:#fff;border-top:1px solid #e0e0e0;display:flex;align-items:center;color:#888;font-family:Noto Sans KR,sans-serif;flex-shrink:0;"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🏠</span><span style="font-size:9px;font-weight:500;">홈</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🎭</span><span style="font-size:9px;font-weight:500;">뮤지컬</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🎤</span><span style="font-size:9px;font-weight:500;">콘서트</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🎟</span><span style="font-size:9px;font-weight:500;">MY티켓</span></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">👤</span><span style="font-size:9px;font-weight:500;">MY</span></div></div>
+
+  </div>
+</div>
+<!-- ══ PC 콘텐츠 ══ -->
+<div class="pc-wrap">
+<div class="practice-badge">🍇 포도알줍줍 연습</div>
+
+<!-- 단일기기 경고 모달 -->
+<div class="device-modal hidden" id="deviceModal">
+  <div class="device-modal-box">
+    <div class="device-modal-icon">⚠️</div>
+    <div class="device-modal-title">동일 계정 중복 접속 감지</div>
+    <div class="device-modal-desc">
+      NOL 티켓은 <strong>한 계정 동시 접속이 불가</strong>합니다.<br>
+      다른 브라우저나 기기에서 로그인한 경우 현재 창이 종료됩니다.<br><br>
+      <em style="font-size:11px;color:#888;">※ 실전 팁: 티켓팅 전 다른 기기는 반드시 로그아웃하세요!</em>
+    </div>
+    <button class="device-modal-btn" onclick="closeDeviceModal()">확인</button>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 0: 공연 목록 ══════ -->
+<div class="screen active" id="sc0">
+  <header class="n-header">
+    <a href="index.html" class="n-logo"><span class="n-logo-nol">NOL</span><span class="n-logo-ticket">티켓</span></a>
+    <ul class="n-gnb">
+      <li class="n-gnb-item on">뮤지컬</li>
+      <li class="n-gnb-item">콘서트</li>
+      <li class="n-gnb-item">연극</li>
+      <li class="n-gnb-item">클래식</li>
+    </ul>
+    <div class="n-header-right">
+      <button class="n-btn-sm" onclick="showDeviceModal()">로그인</button>
+      <button class="n-btn-sm orange">회원가입</button>
+    </div>
+  </header>
+  <div class="n-cat-bar">
+    <div class="n-cat-item on">전체</div>
+    <div class="n-cat-item">NOL 단독</div>
+    <div class="n-cat-item">좌석 우위</div>
+    <div class="n-cat-item">인기 공연</div>
+    <div class="n-cat-item">오픈 예정</div>
+  </div>
+  <div class="practice-bar">⚡ <strong>연습 모드:</strong> NOL(인터파크) 핵심 — <strong>단일 기기·브라우저만 가능</strong>, 예매하기 버튼 타이머, 대기열 순번 방식</div>
+  <div class="n-main-body">
+    <div class="n-section-head">뮤지컬</div>
+    <div class="n-show-list">
+      <div class="n-show-row" onclick="goToDetail('hamilton')">
+        <div class="n-show-thumb" style="background:linear-gradient(135deg,#1a237e,#283593);">🎭</div>
+        <div class="n-show-info">
+          <span class="n-show-genre-tag" style="background:#1a237e;">뮤지컬</span>
+          <div class="n-show-title">뮤지컬 〈해밀턴〉 내한공연</div>
+          <div class="n-show-date-place">2026.05.15 ~ 07.05 · 블루스퀘어 신한카드홀</div>
+        </div>
+        <div class="n-show-right">
+          <div class="n-show-price">최저 <strong>80,000원</strong></div>
+          <span class="n-show-badge n-badge-exclusive">NOL 단독</span>
+        </div>
+      </div>
+      <div class="n-show-row" onclick="goToDetail('wicked')">
+        <div class="n-show-thumb" style="background:linear-gradient(135deg,#2e7d32,#388e3c);">🧙</div>
+        <div class="n-show-info">
+          <span class="n-show-genre-tag" style="background:#2e7d32;">뮤지컬</span>
+          <div class="n-show-title">뮤지컬 〈위키드〉 좌석 우위</div>
+          <div class="n-show-date-place">2026.04.11 ~ 06.28 · 샤롯데씨어터</div>
+        </div>
+        <div class="n-show-right">
+          <div class="n-show-price">최저 <strong>55,000원</strong></div>
+          <span class="n-show-badge n-badge-open">● 예매 가능</span>
+        </div>
+      </div>
+      <div class="n-show-row" onclick="goToDetail('phantom')">
+        <div class="n-show-thumb" style="background:linear-gradient(135deg,#212121,#424242);">👻</div>
+        <div class="n-show-info">
+          <span class="n-show-genre-tag" style="background:#424242;">뮤지컬</span>
+          <div class="n-show-title">뮤지컬 〈오페라의 유령〉 35주년</div>
+          <div class="n-show-date-place">2026.06.01 ~ 09.30 · 예술의전당 오페라극장</div>
+        </div>
+        <div class="n-show-right">
+          <div class="n-show-price">최저 <strong>70,000원</strong></div>
+          <span class="n-show-badge n-badge-soon">◐ 오픈 예정</span>
+        </div>
+      </div>
+    </div>
+    <div class="n-section-head">콘서트</div>
+    <div class="n-show-list">
+      <div class="n-show-row" onclick="goToDetail('coldplay')">
+        <div class="n-show-thumb" style="background:linear-gradient(135deg,#e65100,#ef6c00);">🌈</div>
+        <div class="n-show-info">
+          <span class="n-show-genre-tag" style="background:#e65100;">콘서트</span>
+          <div class="n-show-title">COLDPLAY WORLD TOUR 2026 SEOUL</div>
+          <div class="n-show-date-place">2026.08.22 ~ 08.23 · 고척스카이돔</div>
+        </div>
+        <div class="n-show-right">
+          <div class="n-show-price">최저 <strong>110,000원</strong></div>
+          <span class="n-show-badge n-badge-open">● 예매 가능</span>
+        </div>
+      </div>
+      <div class="n-show-row" onclick="goToDetail('babymonster')">
+        <div class="n-show-thumb" style="background:linear-gradient(135deg,#ad1457,#d81b60);">👾</div>
+        <div class="n-show-info">
+          <span class="n-show-genre-tag" style="background:#ad1457;">콘서트</span>
+          <div class="n-show-title">2026-27 BABYMONSTER WORLD TOUR</div>
+          <div class="n-show-date-place">2026.06.26 ~ 06.28 · 잠실실내체육관</div>
+        </div>
+        <div class="n-show-right">
+          <div class="n-show-price">최저 <strong>121,000원</strong></div>
+          <span class="n-show-badge n-badge-exclusive">NOL 단독</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 1: 공연 상세 ══════ -->
+<div class="screen" id="sc1">
+  <header class="n-header">
+    <a href="index.html" class="n-logo"><span class="n-logo-nol">NOL</span><span class="n-logo-ticket">티켓</span></a>
+    <div class="n-header-right"><button class="n-btn-sm" onclick="sc(0)">← 목록</button></div>
+  </header>
+  <div class="practice-bar">⚡ <strong>NOL 핵심:</strong> 예매하기 버튼에 타이머가 붙어 있어요. 오픈 시각에 버튼 색이 바뀌면 즉시 클릭!</div>
+  <div class="n-detail-body">
+    <div class="n-detail-top">
+      <div class="n-detail-poster" id="nDetailPoster">
+        <div class="ep-icon" id="nDetailIcon">🎭</div>
+        <div class="ep-title" id="nDetailPTitle"></div>
+      </div>
+      <div style="flex:1;">
+        <div class="n-detail-title" id="nDetailTitle">공연명</div>
+        <table class="n-detail-table">
+          <tr><td>기간</td><td id="nDetailDate">—</td></tr>
+          <tr><td>장소</td><td id="nDetailPlace">—</td></tr>
+          <tr><td>주최</td><td id="nDetailHost">—</td></tr>
+          <tr><td>가격</td><td class="n-detail-price" id="nDetailPrice">—</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="n-book-area">
+      <div class="n-book-title">온라인 예매</div>
+      <!-- 단일기기 경고 -->
+      <div class="n-single-device-notice">
+        📵 <div><strong>NOL 주의사항:</strong> 동일 계정으로 PC와 모바일을 동시에 접속하면 오류가 발생합니다.<br>
+        티켓팅 전 사용할 기기를 하나만 정해 로그인하고 나머지는 로그아웃하세요.</div>
+      </div>
+      <!-- 타이머 버튼 (인터파크 핵심) -->
+      <div class="n-timer-btn-wrap">
+        <div class="n-timer-track"><div class="n-timer-fill" id="nTimerFill" style="width:100%;"></div></div>
+        <button class="n-btn-timer counting" id="nBtnTimer" disabled>
+          <span>예매하기</span>
+          <span class="countdown-num" id="nCountdown">00:05</span>
+        </button>
+      </div>
+      <div class="n-book-notice">
+        • 예매 오픈 직전에 미리 로그인하고 화면을 열어두세요<br>
+        • 오픈 시각에 버튼 색이 <strong style="color:var(--nol)">주황색</strong>으로 바뀌면 즉시 클릭!<br>
+        • 대기열에서 순번을 받아 차례대로 입장합니다
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 2: 날짜/회차 팝업 ══════ -->
+<div class="screen" id="sc2">
+  <header class="n-header"><a href="index.html" class="n-logo"><span class="n-logo-nol">NOL</span><span class="n-logo-ticket">티켓</span></a></header>
+  <div style="filter:blur(2px);opacity:0.4;pointer-events:none;background:var(--bg);min-height:150px;padding:20px;"><div style="background:#fff;height:80px;border-radius:6px;"></div></div>
+  <div class="n-pop-overlay">
+    <div class="n-popup">
+      <div class="n-pop-head"><span class="n-pop-title">날짜 및 회차 선택</span><button class="n-pop-close" onclick="sc(1)">×</button></div>
+      <div class="n-pop-body">
+        <div class="n-pop-step-label">날짜 선택</div>
+        <div class="n-date-list" id="nDateList"></div>
+        <div class="n-session-section" id="nSessionSection" style="display:none;">
+          <div class="n-pop-step-label">회차 선택</div>
+          <div class="n-session-list" id="nSessionList"></div>
+        </div>
+      </div>
+      <div class="n-pop-foot">
+        <button class="n-btn-cancel" onclick="sc(1)">취소</button>
+        <button class="n-btn-pop-next" id="nBtnPopNext" disabled onclick="goToQueue()">다음</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 3: 대기열 ══════ -->
+<div class="screen" id="sc3">
+  <header class="n-header"><a href="index.html" class="n-logo"><span class="n-logo-nol">NOL</span><span class="n-logo-ticket">티켓</span></a></header>
+  <div class="n-queue-wrap">
+    <div class="n-queue-card">
+      <div class="n-queue-icon">⏳</div>
+      <div class="n-queue-title">예매 대기 중입니다</div>
+      <div class="n-queue-sub">접속자가 많아 잠시 대기 중입니다.<br>브라우저를 닫거나 새로고침하지 마세요.</div>
+      <div class="n-queue-num-box">
+        <div class="n-queue-num-label">현재 대기 순번</div>
+        <div class="n-queue-num" id="nQueueNum">1,847</div>
+        <div class="n-queue-unit">번째 대기 중</div>
+      </div>
+      <div class="n-queue-stats">
+        <div class="n-queue-stat"><div class="n-queue-stat-l">예상 대기 시간</div><div class="n-queue-stat-v" id="nQueueEta">약 4초</div></div>
+        <div class="n-queue-stat"><div class="n-queue-stat-l">접속 환경</div><div class="n-queue-stat-v">PC 웹</div></div>
+      </div>
+      <div class="n-queue-bar"><div class="n-queue-bar-fill" id="nQueueFill" style="width:0%"></div></div>
+      <div class="n-queue-bar-txt" id="nQueueTxt">0% 완료</div>
+      <div class="n-queue-notice"><strong>NOL 안내사항</strong><br>• 동일 계정 다중 접속 시 현재 창이 강제 종료됩니다<br>• 새로고침 시 대기 순번이 초기화됩니다<br>• 모바일은 LTE/5G가 와이파이보다 안정적입니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 4: 좌석 선택 ══════ -->
+<div class="screen" id="sc4">
+  <div class="n-timer-bar hidden" id="nSeatTimerBar">
+    <span style="color:#c06400;font-weight:600;">⏱ 좌석 선택 제한 (7분)</span>
+    <span class="n-timer-val" id="nSeatTimerVal">07:00</span>
+    <span style="font-size:11px;color:#aaa;">초과 시 자동 취소</span>
+  </div>
+  <div class="n-seat-screen">
+    <div class="n-seat-left">
+      <div class="n-seat-top"><div class="n-seat-top-t" id="nSeatTitle">좌석 선택</div><div class="n-seat-top-s" id="nSeatSub"></div></div>
+      <div class="n-seat-toolbar"><div>구역 선택 후 좌석 클릭 · 최대 <strong>4매</strong></div></div>
+      <div class="n-zone-bar">
+        <div class="n-zone-item on" onclick="setNZone(this,'all')">전체</div>
+        <div class="n-zone-item" onclick="setNZone(this,'vip')">VIP</div>
+        <div class="n-zone-item" onclick="setNZone(this,'r')">R석</div>
+        <div class="n-zone-item" onclick="setNZone(this,'p')">P석</div>
+        <div class="n-zone-item" onclick="setNZone(this,'s')">S석</div>
+      </div>
+      <div class="n-stage-bar">▲ 무대 / 스크린 방향</div>
+      <div id="nSeatSecs"></div>
+      <div class="n-seat-legend">
+        <div class="n-leg"><div class="n-lsw" style="background:#fff8f4;border-color:#ff6100;"></div>VIP (143,000)</div>
+        <div class="n-leg"><div class="n-lsw" style="background:#fff5f5;border-color:#e53935;"></div>R석 (110,000)</div>
+        <div class="n-leg"><div class="n-lsw" style="background:#f0f5ff;border-color:#1565c0;"></div>P석 (99,000)</div>
+        <div class="n-leg"><div class="n-lsw" style="background:#f0fbf0;border-color:#2e7d32;"></div>S석 (80,000)</div>
+        <div class="n-leg"><div class="n-lsw" style="background:#eee;border-color:#e0e0e0;"></div>매진</div>
+        <div class="n-leg"><div class="n-lsw" style="background:var(--nol);border-color:var(--nol);"></div>선택</div>
+      </div>
+    </div>
+    <div class="n-seat-right">
+      <div class="n-ph">선택 정보</div>
+      <div class="n-pb">
+        <div class="n-pb-lbl">선택한 좌석</div>
+        <div class="n-sellist" id="nSelList"><div class="n-nosel">좌석을 클릭해 선택하세요</div></div>
+        <div class="n-pb-lbl">공연 정보</div>
+        <div style="font-size:11px;color:#555;line-height:1.8;" id="nGameInfo"></div>
+      </div>
+      <div class="n-pp">
+        <div class="n-pp-row"><span>티켓 금액</span><span id="nPpTkt">0원</span></div>
+        <div class="n-pp-row"><span>예매 수수료</span><span id="nPpFee">0원</span></div>
+        <div class="n-pp-tot"><span>합계</span><span class="n-pp-amt" id="nPpTot">0원</span></div>
+      </div>
+      <div class="n-pf"><button class="n-btn-conf" id="nBtnConf" disabled onclick="goToNPay()">선택 완료</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 5: 결제 ══════ -->
+<div class="screen" id="sc5">
+  <header class="n-header"><a href="index.html" class="n-logo"><span class="n-logo-nol">NOL</span><span class="n-logo-ticket">티켓</span></a><span style="font-size:13px;color:#888;margin-left:12px;">결제하기</span></header>
+  <div class="n-pay-wrap">
+    <div style="font-size:12px;color:#bbb;margin-bottom:12px;">STEP 3/3 — 결제</div>
+    <div class="n-pay-sec-title">주문 정보</div>
+    <div class="n-pay-card">
+      <table class="n-pay-tbl">
+        <tr><td>공연명</td><td id="npTitle">—</td></tr>
+        <tr><td>일시</td><td id="npDate">—</td></tr>
+        <tr><td>장소</td><td id="npPlace">—</td></tr>
+        <tr><td>좌석</td><td class="n-pay-hl" id="npSeat">—</td></tr>
+        <tr><td>매수</td><td id="npCnt">—</td></tr>
+      </table>
+    </div>
+    <div class="n-pay-sec-title">결제 수단</div>
+    <div class="n-pay-card">
+      <div class="n-pm-list">
+        <label class="n-pm on" onclick="nSelPm(this)"><input type="radio" name="npm" checked><div><div class="n-pm-nm">신용·체크카드</div><div class="n-pm-dc">국내 전체 카드</div></div></label>
+        <label class="n-pm" onclick="nSelPm(this)"><input type="radio" name="npm"><div><div class="n-pm-nm">카카오페이</div><div class="n-pm-dc">카카오페이 결제</div></div></label>
+        <label class="n-pm" onclick="nSelPm(this)"><input type="radio" name="npm"><div><div class="n-pm-nm">네이버페이</div><div class="n-pm-dc">네이버페이 포인트</div></div></label>
+      </div>
+    </div>
+    <div class="n-price-sum">
+      <div class="n-ps-row"><span>티켓 금액</span><span id="npTkt">0원</span></div>
+      <div class="n-ps-row"><span>예매 수수료</span><span id="npFee">0원</span></div>
+      <div class="n-ps-tot"><span>총 결제 금액</span><span class="n-ps-amt" id="npTot">0원</span></div>
+    </div>
+    <div class="n-agree"><input type="checkbox" id="nAgree" onchange="nTogglePay()"><label for="nAgree">결제 정보 확인 및 동의합니다. (필수)</label></div>
+    <button class="n-btn-pay" id="nBtnPay" disabled onclick="goToNDone()">결제하기</button>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 6: 완료 ══════ -->
+<div class="screen" id="sc6">
+  <header class="n-header"><a href="index.html" class="n-logo"><span class="n-logo-nol">NOL</span><span class="n-logo-ticket">티켓</span></a></header>
+  <div class="n-done-wrap">
+    <div class="n-done-card">
+      <div class="n-done-ico">✅</div>
+      <div class="n-done-h">연습 완료!</div>
+      <div class="n-done-sub">NOL 티켓 예매 전 과정을 완료했습니다!<br>단일 기기 전략과 타이머 버튼을 기억하세요.</div>
+      <div class="n-done-tkt">
+        <div class="n-dt-row"><span class="n-dt-l">공연</span><span class="n-dt-v" id="ndShow">—</span></div>
+        <div class="n-dt-row"><span class="n-dt-l">일시</span><span class="n-dt-v" id="ndDate">—</span></div>
+        <div class="n-dt-row"><span class="n-dt-l">좌석</span><span class="n-dt-v" id="ndSeat">—</span></div>
+        <div class="n-dt-row"><span class="n-dt-l">결제금액</span><span class="n-dt-v" style="color:var(--nol);" id="ndPrice">—</span></div>
+      </div>
+      <div class="n-stats">
+        <div class="n-stats-h">⏱ 소요 시간</div>
+        <div class="n-sr"><span>공연 선택</span><span class="tv" id="nstShow">—</span></div>
+        <div class="n-sr"><span>대기열 통과</span><span class="tv" id="nstQ">—</span></div>
+        <div class="n-sr"><span>좌석 선택</span><span class="tv" id="nstSeat">—</span></div>
+        <div class="n-sr"><span>결제 완료</span><span class="tv" id="nstPay">—</span></div>
+        <div class="n-sr" style="border-top:1px solid #ffcba4;padding-top:5px;margin-top:4px;font-weight:700;"><span>총 소요</span><span class="tv" id="nstTot">—</span></div>
+      </div>
+      <div class="n-done-btns">
+        <button class="btn-n-retry" onclick="nRestartAll()">다시 연습</button>
+        <button class="btn-n-home" onclick="location.href='index.html'">홈으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 데이터 ── */
+const NSHOWS={
+  hamilton:{title:"뮤지컬 〈해밀턴〉 내한공연",place:'블루스퀘어 신한카드홀',icon:'🎭',
+    bg:'background:linear-gradient(135deg,#1a237e,#283593)',
+    dates:[{d:'05.15(금)',t:'19:30'},{d:'05.16(토)',t:'14:00'},{d:'05.17(일)',t:'14:00'}],
+    price:{vip:143000,r:110000,p:99000,s:80000},host:'공연기획사 A'},
+  wicked:{title:"뮤지컬 〈위키드〉 Korea Tour",place:'샤롯데씨어터',icon:'🧙',
+    bg:'background:linear-gradient(135deg,#2e7d32,#388e3c)',
+    dates:[{d:'04.11(토)',t:'14:00'},{d:'04.12(일)',t:'14:00'}],
+    price:{vip:110000,r:99000,p:77000,s:55000},host:'샤롯데씨어터'},
+  phantom:{title:"뮤지컬 〈오페라의 유령〉 35주년",place:'예술의전당 오페라극장',icon:'👻',
+    bg:'background:linear-gradient(135deg,#212121,#424242)',
+    dates:[{d:'06.01(월)',t:'19:30'},{d:'06.06(토)',t:'14:00'}],
+    price:{vip:130000,r:110000,p:90000,s:70000},host:'예술의전당'},
+  coldplay:{title:"COLDPLAY WORLD TOUR 2026 SEOUL",place:'고척스카이돔',icon:'🌈',
+    bg:'background:linear-gradient(135deg,#e65100,#ef6c00)',
+    dates:[{d:'08.22(토)',t:'19:00'},{d:'08.23(일)',t:'18:00'}],
+    price:{vip:143000,r:121000,p:110000,s:110000},host:'라이브네이션코리아'},
+  babymonster:{title:"2026-27 BABYMONSTER WORLD TOUR",place:'잠실실내체육관',icon:'👾',
+    bg:'background:linear-gradient(135deg,#ad1457,#d81b60)',
+    dates:[{d:'06.26(금)',t:'18:00'},{d:'06.27(토)',t:'16:00'},{d:'06.28(일)',t:'16:00'}],
+    price:{vip:143000,r:121000,p:110000,s:110000},host:'YG PLUS'},
+};
+const NZONES=[
+  {key:'vip',name:'VIP석',gc:'nv',rows:['VIP1','VIP2'],cols:14,tr:0.6,pr:'vip'},
+  {key:'r',name:'R석',gc:'nr',rows:['R1','R2','R3','R4'],cols:18,tr:0.5,pr:'r'},
+  {key:'p',name:'P석',gc:'np',rows:['P1','P2','P3','P4','P5'],cols:20,tr:0.4,pr:'p'},
+  {key:'s',name:'S석',gc:'ns',rows:['S1','S2','S3','S4','S5','S6'],cols:22,tr:0.3,pr:'s'},
+];
+const NFEE=1000;
+const NS={show:null,date:null,session:null,seats:[],t:{}};
+let nTkMap={};
+let nTimerIv=null,nCountSec=5;
+let nSeatTimerIv=null;
+
+function sc(n){
+  document.querySelectorAll('.pc-wrap .screen').forEach(s=>s.classList.remove('active'));
+  const target=document.getElementById('sc'+n);
+  if(target) target.classList.add('active');
+  window.scrollTo(0,0);
+  const clone=document.getElementById('mfClone');
+  if(clone){
+    const pcScs=Array.from(document.querySelectorAll('.pc-wrap .screen'));
+    const idx=pcScs.findIndex(s=>s.id==='sc'+n);
+    clone.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const clScs=clone.querySelectorAll('.screen');
+    if(idx>=0&&clScs[idx]) clScs[idx].classList.add('active');
+    const mfs=document.getElementById('mfScroll');
+    if(mfs) mfs.scrollTo(0,0);
+  }
+}
+
+/* 단일기기 모달 */
+function showDeviceModal(){document.getElementById('deviceModal').classList.remove('hidden');}
+function closeDeviceModal(){document.getElementById('deviceModal').classList.add('hidden');}
+
+/* SCREEN 0 → 1 */
+function goToDetail(key){
+  NS.show=NSHOWS[key];NS.t.start=Date.now();NS.t.showSelect=Date.now();
+  const sh=NS.show;
+  const p=document.getElementById('nDetailPoster');
+  p.style.cssText=`${sh.bg};width:160px;flex-shrink:0;border-radius:4px;min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:16px 12px;`;
+  document.getElementById('nDetailIcon').textContent=sh.icon;
+  document.getElementById('nDetailPTitle').textContent=sh.title.substring(0,20);
+  document.getElementById('nDetailTitle').textContent=sh.title;
+  document.getElementById('nDetailDate').textContent=sh.dates.map(d=>`2026.${d.d}`).join(' / ');
+  document.getElementById('nDetailPlace').textContent=sh.place;
+  document.getElementById('nDetailHost').textContent=sh.host;
+  document.getElementById('nDetailPrice').textContent=`${Math.min(...Object.values(sh.price)).toLocaleString()}원 ~ ${Math.max(...Object.values(sh.price)).toLocaleString()}원`;
+  startNTimer();sc(1);
+}
+
+/* 타이머 버튼 카운트다운 (인터파크 핵심) */
+function startNTimer(){
+  nCountSec=5;clearInterval(nTimerIv);
+  const btn=document.getElementById('nBtnTimer');
+  const cd=document.getElementById('nCountdown');
+  const fill=document.getElementById('nTimerFill');
+  btn.className='n-btn-timer counting';btn.disabled=true;
+  cd.style.display='';
+  cd.textContent=`00:0${nCountSec}`;fill.style.width='100%';
+  nTimerIv=setInterval(()=>{
+    nCountSec--;
+    const pct=(nCountSec/5)*100;
+    fill.style.width=pct+'%';
+    if(nCountSec>0){cd.textContent=`00:0${nCountSec}`;}
+    else{
+      clearInterval(nTimerIv);
+      btn.className='n-btn-timer open-now';btn.disabled=false;
+      cd.style.display='none';
+      btn.innerHTML='<span>예매하기</span>';
+      btn.onclick=openNPop;
+    }
+  },1000);
+}
+
+/* SCREEN 2: 날짜 팝업 */
+function openNPop(){
+  NS.t.popOpen=Date.now();
+  const sh=NS.show;
+  const dl=document.getElementById('nDateList');dl.innerHTML='';
+  sh.dates.forEach((d,i)=>{
+    const item=document.createElement('div');item.className='n-date-item';
+    const avail=Math.random()>0.3?'많음':'적음';
+    const ac=avail==='많음'?'avail-ok':'avail-few';
+    item.innerHTML=`<div><div class="n-date-main">2026. ${d.d}</div><div class="n-date-sub">${d.t} 공연</div></div><span class="n-date-avail ${ac}">잔여 ${avail}</span>`;
+    item.onclick=()=>{
+      document.querySelectorAll('.n-date-item').forEach(e=>e.classList.remove('sel'));
+      item.classList.add('sel');NS.date=d;
+      document.getElementById('nSessionSection').style.display='block';
+      const sl=document.getElementById('nSessionList');sl.innerHTML='';
+      const si=document.createElement('div');si.className='n-session-item';
+      si.innerHTML=`<span class="n-session-time">${d.t}</span><span class="n-session-avail ${ac}">잔여 ${avail}</span>`;
+      si.onclick=()=>{document.querySelectorAll('.n-session-item').forEach(e=>e.classList.remove('sel'));si.classList.add('sel');NS.session=d;document.getElementById('nBtnPopNext').disabled=false;};
+      sl.appendChild(si);
+    };
+    dl.appendChild(item);
+  });
+  NS.session=null;document.getElementById('nBtnPopNext').disabled=true;
+  document.getElementById('nSessionSection').style.display='none';
+  sc(2);
+}
+
+/* 대기열 */
+function goToQueue(){
+  NS.t.qStart=Date.now();sc(3);
+  const sn=Math.floor(Math.random()*2500)+400;let cur=sn;
+  const dur=4000,st=Date.now();
+  document.getElementById('nQueueNum').textContent=cur.toLocaleString();
+  const iv=setInterval(()=>{
+    const p=Math.min((Date.now()-st)/dur,1);
+    cur=Math.max(Math.floor(sn*(1-p)),0);
+    document.getElementById('nQueueNum').textContent=cur.toLocaleString();
+    document.getElementById('nQueueFill').style.width=(p*100)+'%';
+    const rs=Math.ceil((dur-(Date.now()-st))/1000);
+    document.getElementById('nQueueEta').textContent=rs>0?`약 ${rs}초`:'곧 입장';
+    document.getElementById('nQueueTxt').textContent=Math.round(p*100)+'% 완료';
+    if(p>=1){clearInterval(iv);NS.t.qEnd=Date.now();setTimeout(goToNSeat,500);}
+  },100);
+}
+
+/* 좌석 */
+function goToNSeat(){
+  NS.t.seatStart=Date.now();NS.seats=[];
+  nTkMap={};NZONES.forEach(z=>z.rows.forEach(r=>{for(let c=1;c<=z.cols;c++)nTkMap[`${z.key}-${r}-${c}`]=Math.random()<z.tr?'taken':'avail';}));
+  const sh=NS.show;
+  document.getElementById('nSeatTitle').textContent=`${sh.title.substring(0,20)}... — 좌석 선택`;
+  document.getElementById('nSeatSub').textContent=`${sh.place} | 2026. ${NS.date.d} ${NS.date.t}`;
+  document.getElementById('nGameInfo').innerHTML=`${sh.title}<br>${sh.place}<br>2026. ${NS.date.d} ${NS.date.t}`;
+  buildNSecs('all');nUpdatePanel();
+  document.getElementById('nSeatTimerBar').classList.remove('hidden');
+  startNSeatTimer(420);sc(4);
+}
+
+function setNZone(el,key){document.querySelectorAll('.n-zone-item').forEach(z=>z.classList.remove('on'));el.classList.add('on');buildNSecs(key);}
+
+function buildNSecs(zk){
+  const wrap=document.getElementById('nSeatSecs');wrap.innerHTML='';
+  const filtered=zk==='all'?NZONES:NZONES.filter(z=>z.key===zk);
+  const gps={vip:'#fff8f4',r:'#fff5f5',p:'#f0f5ff',s:'#f0fbf0'};
+  const gbc={vip:'#ff6100',r:'#e53935',p:'#1565c0',s:'#2e7d32'};
+  filtered.forEach(zone=>{
+    const sec=document.createElement('div');sec.className='n-seat-section';
+    const pr=NS.show.price[zone.pr];
+    sec.innerHTML=`<div class="n-seat-sec-hd"><span>${zone.name}</span><span class="n-gpill" style="background:${gps[zone.pr]};color:${gbc[zone.pr]};">${pr.toLocaleString()}원</span></div>`;
+    const rows=document.createElement('div');rows.className='n-seat-rows';
+    zone.rows.forEach(r=>{
+      const re=document.createElement('div');re.className='n-seat-row';
+      const ln=document.createElement('div');ln.className='n-seat-rn';ln.textContent=r.replace(/[A-Z]+/,'');re.appendChild(ln);
+      for(let c=1;c<=zone.cols;c++){
+        const id=`${zone.key}-${r}-${c}`;
+        const b=document.createElement('div');
+        const tk=nTkMap[id],ms=NS.seats.some(s=>s.id===id);
+        b.className=`n-sbtn ${tk?'taken':(ms?'mysel':'avail '+zone.gc)}`;
+        b.title=`${r} ${c}번`;
+        if(!tk)b.onclick=()=>nToggleSeat(id,zone,r,c,b);
+        re.appendChild(b);
+      }
+      rows.appendChild(re);
+    });
+    sec.appendChild(rows);wrap.appendChild(sec);
+  });
+}
+
+function nToggleSeat(id,zone,row,col,btn){
+  const idx=NS.seats.findIndex(s=>s.id===id);
+  if(idx>=0){NS.seats.splice(idx,1);nTkMap[id]='avail';btn.className=`n-sbtn avail ${zone.gc}`;}
+  else{if(NS.seats.length>=4){alert('최대 4매까지 선택 가능합니다.');return;}NS.seats.push({id,zone:zone.key,row,col,price:NS.show.price[zone.pr]});nTkMap[id]='mysel';btn.className='n-sbtn mysel';}
+  nUpdatePanel();
+}
+function nUpdatePanel(){
+  const list=document.getElementById('nSelList');
+  if(!NS.seats.length){list.innerHTML='<div class="n-nosel">좌석을 클릭해 선택하세요</div>';}
+  else{list.innerHTML='';NS.seats.forEach((s,i)=>{const el=document.createElement('div');el.className='n-selitem';el.innerHTML=`<span class="n-selitem-txt">${s.row} ${s.col}번</span><button class="n-seldel" onclick="nRemSeat(${i})">×</button>`;list.appendChild(el);});}
+  const tkt=NS.seats.reduce((a,s)=>a+s.price,0),fee=NS.seats.length*NFEE;
+  document.getElementById('nPpTkt').textContent=tkt.toLocaleString()+'원';
+  document.getElementById('nPpFee').textContent=fee.toLocaleString()+'원';
+  document.getElementById('nPpTot').textContent=(tkt+fee).toLocaleString()+'원';
+  document.getElementById('nBtnConf').disabled=NS.seats.length===0;
+}
+function nRemSeat(i){NS.seats.splice(i,1);buildNSecs('all');nUpdatePanel();}
+
+function startNSeatTimer(sec){
+  let l=sec;const bar=document.getElementById('nSeatTimerBar');
+  nSeatTimerIv=setInterval(()=>{l--;const m=Math.floor(l/60),s=l%60;document.getElementById('nSeatTimerVal').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(l<=60)bar.classList.add('urgent');if(l<=0){clearInterval(nSeatTimerIv);alert('시간이 초과되었습니다.');nRestartAll();}},1000);
+}
+
+/* 결제 */
+function goToNPay(){
+  NS.t.seatEnd=Date.now();NS.t.payStart=Date.now();
+  clearInterval(nSeatTimerIv);document.getElementById('nSeatTimerBar').classList.add('hidden');
+  const sh=NS.show,tkt=NS.seats.reduce((a,s)=>a+s.price,0),fee=NS.seats.length*NFEE;
+  const sl=NS.seats.map(s=>`${s.row} ${s.col}번`).join(', ');
+  document.getElementById('npTitle').textContent=sh.title;
+  document.getElementById('npDate').textContent=`2026. ${NS.date.d} ${NS.date.t}`;
+  document.getElementById('npPlace').textContent=sh.place;
+  document.getElementById('npSeat').textContent=sl;
+  document.getElementById('npCnt').textContent=NS.seats.length+'매';
+  document.getElementById('npTkt').textContent=tkt.toLocaleString()+'원';
+  document.getElementById('npFee').textContent=fee.toLocaleString()+'원';
+  document.getElementById('npTot').textContent=(tkt+fee).toLocaleString()+'원';
+  sc(5);
+}
+function nSelPm(el){el.closest('.n-pm-list').querySelectorAll('.n-pm').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function nTogglePay(){document.getElementById('nBtnPay').disabled=!document.getElementById('nAgree').checked;}
+
+/* 완료 */
+function goToNDone(){
+  NS.t.payEnd=Date.now();
+  const sh=NS.show,tkt=NS.seats.reduce((a,s)=>a+s.price,0),fee=NS.seats.length*NFEE;
+  const sl=NS.seats.map(s=>`${s.row} ${s.col}번`).join(', ');
+  document.getElementById('ndShow').textContent=sh.title;
+  document.getElementById('ndDate').textContent=`2026. ${NS.date.d} ${NS.date.t}`;
+  document.getElementById('ndSeat').textContent=sl;
+  document.getElementById('ndPrice').textContent=(tkt+fee).toLocaleString()+'원';
+  const fmt=ms=>{if(!ms||ms<0)return '—';const s=Math.floor(ms/1000);return s<60?`${s}초`:`${Math.floor(s/60)}분 ${s%60}초`;};
+  const T=NS.t;
+  document.getElementById('nstShow').textContent=fmt(T.showSelect-T.start);
+  document.getElementById('nstQ').textContent=fmt(T.qEnd-T.qStart);
+  document.getElementById('nstSeat').textContent=fmt(T.seatEnd-T.seatStart);
+  document.getElementById('nstPay').textContent=fmt(T.payEnd-T.payStart);
+  document.getElementById('nstTot').textContent=fmt(T.payEnd-T.start);
+  sc(6);
+}
+function nRestartAll(){
+  NS.show=null;NS.date=null;NS.session=null;NS.seats=[];NS.t={};
+  clearInterval(nTimerIv);clearInterval(nSeatTimerIv);
+  document.getElementById('nSeatTimerBar').classList.add('hidden');
+  document.getElementById('nSeatTimerBar').classList.remove('urgent');
+  document.getElementById('nAgree').checked=false;document.getElementById('nBtnPay').disabled=true;
+  sc(0);
+}
+
+/* ══ 뷰 전환 ══ */
+const MOB_CSS_NOL = `
+  /* 팝업/오버레이: 모바일 프레임 안에 표시 */
+  #mfClone .y-popup-overlay,
+  #mfClone .m-popup-overlay,
+  #mfClone .n-pop-overlay,
+  #mfClone .zone-popup-overlay,
+  #mfClone .device-modal,
+  #mfClone .conflict-popup{
+    position:absolute!important;
+    top:0!important;left:0!important;right:0!important;bottom:0!important;
+    height:auto!important;
+  }
+  #mfClone .conflict-popup{
+    top:50%!important;left:50%!important;
+    transform:translate(-50%,-50%)!important;
+    right:auto!important;bottom:auto!important;
+    width:88%!important;
+  }
+  #mfClone .practice-badge{display:none!important;}
+  #mfClone .holding-bar{position:sticky!important;top:0!important;}
+  #mfClone .tbar{position:sticky!important;top:0!important;}
+  #mfClone .n-timer-bar{position:sticky!important;top:48px!important;}
+  /* 클론 내 화면 전환 */
+  #mfClone .screen{display:none;}
+  #mfClone .screen.active{display:block;}
+
+  #mfClone .n-header{height:48px!important;padding:0 12px!important;gap:10px!important;}
+  #mfClone .n-logo-nol{font-size:18px!important;}
+  #mfClone .n-logo-ticket{font-size:12px!important;}
+  #mfClone .n-gnb{display:none!important;}
+  #mfClone .n-header-right{gap:4px!important;}
+  #mfClone .n-btn-sm{font-size:11px!important;padding:3px 8px!important;}
+  #mfClone .n-cat-bar{padding:0 8px!important;}
+  #mfClone .n-cat-item{padding:0 10px!important;font-size:12px!important;height:38px!important;}
+  #mfClone .practice-bar{font-size:10px!important;padding:5px 10px!important;}
+  /* 공연 목록 */
+  #mfClone .n-main-body{padding:12px 10px!important;}
+  #mfClone .n-show-row{padding:12px 10px!important;gap:10px!important;}
+  #mfClone .n-show-thumb{width:52px!important;height:68px!important;}
+  #mfClone .n-show-title{font-size:13px!important;}
+  #mfClone .n-show-right{min-width:auto!important;}
+  #mfClone .n-show-price{font-size:11px!important;}
+  /* 공연 상세 */
+  #mfClone .n-detail-body{padding:12px 10px!important;}
+  #mfClone .n-detail-top{flex-direction:column!important;padding:14px!important;}
+  #mfClone .n-detail-poster{width:100%!important;min-height:110px!important;}
+  #mfClone .n-book-area{padding:14px!important;}
+  /* 타이머 버튼 모바일에서 더 크게 (핵심!) */
+  #mfClone .n-btn-timer{height:60px!important;font-size:18px!important;}
+  #mfClone .n-btn-timer .countdown-num{font-size:26px!important;}
+  #mfClone .n-timer-track{height:6px!important;}
+  /* 단일기기 경고 모달 */
+  #mfClone .device-modal-box{width:88%!important;padding:22px 18px!important;}
+  /* 팝업 */
+  #mfClone .n-pop-overlay{align-items:flex-end!important;padding:0!important;}
+  #mfClone .n-popup{
+    width:100%!important;max-width:100%!important;
+    border-radius:20px 20px 0 0!important;
+    max-height:85vh!important;overflow-y:auto!important;
+  }
+  #mfClone .n-pop-body{padding:16px!important;}
+  /* 대기열 */
+  #mfClone .n-queue-wrap{padding:20px 12px!important;}
+  #mfClone .n-queue-card{padding:22px 16px!important;}
+  #mfClone .n-queue-num{font-size:44px!important;}
+  /* 좌석 선택 */
+  #mfClone .n-seat-screen{flex-direction:column!important;height:auto!important;}
+  #mfClone .n-seat-left{border-right:none!important;border-bottom:1px solid var(--border)!important;}
+  #mfClone .n-seat-right{width:100%!important;}
+  #mfClone .n-zone-bar{padding:0 8px!important;}
+  #mfClone .n-zone-item{padding:0 9px!important;font-size:11px!important;}
+  #mfClone .n-sbtn{width:17px!important;height:17px!important;}
+  #mfClone .n-seat-section{padding:8px 10px 4px!important;}
+  #mfClone .n-timer-bar{position:sticky!important;top:48px!important;}
+  /* 결제 */
+  #mfClone .n-pay-wrap{padding:12px 10px!important;max-width:100%!important;}
+    /* mfClone 스크린 height auto (모바일 스크롤 핵심) */
+  #mfClone .screen.active{height:auto!important;min-height:auto!important;}
+  #mfClone .seat-sc,#mfClone .grape-layout,#mfClone .m-seat-body,#mfClone .n-seat-screen{overflow:visible!important;}
+#mfClone .n-done-wrap{padding:20px 10px!important;}
+  #mfClone .n-done-card{padding:22px 14px!important;}
+  /* 하단 고정 버튼 */
+  #mfClone .n-pf,#mfClone .pay-foot,#mfClone .n-pop-foot{
+    position:sticky!important;bottom:0!important;
+    background:#fff!important;z-index:50!important;
+    border-top:1px solid #ddd!important;padding:10px!important;
+  }
+  #mfClone .n-btn-pay{height:46px!important;}
+`;
+function setView(mode){
+  const isM = mode === 'mobile';
+  document.body.className = isM ? 'view-mobile' : 'view-pc';
+  const pc = document.getElementById('vtbPc');
+  const mob = document.getElementById('vtbMob');
+  const active = 'padding:4px 12px;border-radius:5px;border:none;background:#fff;color:#1a1a1a;font-size:11px;font-weight:700;cursor:pointer;font-family:Noto Sans KR,sans-serif;';
+  const inactive = 'padding:4px 12px;border-radius:5px;border:none;background:none;color:#666;font-size:11px;font-weight:500;cursor:pointer;font-family:Noto Sans KR,sans-serif;';
+  pc.style.cssText = isM ? inactive : active;
+  mob.style.cssText = isM ? active : inactive;
+  document.getElementById('vtbTip').textContent = isM
+    ? '📱 NOL: 단일기기 필수 — 다른 기기 먼저 로그아웃! 타이머 버튼 크게 표시됨'
+    : '💻 PC: 타이머 버튼 주시 · 단일 기기 로그인 유지 필수';
+  const mo = document.getElementById('mobileOuter');
+  const pw = document.querySelector('.pc-wrap');
+  if(isM){
+    mo.style.display='flex'; pw.style.display='none';
+    const sc=document.getElementById('mfScroll');
+    if(!sc.hasChildNodes()){
+      if(!document.getElementById('mob-css-nol')){
+        const st=document.createElement('style');st.id='mob-css-nol';st.textContent=MOB_CSS_NOL;
+        document.head.appendChild(st);
+      }
+      const tip=document.createElement('div');
+      tip.style.cssText='background:#1a0a00;padding:8px 12px;font-size:10px;color:rgba(255,255,255,0.8);line-height:1.65;border-bottom:2px solid #ff6100;display:flex;gap:6px;';
+      tip.innerHTML='<span>📱</span><span><b style="color:#fdba74;">NOL 모바일 핵심:</b> 한 계정 단일 기기만 가능. 앱·모바일웹 레이아웃 동일. 앱은 오픈 1분 전 알림 푸시 지원. 타이머 버튼이 PC보다 크게 표시됨.</span>';
+      sc.appendChild(tip);
+      const clone=pw.cloneNode(true);
+      clone.classList.remove('pc-wrap');clone.id='mfClone';
+      // 클론 내 ID 제거 (PC와 중복 방지), onclick은 글로벌 함수라 유지됨
+      clone.querySelectorAll('[id]').forEach(el=>{ el.removeAttribute('id'); });
+      sc.appendChild(clone);
+      // 클론 초기화: 첫 번째 active 화면 동기화
+      const initActive = document.querySelector('.pc-wrap .screen.active');
+      if(initActive){
+        const pcScs = Array.from(document.querySelectorAll('.pc-wrap .screen'));
+        const initIdx = pcScs.indexOf(initActive);
+        const clScs = clone.querySelectorAll('.screen');
+        clScs.forEach(s=>s.classList.remove('active'));
+        if(initIdx>=0 && clScs[initIdx]) clScs[initIdx].classList.add('active');
+      }
+    }
+  } else {
+    mo.style.display='none'; pw.style.display='block';
+  }
+  const n=new Date();const el=document.getElementById('mfTime');
+  if(el) el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  try{localStorage.setItem('podoal_view',mode);}catch(e){}
+}
+setInterval(()=>{const n=new Date();const el=document.getElementById('mfTime');if(el) el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');},30000);
+try{const s=localStorage.getItem('podoal_view');if(s)setView(s);else setView('pc');}catch(e){setView('pc');}
+</script>
+</div><!-- /pc-wrap -->
+</body>
+</html>

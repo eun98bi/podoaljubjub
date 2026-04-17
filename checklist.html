@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>티켓팅 사전준비 체크리스트 — 포도알줍줍</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --grape:#6d28d9;--grape-lt:#f5f3ff;--grape-dk:#5b21b6;
+  --green:#16a34a;--red:#dc2626;--orange:#ea580c;
+  --blue:#1d4ed8;--border:#e5e7eb;--bg:#f9fafb;--text:#111827;
+}
+html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;}
+
+/* ── 헤더 ── */
+.hd{
+  background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 50%,#7c3aed 100%);
+  padding:28px 24px 22px;color:#fff;
+  position:sticky;top:0;z-index:100;
+}
+.hd-top{display:flex;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto;}
+.hd-back{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:12px;padding:5px 12px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-decoration:none;}
+.hd-title{font-size:20px;font-weight:700;letter-spacing:-0.02em;}
+.hd-sub{font-size:12px;opacity:0.75;margin-top:4px;}
+.hd-progress{max-width:1000px;margin:14px auto 0;display:flex;align-items:center;gap:12px;}
+.hd-progress-bar{flex:1;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;}
+.hd-progress-fill{height:100%;background:#fff;border-radius:3px;transition:width 0.4s ease;}
+.hd-progress-txt{font-size:12px;opacity:0.9;font-weight:600;white-space:nowrap;}
+
+/* ── 레이아웃 ── */
+.body{max-width:1000px;margin:0 auto;padding:24px 20px;}
+
+/* ── 카드 ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+.card-head{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none;transition:background 0.1s;}
+.card-head:hover{background:#fafafa;}
+.card-head-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.card-head-text{flex:1;}
+.card-head-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.card-head-sub{font-size:11px;color:#888;}
+.card-head-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;white-space:nowrap;}
+.badge-done{background:#dcfce7;color:var(--green);}
+.badge-todo{background:#f3f4f6;color:#888;border:1px solid #e5e7eb;}
+.badge-warn{background:#fff7ed;color:var(--orange);border:1px solid #fed7aa;}
+.card-arrow{font-size:13px;color:#aaa;transition:transform 0.2s;flex-shrink:0;}
+.card-arrow.open{transform:rotate(90deg);}
+.card-body{display:none;padding:0 20px 18px;border-top:1px solid #f5f5f5;}
+.card-body.open{display:block;}
+
+/* ── 체크 아이템 ── */
+.check-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 0;border-bottom:1px solid #f5f5f5;
+  cursor:pointer;transition:background 0.1s;border-radius:6px;
+  margin:0 -6px;padding:11px 6px;
+}
+.check-item:last-child{border-bottom:none;}
+.check-item:hover{background:#fafafa;}
+.check-box{
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid #d1d5db;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:transparent;
+  flex-shrink:0;margin-top:1px;transition:all 0.15s;
+}
+.check-item.done .check-box{background:var(--green);border-color:var(--green);color:#fff;}
+.check-label{flex:1;}
+.check-title{font-size:13px;font-weight:600;margin-bottom:3px;transition:color 0.15s;}
+.check-item.done .check-title{color:#888;text-decoration:line-through;}
+.check-desc{font-size:11px;color:#888;line-height:1.65;}
+.check-tip{
+  font-size:11px;font-weight:600;color:var(--grape);
+  background:var(--grape-lt);border:1px solid #ddd6fe;
+  border-radius:4px;padding:3px 8px;margin-top:5px;display:inline-block;
+}
+.check-urgent{color:var(--red);}
+
+/* ── 플랫폼 카드 ── */
+.platform-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:2px;}
+.platform-card{
+  border:1px solid var(--border);border-radius:8px;padding:14px;
+  cursor:pointer;transition:all 0.15s;
+}
+.platform-card:hover{border-color:var(--grape);background:var(--grape-lt);}
+.platform-card.on{border-color:var(--grape);background:var(--grape-lt);}
+.pc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pc-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;}
+.pc-name{font-size:14px;font-weight:700;}
+.pc-tip-list{display:flex;flex-direction:column;gap:5px;}
+.pc-tip{font-size:11px;color:#555;line-height:1.6;display:flex;gap:6px;}
+.pc-tip::before{content:'→';color:var(--grape);font-weight:700;flex-shrink:0;}
+.pc-tip.red-tip{color:var(--red);}
+.pc-tip.red-tip::before{content:'⚠';color:var(--red);}
+
+/* ── 반응속도 테스트 ── */
+.reaction-wrap{padding:8px 0;}
+.reaction-desc{font-size:12px;color:#888;line-height:1.7;margin-bottom:16px;}
+.reaction-game{
+  border:2px solid var(--border);border-radius:10px;
+  padding:24px;text-align:center;
+  min-height:160px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  cursor:pointer;transition:all 0.2s;
+  background:#f9fafb;position:relative;overflow:hidden;
+}
+.reaction-game.waiting{background:#f0f9ff;border-color:#bae6fd;cursor:wait;}
+.reaction-game.ready{background:#dcfce7;border-color:var(--green);animation:rPulse 0.5s ease;cursor:pointer;}
+.reaction-game.clicked{background:#fef9c3;border-color:#ca8a04;}
+.reaction-game.missed{background:#fee2e2;border-color:var(--red);}
+@keyframes rPulse{0%{transform:scale(1);}50%{transform:scale(1.02);}100%{transform:scale(1);}}
+.reaction-icon{font-size:40px;line-height:1;}
+.reaction-title{font-size:16px;font-weight:700;}
+.reaction-sub{font-size:12px;color:#888;}
+.reaction-time{font-size:36px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;}
+.reaction-results{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;
+}
+.reaction-result-card{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:10px;text-align:center;}
+.rr-label{font-size:10px;color:#888;margin-bottom:4px;}
+.rr-val{font-size:18px;font-weight:700;color:var(--grape);}
+.rr-unit{font-size:10px;color:#aaa;}
+.reaction-btn-row{display:flex;gap:8px;margin-top:12px;}
+.btn-reaction{flex:1;height:38px;border:1px solid var(--border);background:#fff;color:#555;font-size:13px;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-reaction.primary{background:var(--grape);border-color:var(--grape);color:#fff;font-weight:700;}
+
+/* ── 서버시간 체커 ── */
+.server-time-area{
+  background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);
+  border-radius:10px;padding:20px;margin-top:8px;
+  color:#fff;text-align:center;
+}
+.server-time-label{font-size:11px;opacity:0.65;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase;}
+.server-time-display{font-size:38px;font-weight:700;letter-spacing:0.06em;font-variant-numeric:tabular-nums;margin-bottom:4px;}
+.server-time-date{font-size:12px;opacity:0.55;}
+.server-time-desc{font-size:11px;color:rgba(255,255,255,0.6);line-height:1.6;margin-top:12px;}
+
+/* ── 완료 배너 ── */
+.done-banner{
+  background:linear-gradient(135deg,#052e16 0%,#14532d 100%);
+  border-radius:12px;padding:24px 20px;color:#fff;text-align:center;
+  display:none;margin-bottom:16px;
+}
+.done-banner.show{display:block;}
+.done-banner-ico{font-size:44px;margin-bottom:10px;}
+.done-banner-title{font-size:18px;font-weight:700;margin-bottom:6px;}
+.done-banner-sub{font-size:12px;opacity:0.75;line-height:1.7;}
+.done-platform-btns{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center;}
+.done-platform-btn{
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
+  color:#fff;font-size:13px;font-weight:600;
+  padding:8px 16px;border-radius:6px;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;text-decoration:none;
+  transition:background 0.15s;
+}
+.done-platform-btn:hover{background:rgba(255,255,255,0.25);}
+
+/* ── 공통 ── */
+.section-lbl{font-size:11px;font-weight:700;color:#888;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:10px;margin-top:16px;}
+.section-lbl:first-child{margin-top:4px;}
+.alert-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;font-size:12px;color:#9a3412;line-height:1.7;margin-bottom:12px;}
+.alert-box strong{color:var(--red);}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;font-size:12px;color:#1e40af;line-height:1.7;margin-bottom:12px;}
+
+.practice-badge{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,0.72);color:#fff;font-size:11px;font-weight:600;padding:7px 13px;border-radius:100px;z-index:9999;backdrop-filter:blur(8px);}
+
+/* ══ 모바일 반응형 ══ */
+@media(max-width:640px){
+  .hd{padding:18px 14px 14px;}
+  .hd-top{flex-direction:row;align-items:center;gap:8px;}
+  .hd-title{font-size:16px;}
+  .hd-sub{font-size:11px;}
+  .hd-back{font-size:11px;padding:4px 10px;flex-shrink:0;}
+  .hd-progress{margin-top:10px;}
+  .body{padding:16px 12px;}
+  .summary-grid{grid-template-columns:repeat(2,1fr);}
+  .card-head{padding:13px 14px;}
+  .card-head-title{font-size:13px;}
+  .card-body{padding:0 14px 14px;}
+  .check-item{padding:9px 4px;}
+  .check-title{font-size:12px;}
+  .check-desc{font-size:11px;}
+  .check-tip{font-size:10px;}
+  /* 플랫폼 카드 모바일: 1열 */
+  .platform-grid{grid-template-columns:1fr;}
+  .platform-card{padding:12px;}
+  .pc-tip{font-size:11px;}
+  /* 반응속도 테스트 */
+  .reaction-game{min-height:130px;padding:18px;}
+  .reaction-icon{font-size:32px;}
+  .reaction-title{font-size:14px;}
+  .reaction-time{font-size:30px;}
+  .reaction-results{grid-template-columns:repeat(3,1fr);gap:6px;}
+  .rr-val{font-size:15px;}
+  /* 서버시간 */
+  .server-time-display{font-size:30px;}
+  /* 완료 배너 */
+  .done-platform-btns{flex-direction:column;}
+  .done-platform-btn{text-align:center;}
+}
+</style>
+</head>
+<body>
+<div class="practice-badge">🍇 포도알줍줍 연습</div>
+
+<div class="hd">
+  <div class="hd-top">
+    <a href="index.html" class="hd-back">← 홈으로</a>
+    <div>
+      <div class="hd-title">🗒 티켓팅 사전준비 체크리스트</div>
+      <div class="hd-sub">티켓팅 전날까지 반드시 완료해야 할 준비사항</div>
+    </div>
+    <div style="width:80px;"></div>
+  </div>
+  <div class="hd-progress">
+    <div class="hd-progress-bar"><div class="hd-progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="hd-progress-txt" id="progressTxt">0 / 15 완료</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- 완료 배너 -->
+  <div class="done-banner" id="doneBanner">
+    <div class="done-banner-ico">🎉</div>
+    <div class="done-banner-title">완벽하게 준비됐어요!</div>
+    <div class="done-banner-sub">모든 사전 준비를 마쳤습니다. 이제 각 플랫폼에서 연습하고 실전에 임하세요!</div>
+    <div class="done-platform-btns">
+      <a href="ticketlink-sports.html" class="done-platform-btn">티켓링크 연습 →</a>
+      <a href="yes24.html" class="done-platform-btn">예스24 연습 →</a>
+      <a href="melon.html" class="done-platform-btn">멜론티켓 연습 →</a>
+      <a href="interpark.html" class="done-platform-btn">NOL 연습 →</a>
+    </div>
+  </div>
+
+  <!-- ── 1. 계정 & 본인인증 ── -->
+  <div class="card" id="cat1">
+    <div class="card-head" onclick="toggleCard('cat1')">
+      <div class="card-head-icon" style="background:#dbeafe;">👤</div>
+      <div class="card-head-text">
+        <div class="card-head-title">계정 & 본인인증</div>
+        <div class="card-head-sub">예매 플랫폼 로그인 및 인증</div>
+      </div>
+      <span class="card-head-badge badge-todo" id="cat1-badge">0 / 4</span>
+      <span class="card-arrow" id="cat1-arrow">›</span>
+    </div>
+    <div class="card-body" id="cat1-body">
+      <div class="section-lbl">계정 설정</div>
+      <div class="check-item" onclick="toggle(this,'cat1')" data-id="c1">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">예매 플랫폼 회원가입 완료</div>
+          <div class="check-desc">티켓링크 / 예스24 / 멜론티켓 / NOL 중 티켓팅할 사이트에 가입하세요. 비회원 예매는 불가합니다.</div>
+          <span class="check-tip">📌 가입은 반드시 티켓팅 전날까지!</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat1')" data-id="c2">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">휴대폰 본인인증 완료</div>
+          <div class="check-desc">대부분의 플랫폼에서 본인인증이 필수입니다. 당일 인증 시 오류가 날 수 있으니 미리 완료하세요.</div>
+          <span class="check-tip">⚠ 당일 인증 시도 절대 금지!</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat1')" data-id="c3">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">아이디 / 비밀번호 확인</div>
+          <div class="check-desc">로그인 정보를 미리 확인하세요. 비밀번호 찾기는 반드시 전날 완료. 당일 로그인 안 되면 끝입니다.</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat1')" data-id="c4">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">자동 로그인 설정</div>
+          <div class="check-desc">티켓팅 당일 로그인 화면이 뜨지 않도록 자동 로그인을 설정해두세요.</div>
+          <div class="check-desc" style="margin-top:3px;"><span class="check-urgent">단, NOL(인터파크)은 단일기기만 가능!</span> 다른 기기는 미리 로그아웃하세요.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. 결제수단 ── -->
+  <div class="card" id="cat2">
+    <div class="card-head" onclick="toggleCard('cat2')">
+      <div class="card-head-icon" style="background:#dcfce7;">💳</div>
+      <div class="card-head-text">
+        <div class="card-head-title">결제수단 등록</div>
+        <div class="check-head-sub">카드·페이 사전 등록 필수</div>
+      </div>
+      <span class="card-head-badge badge-todo" id="cat2-badge">0 / 3</span>
+      <span class="card-arrow" id="cat2-arrow">›</span>
+    </div>
+    <div class="card-body" id="cat2-body">
+      <div class="alert-box">⚠ 결제는 <strong>5~7분 이내</strong> 완료해야 합니다. 카드번호 입력 시간이 1초라도 지체되면 실패합니다.</div>
+      <div class="check-item" onclick="toggle(this,'cat2')" data-id="c5">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">신용·체크카드 사전 등록</div>
+          <div class="check-desc">각 플랫폼 마이페이지 → 결제수단 관리에서 카드를 미리 등록하세요. 당일 카드번호 직접 입력은 시간 낭비입니다.</div>
+          <span class="check-tip">✅ 간편결제(카카오페이 / 네이버페이)가 가장 빠름</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat2')" data-id="c6">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">카카오페이 / 네이버페이 연동</div>
+          <div class="check-desc">앱 로그인 상태 유지 + 카드 연동 확인. 실제 결제 시 생체인증(지문/Face ID)이 활성화되어 있으면 더 빠릅니다.</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat2')" data-id="c7">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">카드 한도 / 잔액 확인</div>
+          <div class="check-desc">티켓팅 당일 카드 한도가 부족하면 결제가 실패합니다. VIP 좌석은 1인 14만원 이상이므로 여유 한도를 확보하세요.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. 브라우저 & 환경 ── -->
+  <div class="card" id="cat3">
+    <div class="card-head" onclick="toggleCard('cat3')">
+      <div class="card-head-icon" style="background:#fef9c3;">🌐</div>
+      <div class="card-head-text">
+        <div class="card-head-title">브라우저 & 환경 설정</div>
+        <div class="card-head-sub">팝업 해제 · 캐시 정리 · 네트워크</div>
+      </div>
+      <span class="card-head-badge badge-todo" id="cat3-badge">0 / 4</span>
+      <span class="card-arrow" id="cat3-arrow">›</span>
+    </div>
+    <div class="card-body" id="cat3-body">
+      <div class="alert-box">⚠ 팝업 차단 해제를 하지 않으면 <strong>예매창 자체가 열리지 않습니다!</strong> 가장 흔한 실패 원인입니다.</div>
+      <div class="check-item" onclick="toggle(this,'cat3')" data-id="c8">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">팝업 차단 해제 (가장 중요!)</div>
+          <div class="check-desc">Chrome: 오른쪽 상단 ⋮ → 설정 → 개인정보 → 사이트 설정 → 팝업 및 리디렉션 → 허용<br>또는 해당 사이트 주소창 🔒 클릭 → 팝업 → 허용</div>
+          <span class="check-tip">🔑 티켓링크·예스24·멜론티켓 모두 팝업창으로 예매창이 열립니다</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat3')" data-id="c9">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">브라우저 캐시 / 쿠키 정리</div>
+          <div class="check-desc">Chrome: Ctrl+Shift+Delete → 캐시된 이미지·파일 + 쿠키 삭제 → 정리. 오래된 캐시가 로딩을 느리게 합니다.</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat3')" data-id="c10">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">인터넷 속도 확인 (유선 권장)</div>
+          <div class="check-desc">유선 인터넷 &gt; Wi-Fi &gt; LTE/5G 순서로 안정적입니다. 모바일만 사용 시 LTE가 Wi-Fi보다 오히려 빠를 수 있습니다.</div>
+          <span class="check-tip">💡 인터넷 속도 테스트: fast.com 또는 speedtest.net</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat3')" data-id="c11">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">불필요한 탭 / 앱 종료</div>
+          <div class="check-desc">유튜브·넷플릭스·게임 등 네트워크를 사용하는 앱을 모두 종료하세요. 다운로드 중인 파일도 일시 정지하세요.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. 서버 시간 & 타이밍 ── -->
+  <div class="card" id="cat4">
+    <div class="card-head" onclick="toggleCard('cat4')">
+      <div class="card-head-icon" style="background:#fce7f3;">⏰</div>
+      <div class="card-head-text">
+        <div class="card-head-title">서버 시간 & 타이밍</div>
+        <div class="card-head-sub">현재 정확한 시간 확인</div>
+      </div>
+      <span class="card-head-badge badge-todo" id="cat4-badge">0 / 2</span>
+      <span class="card-arrow" id="cat4-arrow">›</span>
+    </div>
+    <div class="card-body" id="cat4-body">
+      <div class="server-time-area">
+        <div class="server-time-label">현재 서버 시간</div>
+        <div class="server-time-display" id="serverClock">--:--:--</div>
+        <div class="server-time-date" id="serverDate">----년 --월 --일</div>
+        <div class="server-time-desc">
+          실제 티켓팅 시에는 각 플랫폼의 서버 시간 위젯을 확인하세요.<br>
+          오픈 5~10초 전에 새로고침을 준비하고, <strong style="color:#a5f3fc;">정각 0초에 새로고침!</strong>
+        </div>
+      </div>
+      <div class="check-item" style="margin-top:10px;" onclick="toggle(this,'cat4')" data-id="c12">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">오픈 시각 10분 전부터 대기</div>
+          <div class="check-desc">티켓팅 페이지를 열어두고 로그인 상태를 유지한 채 대기합니다. 오픈 직전에 로그인을 시도하면 느립니다.</div>
+          <span class="check-tip">🕐 오픈 10분 전: 로그인 확인 / 5분 전: 예매 페이지 열기 / 0초: 새로고침!</span>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggle(this,'cat4')" data-id="c13">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">F5 새로고침 연습 (또는 Ctrl+R)</div>
+          <div class="check-desc">예스24는 새로고침 후 예매하기 버튼이 활성화됩니다. 멜론티켓은 오픈 시 자동 이동. 플랫폼마다 다릅니다.</div>
+          <span class="check-tip">📋 플랫폼별 차이가 아래 나와 있어요</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. 플랫폼별 핵심 전략 ── -->
+  <div class="card" id="cat5">
+    <div class="card-head" onclick="toggleCard('cat5')">
+      <div class="card-head-icon" style="background:#ede9fe;">🎯</div>
+      <div class="card-head-text">
+        <div class="card-head-title">플랫폼별 핵심 전략</div>
+        <div class="card-head-sub">티켓링크 · 예스24 · 멜론티켓 · NOL</div>
+      </div>
+      <span class="card-head-badge badge-todo" id="cat5-badge">0 / 1</span>
+      <span class="card-arrow" id="cat5-arrow">›</span>
+    </div>
+    <div class="card-body" id="cat5-body">
+      <div class="platform-grid">
+        <div class="platform-card" onclick="togglePC(this)">
+          <div class="pc-head">
+            <div class="pc-icon" style="background:#e22228;">TL</div>
+            <span class="pc-name">티켓링크</span>
+          </div>
+          <div class="pc-tip-list">
+            <div class="pc-tip">클린예매: 보안문자 입력 후 입장</div>
+            <div class="pc-tip">대기열 팝업 뜨면 창 닫기 금지</div>
+            <div class="pc-tip">좌석 선택 후 10분 내 결제</div>
+            <div class="pc-tip red-tip">새로고침 시 대기 순번 초기화</div>
+          </div>
+        </div>
+        <div class="platform-card" onclick="togglePC(this)">
+          <div class="pc-head">
+            <div class="pc-icon" style="background:#e22228;">Y24</div>
+            <span class="pc-name">예스24</span>
+          </div>
+          <div class="pc-tip-list">
+            <div class="pc-tip">F5 새로고침 후 예매하기 버튼 활성화</div>
+            <div class="pc-tip">포도알(빈 좌석) 빠르게 클릭</div>
+            <div class="pc-tip">이결좌 뜨면 즉시 다른 좌석 선택</div>
+            <div class="pc-tip">홀딩 시간 5분 이내 결제 완료</div>
+            <div class="pc-tip red-tip">다중 접속 시 오류 발생 → 한 기기만!</div>
+          </div>
+        </div>
+        <div class="platform-card" onclick="togglePC(this)">
+          <div class="pc-head">
+            <div class="pc-icon" style="background:#00cd3c;">MT</div>
+            <span class="pc-name">멜론티켓</span>
+          </div>
+          <div class="pc-tip-list">
+            <div class="pc-tip">오픈 시 자동으로 예매 페이지 이동!</div>
+            <div class="pc-tip">PC + 모바일 동시 접속 가능 (전략적)</div>
+            <div class="pc-tip">팝업 차단 해제 필수</div>
+            <div class="pc-tip">회차 선택 후 매수 선택 순서로</div>
+          </div>
+        </div>
+        <div class="platform-card" onclick="togglePC(this)">
+          <div class="pc-head">
+            <div class="pc-icon" style="background:#ff6100;">NOL</div>
+            <span class="pc-name">NOL (인터파크)</span>
+          </div>
+          <div class="pc-tip-list">
+            <div class="pc-tip">예매하기 버튼에 타이머 카운트다운</div>
+            <div class="pc-tip">오픈 시 버튼 색 주황색으로 바뀌면 클릭</div>
+            <div class="pc-tip">대기열 순번 받아 입장</div>
+            <div class="pc-tip">좌석 선택 후 7분 내 결제</div>
+            <div class="pc-tip red-tip">한 계정 동시 접속 불가! 단일 기기만</div>
+          </div>
+        </div>
+      </div>
+      <div class="check-item" style="margin-top:12px;" onclick="toggle(this,'cat5')" data-id="c14">
+        <div class="check-box">✓</div>
+        <div class="check-label">
+          <div class="check-title">예매 플랫폼 차이점 숙지 완료</div>
+          <div class="check-desc">위 4가지 플랫폼별 핵심 전략을 모두 읽고 이해했습니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. 반응속도 테스트 ── -->
+  <div class="card" id="cat6">
+    <div class="card-head" onclick="toggleCard('cat6')">
+      <div class="card-head-icon" style="background:#fce7f3;">⚡</div>
+      <div class="card-head-text">
+        <div class="card-head-title">반응속도 테스트</div>
+        <div class="card-head-sub">클릭 반응 속도 측정 및 연습</div>
+      </div>
+      <span class="card-head-badge badge-todo" id="cat6-badge">0 / 1</span>
+      <span class="card-arrow" id="cat6-arrow">›</span>
+    </div>
+    <div class="card-body" id="cat6-body">
+      <div class="reaction-wrap">
+        <div class="reaction-desc">
+          화면이 초록색으로 바뀌는 순간 즉시 클릭하세요. 포도알이 뜨는 타이밍에 반응하는 연습입니다.<br>
+          <strong>목표: 250ms 이하</strong> (상위 10% 수준 · 평균은 약 350~400ms)
+        </div>
+        <div class="reaction-game" id="rGame" onclick="clickReaction()">
+          <div class="reaction-icon" id="rIcon">👆</div>
+          <div class="reaction-title" id="rTitle">클릭해서 시작</div>
+          <div class="reaction-sub" id="rSub">초록색으로 바뀌면 즉시 클릭!</div>
+        </div>
+        <div class="reaction-results" id="rResults" style="display:none;">
+          <div class="reaction-result-card">
+            <div class="rr-label">최근 반응속도</div>
+            <div class="rr-val" id="rLast">—</div>
+            <div class="rr-unit">ms</div>
+          </div>
+          <div class="reaction-result-card">
+            <div class="rr-label">평균 (최근 5회)</div>
+            <div class="rr-val" id="rAvg">—</div>
+            <div class="rr-unit">ms</div>
+          </div>
+          <div class="reaction-result-card">
+            <div class="rr-label">최고 기록</div>
+            <div class="rr-val" id="rBest">—</div>
+            <div class="rr-unit">ms</div>
+          </div>
+        </div>
+        <div class="reaction-btn-row" id="rBtnRow" style="display:none;">
+          <button class="btn-reaction" onclick="resetReaction()">다시하기</button>
+          <button class="btn-reaction primary" id="rPassBtn" onclick="passReaction()" style="display:none;">목표 달성! 체크 완료</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:20px 0 40px;font-size:12px;color:#aaa;">
+    포도알줍줍 — 티켓팅 연습 플랫폼<br>
+    <a href="index.html" style="color:var(--grape);text-decoration:none;">← 홈으로 돌아가기</a>
+  </div>
+</div>
+
+<script>
+/* ── 체크박스 상태 ── */
+const checks = {};
+const catCounts = {cat1:4, cat2:3, cat3:4, cat4:2, cat5:1, cat6:1};
+const TOTAL = 15;
+
+function toggle(el, catId) {
+  const id = el.dataset.id;
+  const isDone = el.classList.contains('done');
+  if (isDone) { el.classList.remove('done'); delete checks[id]; }
+  else { el.classList.add('done'); checks[id] = true; }
+  updateProgress();
+  updateCatBadge(catId);
+}
+
+function updateProgress() {
+  const done = Object.keys(checks).length;
+  const pct = Math.round((done / TOTAL) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressTxt').textContent = `${done} / ${TOTAL} 완료`;
+  document.getElementById('doneBanner').classList.toggle('show', done >= TOTAL);
+}
+
+function updateCatBadge(catId) {
+  const items = document.querySelectorAll(`#${catId}-body .check-item`);
+  const total = items.length;
+  const done = document.querySelectorAll(`#${catId}-body .check-item.done`).length;
+  const badge = document.getElementById(`${catId}-badge`);
+  badge.textContent = `${done} / ${total}`;
+  badge.className = 'card-head-badge ' + (done >= total ? 'badge-done' : done > 0 ? 'badge-warn' : 'badge-todo');
+}
+
+function toggleCard(id) {
+  const body = document.getElementById(`${id}-body`);
+  const arrow = document.getElementById(`${id}-arrow`);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+
+function togglePC(el) {
+  el.classList.toggle('on');
+}
+
+/* ── 서버 시간 ── */
+function updateServerClock() {
+  const n = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('serverClock').textContent =
+    `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+  document.getElementById('serverDate').textContent =
+    `${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 (${days[n.getDay()]})`;
+  setTimeout(updateServerClock, 1000);
+}
+updateServerClock();
+
+/* ── 반응속도 테스트 ── */
+let rState = 'idle'; // idle | waiting | ready | result
+let rTimer = null;
+let rStartTime = 0;
+const rTimes = [];
+
+function clickReaction() {
+  if (rState === 'idle') {
+    startReaction();
+  } else if (rState === 'waiting') {
+    // 너무 빠름
+    clearTimeout(rTimer);
+    setRGame('missed', '⚡', '너무 빨리 클릭했어요!', '초록색이 될 때까지 기다리세요');
+    rState = 'result';
+    showRResults();
+  } else if (rState === 'ready') {
+    recordReaction();
+  } else if (rState === 'result') {
+    startReaction();
+  }
+}
+
+function startReaction() {
+  rState = 'waiting';
+  setRGame('waiting', '🟡', '기다리세요...', '초록색으로 바뀌면 클릭!');
+  const delay = 1500 + Math.random() * 3500;
+  rTimer = setTimeout(() => {
+    rState = 'ready';
+    rStartTime = Date.now();
+    setRGame('ready', '🟢', '지금 클릭!', '');
+  }, delay);
+}
+
+function recordReaction() {
+  const ms = Date.now() - rStartTime;
+  rState = 'result';
+  rTimes.push(ms);
+  if (rTimes.length > 10) rTimes.shift();
+
+  let feedback, emoji;
+  if (ms < 200) { feedback = '⚡ 번개 반응! 최상위 수준입니다'; emoji = '🏆'; }
+  else if (ms < 250) { feedback = '🎯 매우 빠름! 티켓팅 준비 완료'; emoji = '🎯'; }
+  else if (ms < 350) { feedback = '👍 좋아요! 충분히 빠릅니다'; emoji = '👍'; }
+  else if (ms < 500) { feedback = '😅 평균 수준, 조금 더 연습하세요'; emoji = '😅'; }
+  else { feedback = '💪 연습이 필요해요! 계속 도전하세요'; emoji = '💪'; }
+
+  setRGame('clicked', emoji, `${ms}ms`, feedback);
+  document.getElementById('rResults').style.display = 'grid';
+  document.getElementById('rBtnRow').style.display = 'flex';
+
+  const last5 = rTimes.slice(-5);
+  const avg = Math.round(last5.reduce((a,b)=>a+b,0)/last5.length);
+  const best = Math.min(...rTimes);
+
+  document.getElementById('rLast').textContent = ms;
+  document.getElementById('rAvg').textContent = avg;
+  document.getElementById('rBest').textContent = best;
+
+  // 목표 달성 시 체크 가능
+  if (ms < 350) {
+    document.getElementById('rPassBtn').style.display = '';
+  }
+}
+
+function setRGame(cls, icon, title, sub) {
+  const game = document.getElementById('rGame');
+  game.className = 'reaction-game ' + cls;
+  document.getElementById('rIcon').textContent = icon;
+  document.getElementById('rTitle').textContent = title;
+  document.getElementById('rSub').textContent = sub;
+}
+
+function resetReaction() {
+  clearTimeout(rTimer);
+  rState = 'idle';
+  setRGame('', '👆', '클릭해서 시작', '초록색으로 바뀌면 즉시 클릭!');
+  document.getElementById('rResults').style.display = 'none';
+  document.getElementById('rBtnRow').style.display = 'none';
+  document.getElementById('rPassBtn').style.display = 'none';
+}
+
+function passReaction() {
+  // cat6 체크 완료
+  const item = document.querySelector('#cat6-body .check-item');
+  if (item && !item.classList.contains('done')) {
+    item.classList.add('done');
+    checks['c15'] = true;
+    updateProgress();
+    updateCatBadge('cat6');
+  }
+  document.getElementById('rPassBtn').style.display = 'none';
+}
+
+// 초기 cat5 열어두기
+toggleCard('cat5');
+</script>
+</body>
+</html>

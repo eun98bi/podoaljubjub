@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>티켓링크 예매</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+.hidden{display:none!important;}
+:root{
+  --blue:#005bac;--blue-lt:#e6f0f8;
+  --red:#e22228;--text:#1a1a1a;
+  --border:#ddd;--bg:#f0f0f0;
+  --orange:#e8873a;
+}
+html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:#fff;height:100%;overflow:hidden;}
+.step{display:none;height:calc(100vh - 36px);flex-direction:column;position:relative;}
+.step.active{display:flex;}
+
+/* ══ 모바일 반응형 (팝업창이므로 @media 방식) ══ */
+@media(max-width:600px){
+  .pop-hd{height:44px;padding:0 12px;}
+  .pop-logo{font-size:17px;}.pop-logo-em{font-size:14px;}
+  .sb{font-size:9px;height:34px;padding:0 2px;}
+  .captcha-box{width:100%;padding:20px 14px;}
+  .captcha-title{font-size:15px;}
+  /* 좌석 선택: 세로 배치 */
+  .reserve-body{flex-direction:column!important;}
+  .seat-area{max-height:52vh;border-right:none!important;border-bottom:1px solid var(--border);}
+  .stadium-img-container{max-height:190px;}
+  .seat-ctrl-bar{padding:6px 10px;}
+  .btn-no-seat{font-size:11px;padding:5px 10px;}
+  .ctrl-btn{width:26px;height:26px;font-size:12px;}
+  .seat-area-top{padding:10px 12px 7px;}
+  .game-title{font-size:13px;}.game-sub{font-size:11px;}
+  .seat-bottom-bar{font-size:11px;padding:7px 12px;}
+  /* 등급 패널: 전체 너비 */
+  .grade-panel{width:100%!important;max-height:42vh;border-left:none!important;border-top:1px solid var(--border);}
+  .grade-panel-minimap{height:80px;}.grade-panel-minimap img{width:76px;height:76px;}
+  .grade-panel-head{padding:8px 10px;}
+  .grade-list{max-height:140px!important;}
+  .grade-item{padding:6px 10px;}.grade-name{font-size:11px;}.grade-cnt{font-size:10px;}
+  .grade-next-area{padding:8px 10px;}
+  .btn-next-big{height:44px;font-size:15px;}
+  /* 자동배정 카드 */
+  .auto-qty-overlay{width:100%;bottom:0;right:0;position:fixed;}
+  .auto-qty-card{border-radius:0;border-left:none;}
+  .aqc-btn{width:34px;height:34px;}
+  /* 직접선택 */
+  .direct-ctrl-bar{padding:5px 8px;}
+  .seat-grid-wrap{padding:6px 8px;}
+  /* 권종 */
+  .ticket-type-wrap{padding:14px 12px;}
+  .tt-tbl{font-size:12px;}
+  /* 배송확인 */
+  .confirm-wrap{padding:14px 12px;}
+  .cf-card{padding:12px;}.rcv-card{padding:10px 6px;}.rcv-nm{font-size:11px;}
+  /* 결제 */
+  .pay-wrap{padding:14px 12px;}
+  /* 완료 */
+  .done-wrap{padding:24px 12px;}.done-card{padding:24px 14px;}.done-h{font-size:18px;}
+  /* 팝업 */
+  .zone-popup{width:92%;}.zone-popup-head{font-size:14px;}
+  /* 하단 고정 CTA */
+  .grade-next-area,.pf,.tt-foot,.cf-foot,.pay-foot,.direct-next-area{
+    position:sticky;bottom:0;background:#fff;z-index:50;
+    border-top:1px solid var(--border)!important;
+  }
+  .direct-right-panel{max-height:220px;}
+  #directGradeList{max-height:100px!important;}
+  /* step.active 모바일에서 스크롤 허용 */
+  .step.active{height:auto;min-height:calc(100vh - 36px);overflow-y:auto;}
+  .seat-sc,.reserve-body{height:auto!important;overflow:visible!important;}
+}
+
+/* ── 공통 헤더 ── */
+.pop-hd{background:#fff;border-bottom:1px solid #ddd;padding:0 16px;height:50px;display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.pop-logo{font-size:20px;font-weight:900;color:#1a1a1a;letter-spacing:-0.04em;}
+.pop-logo .lt{font-weight:300;}
+.pop-logo-em{font-size:17px;font-weight:700;color:#1a1a1a;margin-left:2px;}
+
+/* ── 스텝바 ── */
+.stepbar{display:flex;flex-shrink:0;border-bottom:1px solid #ccc;}
+.sb{flex:1;height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#aaa;background:#e8e8e8;border-right:1px solid #ccc;position:relative;}
+.sb:last-child{border-right:none;}
+.sb.done{background:#fff;color:#666;}
+.sb.cur{background:#333;color:#fff;font-weight:700;}
+.sb.cur::after{content:'';position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:10px solid #333;z-index:2;}
+.sb.done::after{content:'';position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:10px solid #fff;z-index:2;}
+
+/* ══════════════════════
+   STEP 0: 보안문자
+══════════════════════ */
+.captcha-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:#fff;}
+.captcha-box{width:360px;padding:28px 28px 22px;}
+.captcha-title{font-size:17px;font-weight:700;text-align:center;margin-bottom:14px;}
+.captcha-desc{font-size:13px;color:#333;text-align:center;margin-bottom:16px;line-height:1.65;}
+.captcha-desc .em{color:var(--blue);font-weight:700;}
+.captcha-desc .em2{font-weight:700;}
+.captcha-img-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.captcha-img{flex:1;height:70px;border-radius:4px;background:linear-gradient(135deg,#c0392b 0%,#e74c3c 40%,#c0392b 70%,#8e1a12 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.captcha-img::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,0.06) 3px,rgba(255,255,255,0.06) 4px);}
+.captcha-txt{font-size:24px;font-weight:900;color:#fff;letter-spacing:7px;font-family:Georgia,serif;text-shadow:2px 2px 0 rgba(0,0,0,0.35);transform:skewX(-5deg);z-index:1;user-select:none;}
+.captcha-refresh{width:32px;height:32px;border-radius:50%;background:#f0f0f0;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#666;flex-shrink:0;transition:all 0.15s;}
+.captcha-refresh:hover{background:#e0e0e0;transform:rotate(30deg);}
+.captcha-input{width:100%;height:40px;border:1px solid #ccc;border-radius:3px;padding:0 12px;font-size:16px;letter-spacing:4px;text-align:center;outline:none;font-family:'Noto Sans KR',sans-serif;transition:border-color 0.15s;margin-bottom:6px;}
+.captcha-input:focus{border-color:var(--blue);}
+.captcha-hint{font-size:11px;color:#888;line-height:1.7;margin-bottom:16px;}
+.captcha-btns{display:flex;gap:8px;}
+.btn-back{flex:1;height:44px;background:#fff;border:1px solid #ccc;color:#333;font-size:13px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-ok{flex:2;height:44px;background:#1a1a1a;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-ok:hover{background:#333;}
+
+/* ══════════════════════
+   STEP 1: 등급/좌석 선택
+══════════════════════ */
+.reserve-body{flex:1;display:flex;overflow:hidden;position:relative;}
+
+/* 좌석 배치도 좌측 */
+.seat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #ddd;background:#fff;position:relative;}
+.seat-area-top{padding:12px 14px 8px;flex-shrink:0;border-bottom:1px solid #eee;}
+.game-title{font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-bottom:2px;}
+.game-sub{font-size:12px;color:#888;}
+
+/* 컨트롤 바 */
+.seat-ctrl-bar{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;flex-shrink:0;}
+.btn-no-seat{background:var(--orange);color:#fff;font-size:12px;font-weight:500;padding:6px 12px;border-radius:3px;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;gap:4px;}
+.ctrl-icons{display:flex;gap:3px;}
+.ctrl-btn{width:30px;height:30px;border-radius:3px;background:#f0f0f0;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#555;transition:all 0.12s;user-select:none;}
+.ctrl-btn:hover{background:#e0e0e0;}
+
+/* 좌석도 컨테이너 - 이미지 기반 */
+.stadium-img-container{
+  flex:1;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:#f8f8f8;
+}
+.stadium-img-wrap{
+  position:relative;
+  transform-origin:center center;
+  transition:transform 0.2s;
+}
+.stadium-img{
+  display:block;
+  width:100%;max-width:640px;
+  cursor:crosshair;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+/* 클릭 오버레이 - 투명하게 전체 덮어서 클릭 감지 */
+.stadium-click-overlay{
+  position:absolute;inset:0;
+  cursor:pointer;
+  z-index:5;
+}
+
+/* 하단 안내바 */
+.seat-bottom-bar{
+  background:#555;color:#fff;
+  padding:9px 14px;font-size:12px;font-weight:500;
+  display:flex;align-items:center;gap:5px;
+  flex-shrink:0;
+}
+
+/* ── 좌석 유형 선택 팝업 (Image 2) ── */
+.zone-popup-overlay{
+  position:absolute;inset:0;
+  background:rgba(80,80,80,0.55);
+  display:flex;align-items:center;justify-content:center;
+  z-index:50;
+}
+.zone-popup-overlay.hidden{display:none;}
+.zone-popup{
+  background:#fff;border-radius:4px;
+  width:280px;padding:22px 22px 18px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.22);
+}
+.zone-popup-head{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:15px;font-weight:700;margin-bottom:14px;
+}
+.zone-popup-close{background:none;border:none;font-size:20px;color:#999;cursor:pointer;line-height:1;padding:0;}
+.zone-popup-close:hover{color:#333;}
+.zone-popup-desc{font-size:12px;color:#444;line-height:1.7;margin-bottom:14px;}
+.zone-popup-desc strong{color:#1a1a1a;}
+.zone-popup-selected{
+  display:flex;align-items:center;gap:7px;
+  margin-bottom:5px;
+}
+.zone-popup-dot{width:14px;height:14px;border-radius:2px;flex-shrink:0;}
+.zone-popup-name{font-size:14px;font-weight:700;}
+.zone-popup-cnt{font-size:16px;font-weight:700;color:var(--red);margin-bottom:14px;padding-left:21px;}
+.zone-popup-btns{display:flex;gap:7px;}
+.btn-zone-auto{flex:1;height:42px;background:#1a1a1a;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-zone-direct{flex:1;height:42px;background:#1a1a1a;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-zone-auto:hover,.btn-zone-direct:hover{background:#333;}
+
+/* ── 우측: 등급 패널 (기본 상태) ── */
+.grade-panel{
+  width:210px;flex-shrink:0;background:#fff;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+#gradePanelDefault{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.grade-panel-minimap{height:120px;background:#f5f5f5;border-bottom:1px solid #eee;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.grade-panel-minimap img{width:108px;height:108px;object-fit:contain;}
+.grade-panel-head{padding:9px 12px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0;}
+.grade-refresh-btn{font-size:11px;color:#666;background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.grade-list{flex:1;overflow-y:auto;}
+.grade-section-lbl{padding:7px 12px 3px;font-size:11px;font-weight:700;color:#aaa;}
+.grade-item{display:flex;align-items:center;gap:7px;padding:7px 12px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background 0.1s;position:relative;}
+.grade-item:hover{background:#f8f8f8;}
+.grade-item.sel{background:#e8f0f8;}
+.grade-item.checked::before{content:'✓';position:absolute;left:3px;font-size:8px;color:var(--blue);}
+.grade-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+.grade-name{flex:1;font-size:11.5px;color:#333;line-height:1.35;}
+.grade-cnt{font-size:11px;color:#aaa;white-space:nowrap;}
+.grade-cnt.avail{color:var(--red);font-weight:700;}
+.grade-seat-link{font-size:11px;color:#666;text-align:right;padding:7px 12px;border-top:1px solid #eee;cursor:pointer;display:flex;align-items:center;justify-content:flex-end;gap:3px;}
+.grade-seat-link:hover{color:var(--blue);}
+.grade-next-area{padding:10px 12px;flex-shrink:0;}
+.btn-next-big{width:100%;height:52px;background:#1a1a1a;color:#fff;font-size:18px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-next-big:hover{background:#333;}
+
+/* ── 자동배정 매수 선택 카드 (우측 하단 고정) ── */
+.auto-qty-overlay{
+  position:fixed;
+  bottom:0;right:0;
+  width:210px;
+  z-index:200;
+}
+.auto-qty-overlay.hidden{display:none;}
+.auto-qty-card{
+  background:#fff;
+  border-top:1px solid #ddd;
+  border-left:1px solid #ddd;
+  border-radius:4px 0 0 0;
+  padding:14px 14px 10px;
+  box-shadow:-2px -4px 16px rgba(0,0,0,0.12);
+}
+.auto-qty-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.auto-qty-grade{display:flex;align-items:center;gap:7px;}
+.auto-qty-dot{width:14px;height:14px;border-radius:2px;flex-shrink:0;}
+.auto-qty-name{font-size:14px;font-weight:700;}
+.auto-qty-close{background:none;border:none;font-size:18px;color:#aaa;cursor:pointer;padding:0;line-height:1;}
+.auto-qty-close:hover{color:#333;}
+.auto-qty-cnt{font-size:22px;font-weight:700;color:var(--red);text-align:center;margin:8px 0;}
+.auto-qty-ctrl{display:flex;align-items:center;justify-content:center;gap:0;border:1px solid #ddd;border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.aqc-btn{width:38px;height:36px;background:#fff;border:none;font-size:18px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:background 0.12s;}
+.aqc-btn:hover{background:#f0f0f0;}
+.aqc-val{flex:1;text-align:center;font-size:15px;font-weight:700;border-left:1px solid #ddd;border-right:1px solid #ddd;padding:8px 0;min-width:60px;}
+.aqc-state{text-align:center;font-size:12px;color:#aaa;margin-bottom:0;}
+.btn-auto-next{width:100%;height:50px;background:#1a1a1a;color:#fff;font-size:18px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;}
+.btn-auto-next:hover{background:#333;}
+
+/* ── 등급 인라인 액션 (자동배정/직접선택 버튼) ── */
+.grade-item-actions{display:flex;gap:6px;padding:5px 12px 8px;background:#e8f0f8;border-bottom:1px solid #d0dce8;}
+.btn-grade-auto,.btn-grade-direct{flex:1;height:30px;border-radius:3px;border:none;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:#1a1a1a;color:#fff;}
+.btn-grade-auto:hover,.btn-grade-direct:hover{background:#333;}
+/* ── 서브존 항목 ── */
+.grade-sub-zone{display:flex;align-items:center;padding:6px 12px 6px 30px;border-bottom:1px solid #f0f0f0;cursor:pointer;background:#f8f8f8;transition:background 0.1s;}
+.grade-sub-zone:hover{background:#eef4fb;}
+.grade-sub-zone.sel{background:#e0eaf6;}
+.grade-sub-zone-name{flex:1;font-size:11.5px;color:#444;}
+.grade-sub-zone-cnt{font-size:11px;color:#bbb;white-space:nowrap;}
+.grade-sub-zone-cnt.avail{color:var(--red);font-weight:700;}
+
+/* ── 직접선택 시: 좌석 그리드 뷰 (Image 4) ── */
+.direct-view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.direct-view.hidden{display:none;}
+.direct-ctrl-bar{display:flex;align-items:center;gap:8px;padding:6px 12px;flex-shrink:0;border-bottom:1px solid #eee;}
+.btn-back-to-map{background:#fff;border:1px solid #ccc;color:#444;font-size:12px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.direct-zone-label{
+  flex:1;text-align:center;
+  font-size:12px;font-weight:500;color:#fff;
+  background:#888;padding:5px 8px;border-radius:3px;
+}
+.seat-grid-wrap{flex:1;overflow:auto;padding:8px 12px;}
+.seat-grid-header{
+  display:flex;align-items:center;
+  padding:5px 0;
+  font-size:11px;color:#888;
+  margin-bottom:6px;
+}
+.seat-row-group{margin-bottom:2px;}
+.seat-row-line{
+  display:flex;align-items:center;gap:1px;
+  margin-bottom:1px;
+}
+.row-num{
+  font-size:8px;color:#bbb;
+  width:16px;text-align:right;
+  flex-shrink:0;margin-right:3px;
+}
+.seat-cell{
+  width:7px;height:7px;
+  border-radius:2px;
+  background:#d8d8d8;
+  border:none;
+  cursor:pointer;
+  flex-shrink:0;
+  box-sizing:border-box;
+  transition:all 0.08s;
+}
+.seat-cell.avail:hover{filter:brightness(0.7);transform:scale(1.5);z-index:2;}
+.seat-cell.taken{background:#e4e4e4 !important;cursor:not-allowed;opacity:0.45;}
+.seat-cell.sel{
+  border-radius:50%;
+  border:2px solid #1a1a1a;
+}
+.seat-col-group{display:flex;gap:8px;}
+.col-block{display:flex;flex-direction:column;}
+.col-header{font-size:9px;color:#888;text-align:center;margin-bottom:4px;font-weight:700;letter-spacing:0.02em;}
+.direct-seat-bottom{
+  background:#555;color:#fff;
+  padding:9px 14px;font-size:12px;font-weight:500;
+  display:flex;align-items:center;gap:5px;
+  flex-shrink:0;
+}
+
+/* 직접선택 우측 패널 추가 UI */
+.direct-right-panel{
+  display:flex;flex-direction:column;
+}
+.direct-grade-head{padding:9px 12px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+.direct-seat-select-mode{padding:9px 12px;border-bottom:1px solid #eee;}
+.dsm-title{font-size:11px;color:#888;margin-bottom:7px;display:flex;align-items:center;gap:4px;}
+.dsm-title span{font-size:10px;}
+.dsm-radios{display:flex;gap:12px;}
+.dsm-radio{display:flex;align-items:center;gap:5px;font-size:12px;color:#333;cursor:pointer;}
+.dsm-radio input{accent-color:var(--blue);}
+.direct-sel-info{padding:9px 12px;flex:1;}
+.dsi-lbl{font-size:11px;color:#aaa;margin-bottom:5px;}
+.dsi-list{font-size:12px;color:#333;line-height:1.9;}
+.dsi-empty{font-size:12px;color:#bbb;}
+
+/* 좌석선택 완료 버튼 */
+.direct-next-area{padding:10px 12px;border-top:1px solid #eee;flex-shrink:0;}
+.btn-direct-next{width:100%;height:44px;background:#1a1a1a;color:#fff;font-size:15px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-direct-next:hover{background:#333;}
+.btn-direct-next:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   STEP 2: 권종/할인/매수 선택
+══════════════════════ */
+/* 카운트다운 배너 */
+.tt-timer-bar{display:flex;align-items:center;justify-content:space-between;background:#d9534f;color:#fff;padding:8px 14px;flex-shrink:0;gap:10px;}
+.tt-timer-text{flex:1;}
+.tt-timer-main{font-size:12px;font-weight:700;line-height:1.5;}
+.tt-timer-sub{font-size:11px;opacity:0.9;line-height:1.5;}
+.tt-timer-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.tt-vs-wrap{display:flex;align-items:center;gap:5px;}
+.tt-team-badge{background:rgba(255,255,255,0.25);border-radius:3px;padding:2px 7px;font-size:11px;font-weight:700;}
+.tt-team-home{background:rgba(255,255,255,0.4);}
+.tt-vs{font-size:10px;opacity:0.8;}
+.tt-countdown{font-size:16px;font-weight:900;letter-spacing:1px;}
+/* 2단 본문 */
+.tt-body{flex:1;display:flex;overflow:hidden;}
+.tt-main{flex:1;overflow-y:auto;padding:14px 16px;}
+.tt-main-hd{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee;}
+.tt-main-title{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:3px;}
+.tt-main-sub{font-size:12px;color:#666;}
+/* 테이블 */
+.tt-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;}
+.tt-tbl th{background:#f5f5f5;padding:7px 8px;border:1px solid #ddd;font-weight:600;font-size:11px;color:#555;text-align:center;}
+.tt-tbl td{padding:8px 8px;border:1px solid #eee;vertical-align:middle;}
+.tt-type-nm{font-size:12px;font-weight:700;color:#1a1a1a;}
+.tt-type-dc{font-size:11px;color:#888;margin-top:2px;}
+.tt-price{color:var(--red);font-weight:700;text-align:right;white-space:nowrap;}
+.tt-sub-amt{text-align:right;font-size:12px;color:#333;font-weight:600;white-space:nowrap;}
+.qty-ctrl{display:flex;align-items:center;gap:5px;justify-content:center;}
+.qty-btn{width:24px;height:24px;border:1px solid #ccc;background:#fff;border-radius:3px;cursor:pointer;font-size:13px;font-weight:700;color:#333;display:flex;align-items:center;justify-content:center;}
+.qty-btn:hover{background:#f0f0f0;}
+.qty-v{font-size:13px;font-weight:700;min-width:18px;text-align:center;}
+.qty-sel{width:64px;height:30px;border:1px solid #ccc;border-radius:3px;font-size:13px;font-weight:700;text-align:center;cursor:pointer;background:#fff;font-family:'Noto Sans KR',sans-serif;}
+/* 상태바 */
+.tt-status-bar{font-size:11.5px;font-weight:600;padding:7px 10px;border-radius:3px;background:#f5f5f5;color:#888;text-align:center;margin-bottom:12px;}
+/* 안내사항 */
+.tt-notice{border:1px solid #eee;border-radius:3px;overflow:hidden;}
+.tt-notice-hd{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#f8f8f8;font-size:12px;font-weight:700;cursor:pointer;user-select:none;}
+.tt-notice-arrow{font-size:10px;color:#aaa;transition:transform 0.2s;}
+.tt-notice.open .tt-notice-arrow{transform:rotate(180deg);}
+.tt-notice-body{display:none;padding:10px 12px;font-size:11px;color:#555;line-height:1.8;}
+.tt-notice.open .tt-notice-body{display:block;}
+.tt-notice-sec{font-weight:700;color:#333;margin:6px 0 2px;}
+/* 우측 요약 패널 */
+.tt-right{width:200px;flex-shrink:0;border-left:1px solid #ddd;display:flex;flex-direction:column;background:#fff;}
+.tt-right-game{padding:10px 12px;border-bottom:1px solid #eee;background:#f8f8f8;}
+.tt-right-label{font-size:10px;color:#888;margin-bottom:2px;}
+.tt-right-matchup{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+.tt-right-meta{font-size:11px;color:#666;line-height:1.6;}
+.tt-sum-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.tt-sum-tbl td{padding:6px 10px;border-bottom:1px solid #f5f5f5;vertical-align:top;}
+.tt-sum-tbl td:first-child{color:#888;white-space:nowrap;}
+.tt-sum-tbl td:last-child{text-align:right;font-weight:600;color:#333;}
+.tt-sum-hd-row td{background:#f5f5f5;font-weight:700;font-size:12px;color:#333;padding:7px 10px;}
+.tt-sum-tot{color:var(--red)!important;font-size:14px!important;font-weight:900!important;}
+/* 공통 footer */
+.tt-foot{display:flex;gap:8px;padding:10px 16px;border-top:1px solid #eee;flex-shrink:0;background:#fff;}
+.btn-prev{flex:1;height:40px;background:#fff;border:1px solid #ccc;color:#333;font-size:13px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-nxt{flex:2;height:40px;background:#333;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-nxt:hover{background:#555;}
+
+/* ══════════════════════
+   STEP 3: 배송/예매확인
+══════════════════════ */
+.confirm-wrap{flex:1;overflow-y:auto;padding:18px;}
+.cf-sec{margin-bottom:18px;}
+.cf-ttl{font-size:14px;font-weight:700;border-left:3px solid var(--blue);padding-left:10px;margin-bottom:10px;}
+.cf-card{background:#fff;border:1px solid #ddd;border-radius:4px;padding:12px 14px;}
+.cf-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.cf-tbl td{padding:7px 0;border-bottom:1px solid #f5f5f5;}
+.cf-tbl tr:last-child td{border-bottom:none;}
+.cf-tbl td:first-child{width:90px;color:#888;font-weight:500;}
+.cf-hl{color:var(--blue);font-weight:700;}
+.rcv-list{display:flex;gap:7px;}
+.rcv-card{flex:1;border:1.5px solid #ddd;border-radius:4px;padding:11px 7px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.rcv-card:hover{border-color:var(--blue);}
+.rcv-card.on{border-color:var(--blue);background:var(--blue-lt);}
+.rcv-ic{font-size:17px;margin-bottom:4px;}
+.rcv-nm{font-size:12px;font-weight:700;}
+.rcv-dc{font-size:10px;color:#aaa;margin-top:2px;}
+.price-box{background:#f9f9f9;border:1px solid #ddd;border-radius:4px;padding:12px 14px;}
+.pb-row{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:5px;}
+.pb-tot{display:flex;justify-content:space-between;font-size:17px;font-weight:700;border-top:1px solid #ddd;padding-top:9px;margin-top:4px;}
+.pb-amt{color:var(--red);}
+.agree-row{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#555;margin:10px 0 12px;}
+.agree-row input{accent-color:var(--blue);margin-top:1px;flex-shrink:0;}
+.agree-item{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#333;}
+.agree-item:last-child{border-bottom:none;}
+.agree-item input{accent-color:var(--blue);margin-top:2px;flex-shrink:0;cursor:pointer;}
+.agree-item label{flex:1;cursor:pointer;line-height:1.5;}
+.agree-item.req label::after{content:' (필수)';color:var(--red);font-size:11px;font-weight:600;}
+.agree-opt{color:#888;}
+.agree-detail{flex-shrink:0;font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;white-space:nowrap;}
+.cf-foot{display:flex;gap:8px;padding:12px 18px;border-top:1px solid #eee;flex-shrink:0;background:#fff;}
+.btn-cf-pay{flex:2;height:42px;background:var(--blue);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-cf-pay:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   STEP 4: 결제
+══════════════════════ */
+.pay-wrap{flex:1;overflow-y:auto;padding:18px;}
+.pay-sec{margin-bottom:16px;}
+.pay-stl{font-size:14px;font-weight:700;border-left:3px solid var(--blue);padding-left:10px;margin-bottom:10px;}
+.pay-card{background:#fff;border:1px solid #ddd;border-radius:4px;padding:12px 14px;}
+.pm-list{display:flex;flex-direction:column;gap:5px;}
+.pm{display:flex;align-items:center;gap:10px;border:1.5px solid #ddd;border-radius:4px;padding:9px 12px;cursor:pointer;transition:all 0.15s;}
+.pm:hover{border-color:var(--blue);}
+.pm.on{border-color:var(--blue);background:var(--blue-lt);}
+.pm input[type=radio]{accent-color:var(--blue);}
+.pm-nm{font-size:13px;font-weight:700;}
+.pm-dc{font-size:11px;color:#aaa;margin-top:1px;}
+.payco-tag{margin-left:auto;background:#ff3c3c;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:2px;}
+.pay-foot{display:flex;gap:8px;padding:12px 18px;border-top:1px solid #eee;flex-shrink:0;background:#fff;}
+.btn-pay-do{flex:2;height:42px;background:var(--blue);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-pay-do:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════════════════════
+   STEP 5: 완료
+══════════════════════ */
+.done-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:#f5f5f5;padding:18px;}
+.done-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:32px 26px;max-width:360px;width:100%;text-align:center;}
+.done-ico{font-size:40px;margin-bottom:12px;}
+.done-h{font-size:20px;font-weight:700;color:#1a8f5a;margin-bottom:6px;}
+.done-sub{font-size:13px;color:#888;line-height:1.7;margin-bottom:18px;}
+.done-tkt{background:#f8f8f8;border:1px solid #eee;border-radius:6px;padding:13px;margin-bottom:14px;text-align:left;}
+.dt-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px dashed #eee;}
+.dt-row:last-child{border-bottom:none;}
+.dt-lbl{color:#aaa;}
+.dt-val{font-weight:700;}
+.done-time{background:#e6f0f8;border:1px solid #b3cce8;border-radius:6px;padding:12px;margin-bottom:14px;text-align:left;font-size:12px;}
+.done-time .th{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:7px;}
+.tsr{display:flex;justify-content:space-between;margin-bottom:4px;color:#4a7aaa;}
+.tsr .tv{font-weight:700;}
+.btn-done-close{width:100%;height:42px;background:#333;color:#fff;font-size:14px;font-weight:700;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+.prac-badge{position:fixed;bottom:12px;right:12px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:600;padding:5px 11px;border-radius:100px;z-index:9999;pointer-events:none;}
+</style>
+</head>
+<body>
+<div id="viewToggleBar" style="background:#111;border-bottom:1px solid #2a2a2a;padding:0 14px;height:36px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:9999;font-family:'Noto Sans KR',sans-serif;flex-shrink:0;">
+  <span style="font-size:10px;font-weight:700;color:#6c5ce7;">🍇 포도알줍줍 예매창</span>
+  <span style="width:1px;height:14px;background:#2a2a2a;display:inline-block;flex-shrink:0;"></span>
+  <div style="display:flex;gap:2px;background:#222;border-radius:5px;padding:2px;flex-shrink:0;">
+    <button id="vtbPc" onclick="setRView('pc')" style="padding:3px 10px;border-radius:4px;border:none;background:#fff;color:#1a1a1a;font-size:10px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">🖥 PC</button>
+    <button id="vtbMob" onclick="setRView('mobile')" style="padding:3px 10px;border-radius:4px;border:none;background:none;color:#666;font-size:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📱 모바일</button>
+  </div>
+  <span style="margin-left:auto;font-size:10px;color:#444;">앱과 모바일웹 레이아웃 동일 · 보안문자 입력 후 좌석 선택</span>
+</div>
+
+<div class="prac-badge">🍇 포도알줍줍 연습</div>
+
+<!-- ══════════ STEP 0: 보안문자 ══════════ -->
+<div class="step active" id="step0">
+  <div class="pop-hd"><span class="pop-logo"><span class="lt">ticket</span>LINK</span><span class="pop-logo-em">예매</span></div>
+  <div class="stepbar">
+    <div class="sb done">날짜/회차선택</div><div class="sb cur">등급/좌석선택</div>
+    <div class="sb">권종/할인/매수선택</div><div class="sb">배송선택/예매확인</div><div class="sb">결제</div>
+  </div>
+  <div class="captcha-wrap">
+    <div class="captcha-box">
+      <div class="captcha-title">클린예매 서비스</div>
+      <div class="captcha-desc"><span class="em">부정예매를 방지</span>하기 위해 <span class="em2">보안문자</span> 입력 후 예매가 가능합니다.</div>
+      <div class="captcha-img-row">
+        <div class="captcha-img"><span class="captcha-txt" id="capText">GRDPA</span></div>
+        <div class="captcha-refresh" onclick="refreshCap()">↻</div>
+      </div>
+      <input type="text" class="captcha-input" id="capInput" maxlength="6"
+        oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')submitCap()">
+      <div class="captcha-hint">- 위 문자를 순서대로 입력해주세요.<br>- 3분 이내 미입력시 자동 새로고침됩니다.</div>
+      <div class="captcha-btns">
+        <button class="btn-back" onclick="window.close()">날짜 다시 선택</button>
+        <button class="btn-ok" onclick="submitCap()">입력완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STEP 1: 등급/좌석 선택 ══════════ -->
+<div class="step" id="step1">
+  <div class="pop-hd"><span class="pop-logo"><span class="lt">ticket</span>LINK</span><span class="pop-logo-em">예매</span></div>
+  <div class="stepbar">
+    <div class="sb done">날짜/회차선택</div><div class="sb cur">등급/좌석선택</div>
+    <div class="sb">권종/할인/매수선택</div><div class="sb">배송선택/예매확인</div><div class="sb">결제</div>
+  </div>
+
+  <div class="reserve-body">
+
+    <!-- ── 좌측: 좌석 배치도 (기본) ── -->
+    <div class="seat-area" id="seatAreaMap">
+      <div class="seat-area-top">
+        <div class="game-title" id="gameTitle">NC 다이노스 vs 삼성 라이온즈</div>
+        <div class="game-sub" id="gameSub">대구 삼성라이온즈파크 | 2026.04.10(금) 18:30</div>
+      </div>
+      <div class="seat-ctrl-bar">
+        <button class="btn-no-seat">⑦ 원하는 좌석이 없다면? &gt;</button>
+        <div class="ctrl-icons">
+          <div class="ctrl-btn" onclick="zoomIn()" title="확대">⊕</div>
+          <div class="ctrl-btn" onclick="zoomOut()" title="축소">⊖</div>
+          <div class="ctrl-btn" onclick="resetZoom()" title="초기화">↺</div>
+        </div>
+      </div>
+      <!-- SVG 기반 좌석 배치도 -->
+      <div class="stadium-img-container" id="stadiumImgCont">
+        <div class="stadium-img-wrap" id="stadiumImgWrap">
+          <div id="stadiumSvgMain" style="width:100%;max-width:640px;cursor:crosshair;" onclick="onStadiumClick()"></div>
+        </div>
+      </div>
+      <!-- 좌석 유형 선택 팝업 (Image 2) -->
+      <div class="zone-popup-overlay hidden" id="zonePopupOverlay">
+        <div class="zone-popup">
+          <div class="zone-popup-head">
+            좌석 유형 선택
+            <button class="zone-popup-close" onclick="closeZonePopup()">×</button>
+          </div>
+          <div class="zone-popup-desc">
+            <strong>자동배정</strong> : 선택된 영역과 상관없이 등급 내 연속된 좌석 선택<br>
+            <strong>직접선택</strong> : 선택된 영역의 좌석 선택
+          </div>
+          <div class="zone-popup-selected">
+            <div class="zone-popup-dot" id="popupDot" style="background:#e22228;"></div>
+            <span class="zone-popup-name" id="popupGradeName">원정응원석</span>
+          </div>
+          <div class="zone-popup-cnt" id="popupCnt">0석</div>
+          <div class="zone-popup-btns">
+            <button class="btn-zone-auto" onclick="onAutoSelect()">자동배정</button>
+            <button class="btn-zone-direct" onclick="onDirectSelect()">직접선택</button>
+          </div>
+        </div>
+      </div>
+      <div class="seat-bottom-bar" id="seatBottomBar">
+        <span>▲</span> 등급을 먼저 선택 후, 좌석선택 유형을 선택해주세요.
+      </div>
+    </div>
+
+    <!-- ── 좌측: 직접선택 좌석 그리드 ── -->
+    <div class="direct-view hidden" id="directView">
+      <div class="seat-area-top">
+        <div class="game-title" id="directGameTitle"></div>
+        <div class="game-sub" id="directGameSub"></div>
+      </div>
+      <div class="direct-ctrl-bar">
+        <button class="btn-back-to-map" onclick="backToMap()">← 배치도로</button>
+        <div class="direct-zone-label" id="directZoneLabel">경기장/무대 방향</div>
+        <div class="ctrl-icons">
+          <div class="ctrl-btn" onclick="gridZoomIn()">⊕</div>
+          <div class="ctrl-btn" onclick="gridZoomOut()">⊖</div>
+          <div class="ctrl-btn" onclick="resetGrid()">↺</div>
+        </div>
+      </div>
+      <div class="seat-grid-wrap" id="seatGridWrap">
+        <!-- JS로 생성 -->
+      </div>
+      <div class="direct-seat-bottom" id="directBottomBar">
+        <span>▲</span> 직접선택으로 예매 진행이 가능합니다. 좌석을 선택해 주세요.
+      </div>
+    </div>
+
+    <!-- ── 우측: 등급 패널 ── -->
+    <div class="grade-panel" id="gradePanel">
+      <!-- 미니맵 -->
+      <div class="grade-panel-minimap">
+        <div id="stadiumSvgMini" style="width:108px;height:108px;"></div>
+      </div>
+
+      <!-- 등급 목록 + 직접선택 정보 통합 패널 -->
+      <div id="gradePanelDefault">
+        <div class="grade-panel-head">
+          등급 선택
+          <button class="grade-refresh-btn" onclick="refreshGrades()">새로고침</button>
+        </div>
+        <div class="grade-list" id="gradeList"></div>
+        <div class="grade-seat-link">ⓘ 좌석선택 및 자동배정 안내 ›</div>
+        <!-- 직접선택 시: 선택된 좌석 표시 -->
+        <div class="direct-sel-info hidden" id="directSelInfoArea" style="padding:9px 12px;">
+          <div class="dsi-lbl">선택된 좌석</div>
+          <div id="directSelInfo" class="dsi-empty">없음</div>
+        </div>
+        <div class="grade-next-area">
+          <button class="btn-next-big" id="btnDirectNext" disabled onclick="toTicketType()">다음단계</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /reserve-body -->
+
+  <!-- 자동배정 매수 선택 중앙 모달 -->
+  <div class="auto-qty-overlay hidden" id="autoQtyOverlay">
+    <div class="auto-qty-card">
+      <div class="auto-qty-head">
+        <div class="auto-qty-grade">
+          <div class="auto-qty-dot" id="aqDot"></div>
+          <span class="auto-qty-name" id="aqName"></span>
+        </div>
+        <button class="auto-qty-close" onclick="closeAutoQty()">×</button>
+      </div>
+      <div class="auto-qty-cnt" id="aqCnt">0석</div>
+      <div class="auto-qty-ctrl">
+        <button class="aqc-btn" onclick="changeAq(-1)">−</button>
+        <div class="aqc-val" id="aqVal">0</div>
+        <button class="aqc-btn" onclick="changeAq(1)">+</button>
+      </div>
+      <div class="aqc-state" id="aqState">매진</div>
+      <button class="btn-auto-next" onclick="confirmAutoQty()">다음단계</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STEP 2: 권종/할인/매수 ══════════ -->
+<div class="step" id="step2">
+  <div class="pop-hd"><span class="pop-logo"><span class="lt">ticket</span>LINK</span><span class="pop-logo-em">예매</span></div>
+  <div class="stepbar">
+    <div class="sb done">날짜/회차선택</div><div class="sb done">등급/좌석선택</div>
+    <div class="sb cur">권종/할인/매수선택</div><div class="sb">배송선택/예매확인</div><div class="sb">결제</div>
+  </div>
+
+  <!-- 카운트다운 배너 -->
+  <div class="tt-timer-bar">
+    <div class="tt-timer-text">
+      <div class="tt-timer-main">선택하신 좌석에서의 고객님께 선점됩니다.</div>
+      <div class="tt-timer-sub">6분 이내 결제하지 않을 경우 선점된 좌석이 해제됩니다.</div>
+    </div>
+    <div class="tt-timer-right">
+      <div class="tt-vs-wrap">
+        <span class="tt-team-badge" id="ttBadgeOpp">NC</span>
+        <span class="tt-vs">vs</span>
+        <span class="tt-team-badge tt-team-home" id="ttBadgeHome">삼성</span>
+      </div>
+      <div class="tt-countdown" id="ttCountdown">06:00</div>
+    </div>
+  </div>
+
+  <!-- 2단 본문 -->
+  <div class="tt-body">
+
+    <!-- 좌측 메인 -->
+    <div class="tt-main">
+      <div class="tt-main-hd">
+        <div class="tt-main-title">티켓종류, 할인, 매수 선택</div>
+        <div class="tt-main-sub" id="ttSeatInfo">—</div>
+      </div>
+
+      <table class="tt-tbl">
+        <thead>
+          <tr><th>티켓종류</th><th>가격</th><th>매수</th><th>소계</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="tt-type-nm">일반(정기)</div><div class="tt-type-dc">일반</div></td>
+            <td class="tt-price" id="ttPrice">—</td>
+            <td><select class="qty-sel" id="qtyV" onchange="chQtySel('V',this.value)"><option>0</option></select></td>
+            <td class="tt-sub-amt" id="ttSub1">0원</td>
+          </tr>
+          <tr>
+            <td><div class="tt-type-nm">카드할인</div><div class="tt-type-dc" id="ttCardName">삼성이오스카드(일반)</div></td>
+            <td class="tt-price" id="ttPriceCard">—</td>
+            <td><select class="qty-sel" id="qtyCard" onchange="chQtySel('Card',this.value)"><option>0</option></select></td>
+            <td class="tt-sub-amt" id="ttSub2">0원</td>
+          </tr>
+          <tr>
+            <td><div class="tt-type-nm">인증</div><div class="tt-type-dc">의이의회원 가족할인(정류)</div></td>
+            <td class="tt-price" id="ttPriceD">—</td>
+            <td><select class="qty-sel" id="qtyVD" onchange="chQtySel('D',this.value)"><option>0</option></select></td>
+            <td class="tt-sub-amt" id="ttSub3">0원</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 매수 현황 -->
+      <div id="ttStatus" class="tt-status-bar">좌석을 선택하면 여기에 매수 현황이 표시됩니다.</div>
+
+      <!-- 안내사항 -->
+      <div class="tt-notice">
+        <div class="tt-notice-hd" onclick="this.parentElement.classList.toggle('open')">
+          ■ 안내사항 <span class="tt-notice-arrow">▼</span>
+        </div>
+        <div class="tt-notice-body">
+          <p class="tt-notice-sec">● 주요 안내사항</p>
+          <p>예매 취소 마감 시간 변경 : 경기 시작 2시간 전 → 4시간 전<br>
+          수정 제한 구매 가능 수량 변경: 8매 → 4매<br>
+          최소 마감 시간(경기 시작 4시간 이후)에는 관람 변경(날짜/경기변경/클럽/구역)이 불가합니다.</p>
+          <p class="tt-notice-sec">● 관람 및 이용 안내</p>
+          <p>전 좌석 지정좌석제로 운영되며, 반드시 예매석 좌석에 착석하여 주시기 바랍니다.<br>
+          경기장 내 제반 질서, 관련 사항, 타인의 관람을 방해하는 행동 등은 퇴장 조치 될 수 있습니다.</p>
+          <p class="tt-notice-sec">● 관람 및 이용 안내</p>
+          <p>전 좌석 지정좌석제로 운영되며, 반드시 예매석에 좌석에 착석하여 주시기 바랍니다.<br>
+          차기 마감 시간(경기 시작 4시간 이후)에는 관람 변경(날짜,경기변경/클럽/구역)이 불가합니다.<br>
+          ·차기 마감이 된 티켓은 티켓링크에서만 환불이 가능합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 우측 요약 패널 -->
+    <div class="tt-right">
+      <div class="tt-right-game">
+        <div class="tt-right-label">그래서</div>
+        <div class="tt-right-matchup" id="ttRightMatchup">—</div>
+        <div class="tt-right-meta" id="ttRightMeta">—</div>
+      </div>
+      <table class="tt-sum-tbl">
+        <tr class="tt-sum-hd-row"><td colspan="2">티켓정보</td></tr>
+        <tr><td>티켓종류</td><td id="sumType">—</td></tr>
+        <tr><td>할인적용</td><td id="sumDisc">0</td></tr>
+        <tr><td>매수</td><td id="sumQty">0</td></tr>
+        <tr><td>좌석</td><td id="sumSeat">—</td></tr>
+        <tr><td>배송비</td><td>0원</td></tr>
+        <tr><td>할인금액</td><td id="sumDiscAmt">0원</td></tr>
+        <tr><td>총계</td><td class="tt-sum-tot" id="sumTotal">0원</td></tr>
+      </table>
+      <div class="tt-right-notice" id="ttRightNotice" style="display:none;">
+        <span id="ttRightNoticeText"></span>
+      </div>
+    </div>
+
+  </div><!-- /tt-body -->
+
+  <div class="tt-foot">
+    <button class="btn-prev" onclick="goStep(1)">이전단계</button>
+    <button class="btn-nxt" id="btnTtNext" onclick="toConfirm()" disabled style="opacity:0.5;cursor:not-allowed;">다음단계</button>
+  </div>
+</div>
+
+<!-- ══════════ STEP 3: 배송/예매확인 ══════════ -->
+<div class="step" id="step3">
+  <div class="pop-hd"><span class="pop-logo"><span class="lt">ticket</span>LINK</span><span class="pop-logo-em">예매</span></div>
+  <div class="stepbar">
+    <div class="sb done">날짜/회차선택</div><div class="sb done">등급/좌석선택</div>
+    <div class="sb done">권종/할인/매수선택</div><div class="sb cur">배송선택/예매확인</div><div class="sb">결제</div>
+  </div>
+  <div class="confirm-wrap">
+    <div class="cf-sec">
+      <div class="cf-ttl">예매 정보 확인</div>
+      <div class="cf-card">
+        <table class="cf-tbl">
+          <tr><td>공연명</td><td id="cfGame">—</td></tr>
+          <tr><td>일시</td><td id="cfDate">—</td></tr>
+          <tr><td>장소</td><td id="cfPlace">—</td></tr>
+          <tr><td>좌석</td><td class="cf-hl" id="cfSeat">—</td></tr>
+          <tr><td>권종</td><td id="cfTktType">일반 1매</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cf-sec">
+      <div class="cf-ttl">티켓 수령 방법</div>
+      <div class="cf-card">
+        <div class="rcv-list">
+          <div class="rcv-card on" onclick="selRcv(this)"><div class="rcv-ic">📱</div><div class="rcv-nm">스마트티켓</div><div class="rcv-dc">앱 QR 입장</div></div>
+          <div class="rcv-card" onclick="selRcv(this)"><div class="rcv-ic">🖨️</div><div class="rcv-nm">홈티켓</div><div class="rcv-dc">출력 후 입장</div></div>
+          <div class="rcv-card" onclick="selRcv(this)"><div class="rcv-ic">📦</div><div class="rcv-nm">배송</div><div class="rcv-dc">+3,000원</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="price-box">
+      <div class="pb-row"><span>티켓 금액</span><span id="cfTktAmt">0원</span></div>
+      <div class="pb-row"><span>예매 수수료</span><span id="cfFeeAmt">0원</span></div>
+      <div class="pb-row"><span>배송비</span><span>0원</span></div>
+      <div class="pb-tot"><span>총 결제 금액</span><span class="pb-amt" id="cfTotAmt">0원</span></div>
+    </div>
+    <div class="cf-sec">
+      <div class="cf-ttl">예매자 확인</div>
+      <div class="cf-card" style="padding:0;">
+        <div class="agree-item req">
+          <input type="checkbox" id="cfAgree1" onchange="toggleCfPay()">
+          <label for="cfAgree1">티켓 예매확인, 취소 처리 및 배송을 위해 개인정보를 수집·이용합니다.</label>
+          <span class="agree-detail">상세보기</span>
+        </div>
+        <div class="agree-item">
+          <input type="checkbox" id="cfAgree2" onchange="toggleCfPay()">
+          <label for="cfAgree2"><span class="agree-opt">(선택)</span> 예매 안내 메일 발송을 위해 이메일 정보를 수집·이용합니다.</label>
+          <span class="agree-detail">상세보기</span>
+        </div>
+        <div class="agree-item req">
+          <input type="checkbox" id="cfAgree3" onchange="toggleCfPay()">
+          <label for="cfAgree3">개인정보 제3자 제공에 동의합니다.(고객응대 및 관람정보안내 등을 위함)</label>
+          <span class="agree-detail">상세보기</span>
+        </div>
+        <div class="agree-item req">
+          <input type="checkbox" id="cfAgree4" onchange="toggleCfPay()">
+          <label for="cfAgree4">KBO리그 SAFE캠페인에 동의합니다.</label>
+          <span class="agree-detail">상세보기</span>
+        </div>
+        <div class="agree-item req">
+          <input type="checkbox" id="cfAgree5" onchange="toggleCfPay()">
+          <label for="cfAgree5">프로스포츠 암표매매 행위에 따른 제재사항에 동의합니다.</label>
+          <span class="agree-detail">상세보기</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cf-foot">
+    <button class="btn-prev" onclick="goStep(2)">이전단계</button>
+    <button class="btn-cf-pay" id="btnCfPay" disabled onclick="goStep(4)">결제하기</button>
+  </div>
+</div>
+
+<!-- ══════════ STEP 4: 연습 완료 ══════════ -->
+<div class="step" id="step4">
+  <div class="pop-hd"><span class="pop-logo"><span class="lt">ticket</span>LINK</span><span class="pop-logo-em">예매</span></div>
+  <div class="stepbar">
+    <div class="sb done">날짜/회차선택</div><div class="sb done">등급/좌석선택</div>
+    <div class="sb done">권종/할인/매수선택</div><div class="sb done">배송선택/예매확인</div><div class="sb cur">결제</div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:32px 24px;">
+    <div style="text-align:center;max-width:360px;">
+      <div style="font-size:56px;margin-bottom:20px;">🎉</div>
+      <div style="font-size:22px;font-weight:900;color:#1a1a1a;margin-bottom:12px;letter-spacing:-0.02em;">축하합니다!</div>
+      <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">티켓팅에 성공하셨습니다.</div>
+      <div style="font-size:13px;color:#888;line-height:1.8;margin-bottom:28px;padding:14px 18px;background:#f8f8f8;border-radius:8px;border-left:3px solid #e22228;">
+        실제 티켓팅에서는 이 단계에서<br><strong style="color:#333;">결제를 진행하셔야 예매가 완료</strong>됩니다.<br>
+        결제 전까지는 좌석이 확정되지 않으니<br>빠르게 진행해주세요.
+      </div>
+      <button onclick="location.reload()" style="width:100%;height:48px;background:#1a1a1a;color:#fff;font-size:15px;font-weight:700;border:none;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-bottom:10px;">다시 연습하기</button>
+      <button onclick="window.close()" style="width:100%;height:40px;background:#fff;color:#555;font-size:13px;font-weight:500;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STEP 5: 완료 ══════════ -->
+<div class="step" id="step5">
+  <div class="pop-hd"><span class="pop-logo"><span class="lt">ticket</span>LINK</span><span class="pop-logo-em">예매</span></div>
+  <div class="done-wrap">
+    <div class="done-card">
+      <div class="done-ico">✅</div>
+      <div class="done-h">연습 완료!</div>
+      <div class="done-sub">티켓링크 예매 전 과정 완료!<br>실전에서도 이 순서를 기억하세요.</div>
+      <div class="done-tkt">
+        <div class="dt-row"><span class="dt-lbl">경기</span><span class="dt-val" id="doneGame">—</span></div>
+        <div class="dt-row"><span class="dt-lbl">일시</span><span class="dt-val" id="doneDate">—</span></div>
+        <div class="dt-row"><span class="dt-lbl">장소</span><span class="dt-val" id="donePlace">—</span></div>
+        <div class="dt-row"><span class="dt-lbl">좌석</span><span class="dt-val" id="doneSeat">—</span></div>
+        <div class="dt-row"><span class="dt-lbl">결제금액</span><span class="dt-val" style="color:var(--red);" id="donePrice">—</span></div>
+      </div>
+      <div class="done-time">
+        <div class="th">⏱ 단계별 소요 시간</div>
+        <div class="tsr"><span>보안문자 통과</span><span class="tv" id="dtCap">—</span></div>
+        <div class="tsr"><span>좌석 선택</span><span class="tv" id="dtSeat">—</span></div>
+        <div class="tsr"><span>권종 선택</span><span class="tv" id="dtTkt">—</span></div>
+        <div class="tsr"><span>결제 완료</span><span class="tv" id="dtPay">—</span></div>
+        <div class="tsr" style="border-top:1px solid #b3cce8;padding-top:5px;margin-top:4px;font-weight:700;">
+          <span>총 소요</span><span class="tv" id="dtTot">—</span>
+        </div>
+      </div>
+      <button class="btn-done-close" onclick="window.close()">창 닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── URL 파라미터 ── */
+const P = new URLSearchParams(location.search);
+const team = P.get('team') || 'samsung';
+const GAME = {
+  teamName: P.get('teamName') || '삼성 라이온즈',
+  stadium:  P.get('stadium')  || '대구 삼성라이온즈파크',
+  opp:      P.get('opp')      || 'NC 다이노스',
+  day:      P.get('day')      || '10',
+  dow:      P.get('dow')      || '5',
+  time:     P.get('time')     || '18:30',
+};
+const DOW = ['일','월','화','수','목','금','토'];
+const FEE = 1000;
+const TS = {start:0,cap:0,seat:0,tkt:0,pay:0};
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+/* ── 팀별 등급 데이터 ── */
+const TEAM_GRADES = {
+  lg:[
+    {color:'#7b1fa2',name:'프리미엄석',              cnt:0,          price:55000},
+    {color:'#4a148c',name:'1루 테이블석',             cnt:0,          price:48000},
+    {color:'#6a1b9a',name:'3루 테이블석',             cnt:0,          price:48000},
+    {color:'#fdd835',name:'1루 익사이팅석',           cnt:rnd(10,30), price:38000},
+    {color:'#f9a825',name:'3루 익사이팅석',           cnt:rnd(10,30), price:38000},
+    {color:'#1565c0',name:'1루 블루석',               cnt:rnd(30,80), price:25000},
+    {color:'#1976d2',name:'3루 블루석',               cnt:rnd(30,80), price:25000},
+    {color:'#e65c00',name:'1루 오렌지석(응원석)',      cnt:rnd(20,60), price:18000},
+    {color:'#ef6c00',name:'3루 오렌지석(응원석)',      cnt:rnd(20,60), price:18000},
+    {color:'#c62828',name:'1루 레드석',               cnt:rnd(50,120),price:15000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)}]},
+    {color:'#d32f2f',name:'3루 레드석',               cnt:rnd(50,120),price:15000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)}]},
+    {color:'#0d47a1',name:'1루 네이비석',             cnt:rnd(50,120),price:12000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)}]},
+    {color:'#1565c0',name:'3루 네이비석',             cnt:rnd(50,120),price:12000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)}]},
+    {color:'#c62828',name:'외야응원석',               cnt:rnd(40,120),price:10000},
+    {color:'#2e7d32',name:'외야그린석',               cnt:rnd(40,100),price:10000},
+    {color:'#b0bec5',name:'휠체어석(블루석)',          cnt:2,          price:10000},
+    {color:'#90a4ae',name:'휠체어석(레드석)',          cnt:2,          price:10000},
+  ],
+  hanwha:[
+    {color:'#43a047',name:'1루 내야지정석A',          cnt:rnd(30,80), price:25000,
+      zones:[{name:'A구역',cnt:rnd(0,20)},{name:'B구역',cnt:rnd(0,20)},{name:'C구역',cnt:rnd(0,20)}]},
+    {color:'#2e7d32',name:'3루 내야지정석A',          cnt:rnd(30,80), price:25000,
+      zones:[{name:'A구역',cnt:rnd(0,20)},{name:'B구역',cnt:rnd(0,20)},{name:'C구역',cnt:rnd(0,20)}]},
+    {color:'#66bb6a',name:'1루 내야지정석B',          cnt:rnd(50,120),price:20000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)}]},
+    {color:'#81c784',name:'3루 내야지정석B',          cnt:rnd(50,120),price:20000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)}]},
+    {color:'#c62828',name:'1루 응원단석',            cnt:rnd(20,60), price:15000},
+    {color:'#d32f2f',name:'3루 응원단석',            cnt:rnd(20,60), price:15000},
+    {color:'#ff8f00',name:'포수후면석',              cnt:rnd(10,30), price:35000},
+    {color:'#1565c0',name:'중앙지정석',              cnt:rnd(20,50), price:30000},
+    {color:'#e65c00',name:'중앙탁자석',              cnt:0,          price:80000},
+    {color:'#e64a19',name:'1루 내야탁자석(1층)',      cnt:rnd(5,15),  price:50000},
+    {color:'#f4511e',name:'3루 내야탁자석(1층)',      cnt:rnd(5,15),  price:50000},
+    {color:'#bf360c',name:'내야탁자석(4층)',          cnt:0,          price:60000},
+    {color:'#d84315',name:'내야박스석(6인)',          cnt:0,          price:55000},
+    {color:'#00897b',name:'외야지정석',              cnt:rnd(40,100),price:12000,
+      zones:[{name:'1구역',cnt:rnd(0,25)},{name:'2구역',cnt:rnd(0,25)},{name:'3구역',cnt:rnd(0,25)},{name:'4구역',cnt:rnd(0,25)}]},
+    {color:'#f9a825',name:'외야탁자석',              cnt:rnd(10,25), price:45000},
+    {color:'#fdd835',name:'외야커플석',              cnt:rnd(10,25), price:40000},
+    {color:'#2e7d32',name:'잔디석',                  cnt:rnd(30,80), price:10000},
+    {color:'#b0bec5',name:'중앙 휠체어석',            cnt:2,          price:10000},
+    {color:'#90a4ae',name:'내야 휠체어석',            cnt:2,          price:10000},
+    {color:'#78909c',name:'외야 휠체어석',            cnt:2,          price:10000},
+    {color:'#4a148c',name:'스카이박스',              cnt:0,          price:150000},
+  ],
+  samsung:[
+    {color:'#1565c0',name:'VIP석',                          cnt:0,          price:50000},
+    {color:'#0d47a1',name:'으뜸병원 중앙 테이블석',          cnt:0,          price:45000},
+    {color:'#1976d2',name:'이수그룹 3루 테이블석',            cnt:0,          price:42000},
+    {color:'#1e88e5',name:'이수페타시스 1루 테이블석',         cnt:0,          price:42000},
+    {color:'#f9a825',name:'3루 익사이팅석',                  cnt:rnd(10,30), price:38000},
+    {color:'#fdd835',name:'1루 익사이팅석',                  cnt:rnd(10,30), price:38000},
+    {color:'#1565c0',name:'블루존',                          cnt:rnd(30,80), price:25000},
+    {color:'#2e7d32',name:'3루 내야지정석',                  cnt:rnd(50,150),price:20000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)},{name:'D구역',cnt:rnd(0,30)}]},
+    {color:'#c62828',name:'원정응원석',                      cnt:rnd(10,40), price:15000},
+    {color:'#43a047',name:'1루 내야지정석',                  cnt:rnd(50,150),price:20000,
+      zones:[{name:'A구역',cnt:rnd(0,30)},{name:'B구역',cnt:rnd(0,30)},{name:'C구역',cnt:rnd(0,30)},{name:'D구역',cnt:rnd(0,30)}]},
+    {color:'#303f9f',name:'SKY 요기보 패밀리존(4인)',         cnt:rnd(5,15),  price:22000},
+    {color:'#1a237e',name:'SKY 블루존',                      cnt:rnd(10,40), price:18000,
+      zones:[{name:'B-1구역',cnt:rnd(0,8)},{name:'B-2구역',cnt:rnd(0,8)},{name:'B-3구역',cnt:rnd(0,8)},{name:'B-4구역',cnt:rnd(0,8)}]},
+    {color:'#283593',name:'중앙 SKY 상단지정석',             cnt:rnd(10,30), price:15000},
+    {color:'#3949ab',name:'3루 SKY 상단지정석',              cnt:rnd(10,30), price:15000},
+    {color:'#3f51b5',name:'1루 SKY 상단지정석',              cnt:rnd(10,30), price:15000},
+    {color:'#29b6f6',name:'SKY 하단지정석',                  cnt:rnd(30,80), price:12000,
+      zones:[{name:'S-1구역',cnt:rnd(0,10)},{name:'S-2구역',cnt:rnd(0,10)},{name:'S-3구역',cnt:rnd(0,10)},{name:'S-4구역',cnt:rnd(0,10)}]},
+    {color:'#00897b',name:'외야 지정석',                     cnt:rnd(40,120),price:10000,
+      zones:[{name:'O-1구역',cnt:rnd(0,20)},{name:'O-2구역',cnt:rnd(0,20)},{name:'O-3구역',cnt:rnd(0,20)},{name:'O-4구역',cnt:rnd(0,20)}]},
+    {color:'#558b2f',name:'외야패밀리석(2인/3인/4인)',         cnt:rnd(10,30), price:10000},
+    {color:'#7cb342',name:'외야테이블석(4인)',                cnt:rnd(5,15),  price:12000},
+    {color:'#8bc34a',name:'외야테이블석(8인)',                cnt:rnd(3,10),  price:12000},
+    {color:'#9ccc65',name:'외야커플테이블석(2인)',             cnt:rnd(5,15),  price:12000},
+    {color:'#ef6c00',name:'루프탑 테이블석',                 cnt:rnd(5,15),  price:15000},
+    {color:'#2e7d32',name:'잔디그린존',                      cnt:rnd(20,60), price:10000},
+    {color:'#e65c00',name:'iM뱅크 캠핑존(6인)',              cnt:rnd(3,10),  price:15000},
+    {color:'#b0bec5',name:'휠체어 장애인석',                  cnt:3,          price:10000},
+    {color:'#546e7a',name:'파티플로어 라이브석',              cnt:rnd(5,15),  price:18000},
+  ],
+  kt:[
+    {color:'#c62828',name:'비씨카드존',              cnt:rnd(10,30), price:45000},
+    {color:'#b71c1c',name:'네이버클립존',            cnt:rnd(10,30), price:40000},
+    {color:'#e53935',name:'KT존',                   cnt:rnd(20,50), price:35000},
+    {color:'#f44336',name:'1루 응원지정석',          cnt:rnd(30,80), price:20000,
+      zones:[{name:'A구역',cnt:rnd(0,20)},{name:'B구역',cnt:rnd(0,20)},{name:'C구역',cnt:rnd(0,20)}]},
+    {color:'#ef5350',name:'3루 응원지정석',          cnt:rnd(30,80), price:20000,
+      zones:[{name:'A구역',cnt:rnd(0,20)},{name:'B구역',cnt:rnd(0,20)},{name:'C구역',cnt:rnd(0,20)}]},
+    {color:'#1565c0',name:'1루 스카이존',            cnt:rnd(20,50), price:18000},
+    {color:'#1976d2',name:'3루 스카이존',            cnt:rnd(20,50), price:18000},
+    {color:'#ff8f00',name:'하이파이브존',            cnt:rnd(10,30), price:20000},
+    {color:'#fdd835',name:'3루 익사이팅석',          cnt:rnd(10,30), price:35000},
+    {color:'#b0bec5',name:'1루 휠체어석',            cnt:2,          price:10000},
+    {color:'#90a4ae',name:'3루 휠체어석',            cnt:2,          price:10000},
+    {color:'#2e7d32',name:'외야잔디자유석',          cnt:rnd(40,100),price:10000},
+    {color:'#e65c00',name:'티빙테이블석',            cnt:0,          price:50000},
+    {color:'#ef6c00',name:'캠핑존(4층)',             cnt:rnd(3,10),  price:15000},
+    {color:'#ff8f00',name:'캠핑존(5층)',             cnt:rnd(3,10),  price:15000},
+  ],
+};
+const GRADES = (TEAM_GRADES[team] || TEAM_GRADES.samsung).map(g=>({...g}));
+
+/* ── 상태 ── */
+let selGrade = null;
+let autoQty = 1;
+let qty = 1, qtyD = 0, qtyCard = 0;
+let unitPrice = 0;
+let directSeats = []; // 직접선택한 좌석들
+let isDirectMode = false;
+let zoomLv = 1;
+let expandedGradeIdx = null; // 인라인 펼쳐진 등급
+let showZones = false;       // 구역 목록 표시 여부
+let selZoneKey = null;       // {gradeIdx, zoneIdx}
+
+/* ── 화면 전환 ── */
+function goStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+}
+
+/* ══════════
+   STEP 0: 보안문자
+══════════ */
+/* ── 팀별 스타디움 SVG 배치도 ── */
+function buildStadiumSvg(){
+  // 팀별 색상 (주요 존 색)
+  // 팀별 실제 좌석도 이미지 (seat 폴더, pages/seat/ 기준)
+  const SEAT_IMGS = {
+    samsung: 'seat/ss.webp',
+    hanwha:  'seat/hh.png',
+    lg:      'seat/lg.png',
+    kt:      'seat/kt.webp',
+  };
+  const imgSrc = SEAT_IMGS[team];
+
+  const mainEl = document.getElementById('stadiumSvgMain');
+  const miniEl = document.getElementById('stadiumSvgMini');
+
+  if(imgSrc) {
+    // 실제 좌석 배치도 이미지 사용
+    if(mainEl) mainEl.innerHTML =
+      `<img src="${imgSrc}" alt="${GAME.stadium} 좌석 배치도"
+        style="width:100%;max-width:640px;display:block;cursor:crosshair;user-select:none;">`;
+    if(miniEl) miniEl.innerHTML =
+      `<img src="${imgSrc}" alt="미니맵"
+        style="width:108px;height:108px;object-fit:cover;display:block;">`;
+  } else {
+    // 이미지 없는 팀: SVG 폴백
+    const tc = {};
+    const c = tc[team] || {vip:'#1565c0',in3:'#2e7d32',in1:'#43a047',out:'#00897b',bg:'#e3f2fd'};
+    const vipG=GRADES[0], in3G=GRADES.find(g=>g.name.includes('3루 내야'));
+    const in1G=GRADES.find(g=>g.name.includes('1루 내야')), outG=GRADES.find(g=>g.name.includes('외야'));
+    const makeSvg=(w,h,fs,br)=>`<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block;">
+      <rect width="${w}" height="${h}" fill="${c.bg}" rx="${br}"/>
+      <ellipse cx="${w/2}" cy="${h*0.62}" rx="${w*0.43}" ry="${h*0.56}" fill="#2d7d2d" opacity="0.13"/>
+      <ellipse cx="${w/2}" cy="${h*0.67}" rx="${w*0.30}" ry="${h*0.40}" fill="#2d7d2d" opacity="0.18"/>
+      <polygon points="${w/2},${h*0.41} ${w/2-w*0.07},${h*0.54} ${w/2},${h*0.67} ${w/2+w*0.07},${h*0.54}" fill="none" stroke="#8B6914" stroke-width="${fs*0.15}" opacity="0.65"/>
+      <ellipse cx="${w/2}" cy="${h*0.67}" rx="${fs*0.35}" ry="${fs*0.28}" fill="#8B6914" opacity="0.6"/>
+      <rect x="${w*0.25}" y="${fs*0.3}" width="${w*0.5}" height="${fs*1.7}" rx="${fs*0.2}" fill="${c.vip}" opacity="0.9"/>
+      <text x="${w/2}" y="${fs*1.5}" text-anchor="middle" font-size="${fs}" fill="white" font-family="Noto Sans KR" font-weight="700">${vipG?vipG.name:'VIP석'}</text>
+      <rect x="${w*0.03}" y="${h*0.26}" width="${w*0.26}" height="${fs*1.7}" rx="${fs*0.2}" fill="${c.in3}" opacity="0.9"/>
+      <text x="${w*0.16}" y="${h*0.26+fs*1.2}" text-anchor="middle" font-size="${fs*0.9}" fill="white" font-family="Noto Sans KR" font-weight="700">${in3G?in3G.name.replace('지정석',''):'3루 내야'}</text>
+      <rect x="${w*0.71}" y="${h*0.26}" width="${w*0.26}" height="${fs*1.7}" rx="${fs*0.2}" fill="${c.in1}" opacity="0.9"/>
+      <text x="${w*0.84}" y="${h*0.26+fs*1.2}" text-anchor="middle" font-size="${fs*0.9}" fill="white" font-family="Noto Sans KR" font-weight="700">${in1G?in1G.name.replace('지정석',''):'1루 내야'}</text>
+      <rect x="${w*0.28}" y="${h*0.86}" width="${w*0.44}" height="${fs*1.7}" rx="${fs*0.2}" fill="${c.out}" opacity="0.8"/>
+      <text x="${w/2}" y="${h*0.86+fs*1.2}" text-anchor="middle" font-size="${fs*0.85}" fill="white" font-family="Noto Sans KR" font-weight="700">${outG?outG.name:'외야'}</text>
+      <text x="${w/2}" y="${h-fs*0.4}" text-anchor="middle" font-size="${fs*0.75}" fill="#bbb" font-family="Noto Sans KR">${GAME.stadium}</text>
+    </svg>`;
+    if(mainEl) mainEl.innerHTML=makeSvg(600,380,14,4);
+    if(miniEl) miniEl.innerHTML=makeSvg(108,108,10,6);
+  }
+}
+buildStadiumSvg();
+
+const POOL=['GRDPA','XKWQB','MTZVF','HLNJC','BPYRE','SDGWK','VFMQZ','QJNRT','CWPBX','ZKHDA'];
+let capAns='';
+TS.start=Date.now();
+function refreshCap(){capAns=POOL[Math.floor(Math.random()*POOL.length)];document.getElementById('capText').textContent=capAns;document.getElementById('capInput').value='';document.getElementById('capInput').focus();}
+refreshCap();
+function submitCap(){
+  const v=document.getElementById('capInput').value.trim().toUpperCase();
+  if(!v){alert('보안문자를 입력해주세요.');return;}
+  if(v!==capAns){alert('보안문자가 일치하지 않습니다.\n다시 입력해주세요.');refreshCap();return;}
+  TS.cap=Date.now();
+  const dateStr=`2026.04.${String(GAME.day).padStart(2,'0')}(${DOW[+GAME.dow]}) ${GAME.time}`;
+  document.getElementById('gameTitle').textContent=`${GAME.opp} vs ${GAME.teamName}`;
+  document.getElementById('gameSub').textContent=`${GAME.stadium} | ${dateStr}`;
+  document.getElementById('directGameTitle').textContent=`${GAME.opp} vs ${GAME.teamName}`;
+  document.getElementById('directGameSub').textContent=`${GAME.stadium} | ${dateStr}`;
+  buildGrades();
+  TS.seat=Date.now();
+  goStep(1);
+}
+
+/* ══════════
+   STEP 1: 등급/좌석 선택
+══════════ */
+function refreshGrades(){
+  GRADES.forEach(g => {
+    // 원래 0석(품절 고정) 등급 제외하고 나머지 랜덤 재생성
+    if(g._fixed0) return;
+    g.cnt = Math.random() < 0.25 ? 0 : rnd(1, 80);
+    if(g.zones) g.zones.forEach(z => { z.cnt = Math.random() < 0.3 ? 0 : rnd(1, 12); });
+  });
+  expandedGradeIdx = null;
+  showZones = false;
+  selZoneKey = null;
+  buildGrades();
+}
+
+function buildGrades(){
+  const list = document.getElementById('gradeList');
+  if(!list) return;
+  list.innerHTML = '<div class="grade-section-lbl">전체</div>';
+  GRADES.forEach((g, i) => {
+    const isExpanded = expandedGradeIdx === i;
+    const div = document.createElement('div');
+    div.className = 'grade-item' + (isExpanded ? ' sel' : '');
+    div.dataset.idx = i;
+    div.innerHTML = `<div class="grade-dot" style="background:${g.color};"></div><span class="grade-name">${g.name}</span><span class="grade-cnt ${g.cnt>0?'avail':''}">${g.cnt>0?g.cnt+' 석':'0 석'}</span>`;
+    div.onclick = () => toggleGradeExpand(i);
+    list.appendChild(div);
+
+    if (isExpanded) {
+      if (!showZones) {
+        // 자동배정 / 직접선택 버튼 행
+        const actions = document.createElement('div');
+        actions.className = 'grade-item-actions';
+        actions.innerHTML = `<button class="btn-grade-auto" onclick="onRightAutoSelect(${i})">자동배정</button><button class="btn-grade-direct" onclick="onRightDirectSelect(${i})">직접선택</button>`;
+        list.appendChild(actions);
+      } else {
+        // 구역 목록
+        const zones = g.zones || [];
+        zones.forEach((z, j) => {
+          const isSel = selZoneKey && selZoneKey.gradeIdx===i && selZoneKey.zoneIdx===j;
+          const ze = document.createElement('div');
+          ze.className = 'grade-sub-zone' + (isSel ? ' sel' : '');
+          ze.innerHTML = `<span class="grade-sub-zone-name">${z.name}</span><span class="grade-sub-zone-cnt ${z.cnt>0?'avail':''}">${z.cnt>0?z.cnt+' 석':'0 석'}</span>`;
+          ze.onclick = () => selectSubZone(i, j);
+          list.appendChild(ze);
+        });
+      }
+    }
+  });
+}
+
+function toggleGradeExpand(idx){
+  if (expandedGradeIdx === idx) {
+    expandedGradeIdx = null;
+    showZones = false;
+  } else {
+    expandedGradeIdx = idx;
+    showZones = false;
+    selGrade = GRADES[idx];
+    unitPrice = selGrade.price;
+    document.getElementById('seatBottomBar').textContent = `▲ [${selGrade.name}] 선택됨 — 배치도를 클릭하거나 우측에서 유형을 선택하세요.`;
+  }
+  buildGrades();
+}
+
+/* 배치도 클릭 시 사용 (자동배정 12번 등급 선택) */
+function selectGrade(idx){
+  selGrade = GRADES[idx];
+  unitPrice = selGrade.price;
+  expandedGradeIdx = idx;
+  showZones = false;
+  buildGrades();
+  document.getElementById('seatBottomBar').textContent = `▲ [${selGrade.name}] 선택됨 — 배치도를 클릭하여 좌석 유형을 선택하세요.`;
+}
+
+function onRightAutoSelect(idx){
+  selGrade = GRADES[idx];
+  unitPrice = selGrade.price;
+  const ov = document.getElementById('autoQtyOverlay');
+  ov.classList.remove('hidden');
+  document.getElementById('aqDot').style.background = selGrade.color;
+  document.getElementById('aqName').textContent = selGrade.name;
+  const cnt = selGrade.cnt;
+  document.getElementById('aqCnt').textContent = cnt+'석';
+  document.getElementById('aqCnt').style.color = cnt>0?'var(--red)':'#aaa';
+  document.getElementById('aqState').textContent = cnt>0?'잔여 있음':'매진';
+  autoQty = cnt>0?1:0;
+  document.getElementById('aqVal').textContent = autoQty;
+}
+
+function onRightDirectSelect(idx){
+  selGrade = GRADES[idx];
+  unitPrice = selGrade.price;
+  if (selGrade.zones && selGrade.zones.length > 0) {
+    showZones = true;
+    buildGrades();
+  } else {
+    selectSubZone(idx, -1);
+  }
+}
+
+function selectSubZone(gradeIdx, zoneIdx){
+  selGrade = GRADES[gradeIdx];
+  unitPrice = selGrade.price;
+  selZoneKey = {gradeIdx, zoneIdx};
+  isDirectMode = true;
+  directSeats = [];
+
+  document.getElementById('seatAreaMap').classList.add('hidden');
+  document.getElementById('directView').classList.remove('hidden');
+
+  const zoneName = zoneIdx >= 0 ? selGrade.zones[zoneIdx].name : selGrade.name;
+  document.getElementById('directZoneLabel').textContent = `${selGrade.name} — ${zoneName}`;
+  document.getElementById('directBottomBar').textContent = '▲ 직접선택으로 예매 진행이 가능합니다. 좌석을 선택해 주세요.';
+  document.getElementById('directGameTitle').textContent = document.getElementById('gameTitle').textContent;
+  document.getElementById('directGameSub').textContent = document.getElementById('gameSub').textContent;
+
+  buildGrades();
+  buildSeatGrid();
+  document.getElementById('directSelInfoArea').classList.remove('hidden');
+  document.getElementById('btnDirectNext').disabled = true;
+  document.getElementById('directSelInfo').innerHTML = '<span class="dsi-empty">없음</span>';
+}
+
+/* 배치도 클릭 → 좌석 유형 선택 팝업 */
+function onStadiumClick(){
+  // 등급 미선택 시 스카이 상단석(중앙 SKY 상단지정석) 자동 선택
+  if(!selGrade){
+    selectGrade(12);
+  }
+  // 팝업 정보 채우기
+  document.getElementById('popupDot').style.background = selGrade.color;
+  document.getElementById('popupGradeName').textContent = selGrade.name;
+  const cntEl = document.getElementById('popupCnt');
+  cntEl.textContent = selGrade.cnt > 0 ? selGrade.cnt+'석' : '0석';
+  cntEl.style.color = selGrade.cnt > 0 ? 'var(--red)' : '#aaa';
+
+  // 팝업 열기
+  document.getElementById('zonePopupOverlay').classList.remove('hidden');
+}
+
+function closeZonePopup(){
+  document.getElementById('zonePopupOverlay').classList.add('hidden');
+}
+
+/* 배치도 중앙 팝업 → 자동배정 → 중앙 모달 */
+function onAutoSelect(){
+  closeZonePopup();
+  isDirectMode = false;
+  onRightAutoSelect(GRADES.indexOf(selGrade));
+}
+
+function closeAutoQty(){
+  document.getElementById('autoQtyOverlay').classList.add('hidden');
+}
+
+function changeAq(d){
+  const max = selGrade?Math.min(selGrade.cnt,6):0;
+  autoQty=Math.max(0,Math.min(max,autoQty+d));
+  document.getElementById('aqVal').textContent=autoQty;
+}
+
+function confirmAutoQty(){
+  if(autoQty===0){alert('매수를 선택해주세요.');return;}
+  qty=autoQty;qtyD=0;
+  goToTicketStep();
+}
+
+/* 배치도 중앙 팝업 → 직접선택 → 구역 선택 없이 바로 그리드 */
+function onDirectSelect(){
+  closeZonePopup();
+  selectSubZone(GRADES.indexOf(selGrade), -1);
+}
+
+function backToMap(){
+  document.getElementById('seatAreaMap').classList.remove('hidden');
+  document.getElementById('directView').classList.add('hidden');
+  document.getElementById('autoQtyOverlay').classList.add('hidden');
+  selZoneKey = null;
+  directSeats = [];
+  buildGrades();
+  document.getElementById('directSelInfoArea').classList.add('hidden');
+  document.getElementById('btnDirectNext').disabled = true;
+  document.getElementById('directSelInfo').innerHTML = '<span class="dsi-empty">없음</span>';
+}
+
+/* 좌석 그리드 생성 */
+let gridZoom=1;
+function buildSeatGrid(){
+  const wrap=document.getElementById('seatGridWrap');
+  wrap.innerHTML='';
+
+  // 선택된 구역 이름 기반으로 서브블록 라벨 생성
+  const baseName = selZoneKey && selZoneKey.zoneIdx >= 0
+    ? selGrade.zones[selZoneKey.zoneIdx].name
+    : (selGrade ? selGrade.name : '구역');
+  const gradeColor = selGrade ? selGrade.color : '#888';
+  const colGroups=[
+    {label: baseName.replace('구역','') + '-L구역', rows:22, cols:18},
+    {label: baseName,                               rows:22, cols:20},
+    {label: baseName.replace('구역','') + '-R구역', rows:22, cols:18},
+  ];
+
+  const container=document.createElement('div');
+  container.className='seat-col-group';
+  container.style.transform=`scale(${gridZoom})`;
+  container.style.transformOrigin='top left';
+
+  colGroups.forEach(cg=>{
+    const block=document.createElement('div');
+    block.className='col-block';
+    const hdr=document.createElement('div');
+    hdr.className='col-header';hdr.textContent=cg.label;
+    block.appendChild(hdr);
+    for(let r=6;r<=cg.rows+5;r++){
+      const rowLine=document.createElement('div');
+      rowLine.className='seat-row-line';
+      const rn=document.createElement('div');
+      rn.className='row-num';rn.textContent=r;rowLine.appendChild(rn);
+      for(let c=1;c<=cg.cols;c++){
+        const cell=document.createElement('div');
+        const id=`${cg.label}-${r}-${c}`;
+        const taken=Math.random()<0.35;
+        const isSel=directSeats.includes(id);
+        cell.className=`seat-cell ${taken?'taken':(isSel?'sel':'avail')}`;
+        cell.title=`${cg.label} ${r}열 ${c}번`;
+        if(!taken) cell.style.background=gradeColor;
+        if(!taken){
+          cell.onclick=()=>toggleDirectSeat(id,cell,`${cg.label} ${r}열 ${c}번`);
+        }
+        rowLine.appendChild(cell);
+      }
+      block.appendChild(rowLine);
+    }
+    container.appendChild(block);
+  });
+  wrap.appendChild(container);
+}
+
+function toggleDirectSeat(id,cell,label){
+  const idx=directSeats.indexOf(id);
+  if(idx>=0){
+    directSeats.splice(idx,1);
+    cell.classList.remove('sel');
+    cell.classList.add('avail');
+  }else{
+    if(directSeats.length>=6){alert('최대 6매까지 선택 가능합니다.');return;}
+    directSeats.push(id);
+    cell.classList.remove('avail');
+    cell.classList.add('sel');
+  }
+  updateDirectInfo();
+}
+
+function updateDirectInfo(){
+  const info=document.getElementById('directSelInfo');
+  if(!directSeats.length){
+    info.innerHTML='<span class="dsi-empty">없음</span>';
+  }else{
+    info.innerHTML=directSeats.map(id=>`<div>・${id.replace(/-/g,' ')}</div>`).join('');
+  }
+  document.getElementById('btnDirectNext').disabled=directSeats.length===0;
+}
+
+function gridZoomIn(){gridZoom=Math.min(gridZoom+0.15,2);buildSeatGrid();}
+function gridZoomOut(){gridZoom=Math.max(gridZoom-0.15,0.5);buildSeatGrid();}
+function resetGrid(){gridZoom=1;buildSeatGrid();}
+
+/* 지도 줌 */
+let zoomLvMap=1;
+function zoomIn(){zoomLvMap=Math.min(zoomLvMap+0.2,3);document.getElementById('stadiumImgWrap').style.transform=`scale(${zoomLvMap})`;}
+function zoomOut(){zoomLvMap=Math.max(zoomLvMap-0.2,0.5);document.getElementById('stadiumImgWrap').style.transform=`scale(${zoomLvMap})`;}
+function resetZoom(){zoomLvMap=1;document.getElementById('stadiumImgWrap').style.transform='scale(1)';}
+
+/* 다음 단계 (직접선택에서도 공통) */
+function toTicketType(){
+  if(isDirectMode){
+    if(directSeats.length===0){alert('좌석을 선택해주세요.');return;}
+    qty=directSeats.length;qtyD=0;
+  }
+  goToTicketStep();
+}
+function goToTicketStep(){
+  const maxQty = isDirectMode ? directSeats.length : autoQty;
+  const cardPrice = Math.round(unitPrice * 0.9);
+  const discPrice = Math.round(unitPrice * 0.5);
+  const dateStr = `2026.04.${String(GAME.day).padStart(2,'0')}(${DOW[+GAME.dow]}) ${GAME.time}`;
+  const seatInfo = isDirectMode
+    ? directSeats.slice(0,2).join(', ')+(directSeats.length>2?` 외 ${directSeats.length-2}석`:'')
+    : (selGrade ? selGrade.name+' 자동배정' : '—');
+
+  // 가격 표시
+  document.getElementById('ttPrice').textContent = unitPrice.toLocaleString()+'원';
+  document.getElementById('ttPriceCard').textContent = cardPrice.toLocaleString()+'원';
+  document.getElementById('ttPriceD').textContent = discPrice.toLocaleString()+'원';
+  // 매수 초기화 및 최대 제한 저장
+  qty=0; qtyD=0; qtyCard=0;
+  window._maxTotalQty = maxQty;
+  window._cardPrice = cardPrice;
+  buildQtySelects();
+  // 안내문
+  const sub = document.getElementById('ttSeatInfo');
+  if(sub) sub.textContent = `${selGrade?selGrade.name:'—'}을 ${maxQty}매 선택하셨습니다.`;
+  // 우측 패널
+  document.getElementById('ttRightMatchup').textContent = `${GAME.opp} vs ${GAME.teamName}`;
+  document.getElementById('ttRightMeta').textContent = `${GAME.stadium}\n${dateStr}`;
+  document.getElementById('ttBadgeOpp').textContent = GAME.opp.replace(/ /g,'').slice(0,2);
+  document.getElementById('ttBadgeHome').textContent = GAME.teamName.replace(/ /g,'').slice(0,2);
+  document.getElementById('sumSeat').textContent = seatInfo;
+  updateTtTotal();
+  startCountdown();
+  TS.tkt=Date.now();
+  goStep(2);
+}
+
+/* ══════════
+   STEP 2
+══════════ */
+function buildQtySelects(){
+  const max = window._maxTotalQty||6;
+  ['qtyV','qtyCard','qtyVD'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = '';
+    for(let i=0;i<=max;i++){
+      const opt = document.createElement('option');
+      opt.value = i; opt.textContent = i;
+      sel.appendChild(opt);
+    }
+    sel.value = 0;
+  });
+}
+function chQtySel(type, val){
+  const max = window._maxTotalQty||6;
+  const v = parseInt(val)||0;
+  const others = {
+    V: qtyCard+qtyD,
+    Card: qty+qtyD,
+    D: qty+qtyCard
+  }[type];
+  if(v + others > max){
+    alert(`선택한 좌석 수(${max}매)를 초과할 수 없습니다.`);
+    // 현재 값으로 되돌리기
+    const prev = type==='V'?qty:type==='Card'?qtyCard:qtyD;
+    document.getElementById(type==='V'?'qtyV':type==='Card'?'qtyCard':'qtyVD').value = prev;
+    return;
+  }
+  if(type==='V') qty=v;
+  else if(type==='Card') qtyCard=v;
+  else qtyD=v;
+  updateTtTotal();
+}
+function updateTtTotal(){
+  const max = window._maxTotalQty||0;
+  const cur = qty+qtyCard+qtyD;
+  const cardP = window._cardPrice||Math.round(unitPrice*0.9);
+  const discP = Math.round(unitPrice*0.5);
+  const sub1 = qty*unitPrice;
+  const sub2 = qtyCard*cardP;
+  const sub3 = qtyD*discP;
+  const subtotal = sub1+sub2+sub3;
+  const fee = cur*FEE;
+  const total = subtotal+fee;
+
+  // 소계 셀
+  document.getElementById('ttSub1').textContent = sub1?sub1.toLocaleString()+'원':'0원';
+  document.getElementById('ttSub2').textContent = sub2?sub2.toLocaleString()+'원':'0원';
+  document.getElementById('ttSub3').textContent = sub3?sub3.toLocaleString()+'원':'0원';
+
+  // 우측 요약
+  const typeArr=[];
+  if(qty) typeArr.push(`일반 ${qty}매`);
+  if(qtyCard) typeArr.push(`카드할인 ${qtyCard}매`);
+  if(qtyD) typeArr.push(`인증 ${qtyD}매`);
+  document.getElementById('sumType').textContent = typeArr.join(' / ')||'—';
+  document.getElementById('sumDisc').textContent = (qtyCard+qtyD)||0;
+  document.getElementById('sumQty').textContent = cur||0;
+  const discAmt = (qty+qtyCard+qtyD)*unitPrice - subtotal;
+  document.getElementById('sumDiscAmt').textContent = discAmt?discAmt.toLocaleString()+'원':'0원';
+  document.getElementById('sumTotal').textContent = total?total.toLocaleString()+'원':'0원';
+
+  // 상태 배너
+  const statusEl = document.getElementById('ttStatus');
+  const nxt = document.getElementById('btnTtNext');
+  if(statusEl){
+    if(max===0){statusEl.textContent='좌석을 선택하면 여기에 매수 현황이 표시됩니다.';statusEl.style.cssText='';return;}
+    if(cur===0){
+      statusEl.textContent=`0/${max}매 — 권종별 매수를 선택해주세요`;
+      statusEl.style.background='#fff3f3';statusEl.style.color='#e65c00';
+      if(nxt){nxt.disabled=true;nxt.style.opacity='0.5';nxt.style.cursor='not-allowed';}
+    } else if(cur<max){
+      statusEl.textContent=`${cur}/${max}매 선택 — ${max-cur}매 더 선택해주세요`;
+      statusEl.style.background='#fff8e1';statusEl.style.color='#e65c00';
+      if(nxt){nxt.disabled=true;nxt.style.opacity='0.5';nxt.style.cursor='not-allowed';}
+    } else if(cur===max){
+      statusEl.textContent=`✅ ${max}/${max}매 선택 완료 — 다음 단계로 이동하세요`;
+      statusEl.style.background='#f0fff4';statusEl.style.color='#1a8f5a';
+      if(nxt){nxt.disabled=false;nxt.style.opacity='1';nxt.style.cursor='pointer';}
+    } else {
+      statusEl.textContent=`⚠ ${max}매 초과 (${cur}매) — 조정해주세요`;
+      statusEl.style.background='#fff0f0';statusEl.style.color='#e22228';
+      if(nxt){nxt.disabled=true;nxt.style.opacity='0.5';nxt.style.cursor='not-allowed';}
+    }
+  }
+}
+
+/* 카운트다운 타이머 */
+let _countdownTimer = null;
+function startCountdown(){
+  clearInterval(_countdownTimer);
+  let secs = 6*60;
+  const el = document.getElementById('ttCountdown');
+  function tick(){
+    const m = Math.floor(secs/60), s = secs%60;
+    if(el) el.textContent = `0${m}:${String(s).padStart(2,'0')}`;
+    if(secs<=0){clearInterval(_countdownTimer);return;}
+    secs--;
+  }
+  tick();
+  _countdownTimer = setInterval(tick, 1000);
+}
+function toConfirm(){
+  const max=window._maxTotalQty||0;
+  const total=qty+qtyCard+qtyD;
+  if(total===0){alert('권종별 매수를 선택해주세요.');return;}
+  if(max>0 && total!==max){alert(`선택한 좌석 ${max}매에 맞게 권종 합계를 ${max}매로 맞춰주세요.\n현재: ${total}매`);return;}
+  const cardP=window._cardPrice||Math.round(unitPrice*0.9);
+  const sub=qty*unitPrice+qtyCard*cardP+qtyD*Math.round(unitPrice*0.5);
+  const fee=total*FEE;
+  const dateStr=`2026.04.${String(GAME.day).padStart(2,'0')}(${DOW[+GAME.dow]}) ${GAME.time}`;
+  const seatInfo=isDirectMode?directSeats.slice(0,2).join(', ')+(directSeats.length>2?` 외 ${directSeats.length-2}석`:''):(selGrade?selGrade.name+' 자동배정':'—');
+  document.getElementById('cfGame').textContent=`${GAME.opp} vs ${GAME.teamName}`;
+  document.getElementById('cfDate').textContent=dateStr;
+  document.getElementById('cfPlace').textContent=GAME.stadium;
+  document.getElementById('cfSeat').textContent=seatInfo;
+  const typeArr2=[];
+  if(qty) typeArr2.push(`일반 ${qty}매`);
+  if(qtyCard) typeArr2.push(`카드할인 ${qtyCard}매`);
+  if(qtyD) typeArr2.push(`인증 ${qtyD}매`);
+  document.getElementById('cfTktType').textContent=typeArr2.join(' / ');
+  document.getElementById('cfTktAmt').textContent=sub.toLocaleString()+'원';
+  document.getElementById('cfFeeAmt').textContent=fee.toLocaleString()+'원';
+  document.getElementById('cfTotAmt').textContent=(sub+fee).toLocaleString()+'원';
+  goStep(3);
+}
+function selRcv(el){el.closest('.rcv-list').querySelectorAll('.rcv-card').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+function toggleCfPay(){
+  const req=['cfAgree1','cfAgree3','cfAgree4','cfAgree5'];
+  const allChecked=req.every(id=>document.getElementById(id).checked);
+  document.getElementById('btnCfPay').disabled=!allChecked;
+}
+function selPay(el){el.closest('.pm-list').querySelectorAll('.pm').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function togglePayBtn(){document.getElementById('btnPayDo').disabled=!document.getElementById('payAgree').checked;}
+
+/* ══════════
+   완료
+══════════ */
+function doComplete(){
+  TS.pay=Date.now();
+  const sub=qty*unitPrice+qtyD*Math.round(unitPrice*0.5);
+  const fee=(qty+qtyD)*FEE;
+  const dateStr=`2026.04.${String(GAME.day).padStart(2,'0')}(${DOW[+GAME.dow]}) ${GAME.time}`;
+  const seatInfo=isDirectMode?directSeats.slice(0,2).join(', ')+(directSeats.length>2?` 외 ${directSeats.length-2}석`:''):(selGrade?selGrade.name+' 자동배정':'—');
+  document.getElementById('doneGame').textContent=`${GAME.opp} vs ${GAME.teamName}`;
+  document.getElementById('doneDate').textContent=dateStr;
+  document.getElementById('donePlace').textContent=GAME.stadium;
+  document.getElementById('doneSeat').textContent=seatInfo;
+  document.getElementById('donePrice').textContent=(sub+fee).toLocaleString()+'원';
+  const fmt=ms=>{if(!ms||ms<0)return '—';const s=Math.floor(ms/1000);return s<60?`${s}초`:`${Math.floor(s/60)}분 ${s%60}초`;};
+  document.getElementById('dtCap').textContent=fmt(TS.cap-TS.start);
+  document.getElementById('dtSeat').textContent=fmt(TS.tkt-TS.seat);
+  document.getElementById('dtTkt').textContent=fmt(TS.pay-TS.tkt);
+  document.getElementById('dtPay').textContent=fmt(Date.now()-TS.pay);
+  document.getElementById('dtTot').textContent=fmt(Date.now()-TS.start);
+  goStep(5);
+}
+
+/* ══ 예매창 뷰 전환 ══ */
+function setRView(mode){
+  const isM = mode === 'mobile';
+  document.getElementById('vtbPc').style.cssText = isM
+    ? 'padding:3px 10px;border-radius:4px;border:none;background:none;color:#666;font-size:10px;cursor:pointer;font-family:Noto Sans KR,sans-serif;'
+    : 'padding:3px 10px;border-radius:4px;border:none;background:#fff;color:#1a1a1a;font-size:10px;font-weight:700;cursor:pointer;font-family:Noto Sans KR,sans-serif;';
+  document.getElementById('vtbMob').style.cssText = isM
+    ? 'padding:3px 10px;border-radius:4px;border:none;background:#fff;color:#1a1a1a;font-size:10px;font-weight:700;cursor:pointer;font-family:Noto Sans KR,sans-serif;'
+    : 'padding:3px 10px;border-radius:4px;border:none;background:none;color:#666;font-size:10px;cursor:pointer;font-family:Noto Sans KR,sans-serif;';
+  // 모바일: 좌석 패널 세로 배치
+  document.querySelectorAll('.reserve-body,.m-seat-body').forEach(e => {
+    e.style.flexDirection = isM ? 'column' : '';
+    e.style.overflow = isM ? 'auto' : '';
+    e.style.height = isM ? 'auto' : '';
+  });
+  document.querySelectorAll('.grade-panel,.m-seat-right,.seat-rt').forEach(e => {
+    e.style.width = isM ? '100%' : '';
+    e.style.borderLeft = isM ? 'none' : '';
+    e.style.borderTop = isM ? '1px solid #ddd' : '';
+    e.style.maxHeight = isM ? '300px' : '';
+  });
+  document.querySelectorAll('.seat-area,.m-seat-left,.seat-lt').forEach(e => {
+    e.style.maxHeight = isM ? '500px' : '';
+    e.style.overflow = isM ? 'auto' : '';
+  });
+  // 스텝바 폰트 축소
+  document.querySelectorAll('.sb,.sb-item').forEach(e => {
+    e.style.fontSize = isM ? '10px' : '';
+  });
+}
+
+</script>
+</body>
+</html>

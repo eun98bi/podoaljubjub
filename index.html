@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포도알줍줍 — 티켓팅 연습 플랫폼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ff;
+    --surface: #ffffff;
+    --surface2: #ede9ff;
+    --border: rgba(0,0,0,0.09);
+    --text: #1a1824;
+    --muted: #6b6882;
+    --accent: #6c5ce7;
+    --accent2: #4f3fba;
+    --green: #00a67a;
+    --amber: #b86d00;
+    --pink: #c92b6a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── 배경 그라데이션 ── */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(108,92,231,0.10) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 35% at 80% 80%, rgba(0,180,130,0.07) 0%, transparent 70%);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 60px;
+    background: rgba(245,243,255,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-grape {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .logo-text span { color: var(--accent2); }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 24px 60px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(108,92,231,0.10);
+    border: 1px solid rgba(108,92,231,0.25);
+    color: var(--accent2);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px 5px 10px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+    letter-spacing: 0.02em;
+  }
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(43px, 7.2vw, 79px);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent2);
+  }
+
+  .hero-ko {
+    font-size: clamp(16px, 2.7vw, 23px);
+    font-weight: 300;
+    color: var(--muted);
+    margin-bottom: 28px;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-desc {
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 72px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: -0.01em;
+  }
+  .btn-primary:hover {
+    background: var(--accent2);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(108,92,231,0.4);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    background: var(--surface2);
+    border-color: rgba(0,0,0,0.15);
+  }
+
+  /* ── PLATFORM CARDS ── */
+  .platforms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 860px;
+  }
+
+  .platform-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 20px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    overflow: hidden;
+    cursor: pointer;
+    display: block;
+  }
+  .platform-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+    border-radius: 16px;
+    pointer-events: none;
+  }
+  .platform-card:hover {
+    border-color: rgba(0,0,0,0.18);
+    transform: translateY(-4px);
+  }
+  .platform-card:hover::before { opacity: 1; }
+
+  .platform-card.tl::before { background: radial-gradient(ellipse at 0% 0%, rgba(24,95,165,0.2) 0%, transparent 70%); }
+  .platform-card.ml::before { background: radial-gradient(ellipse at 0% 0%, rgba(186,117,23,0.2) 0%, transparent 70%); }
+  .platform-card.y2::before { background: radial-gradient(ellipse at 0% 0%, rgba(83,74,183,0.2) 0%, transparent 70%); }
+  .platform-card.ip::before { background: radial-gradient(ellipse at 0% 0%, rgba(153,60,29,0.2) 0%, transparent 70%); }
+
+  .platform-card.tl:hover { box-shadow: 0 12px 40px rgba(24,95,165,0.15); }
+  .platform-card.ml:hover { box-shadow: 0 12px 40px rgba(186,117,23,0.15); }
+  .platform-card.y2:hover { box-shadow: 0 12px 40px rgba(83,74,183,0.15); }
+  .platform-card.ip:hover { box-shadow: 0 12px 40px rgba(153,60,29,0.15); }
+
+  .platform-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-bottom: 14px;
+  }
+  .tl .platform-dot { background: #378ADD; }
+  .ml .platform-dot { background: #EF9F27; }
+  .y2 .platform-dot { background: #7F77DD; }
+  .ip .platform-dot { background: #D85A30; }
+
+  .platform-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .platform-sub {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .platform-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 100px;
+    background: rgba(0,0,0,0.04);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .platform-status {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+  .status-ready {
+    background: rgba(0,210,160,0.12);
+    color: var(--green);
+    border: 1px solid rgba(0,210,160,0.25);
+  }
+  .status-soon {
+    background: rgba(255,169,77,0.12);
+    color: var(--amber);
+    border: 1px solid rgba(255,169,77,0.25);
+  }
+
+  /* ── SECTION ── */
+  .section {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 48px;
+    color: var(--text);
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+  }
+  .step {
+    background: var(--surface);
+    padding: 28px 24px;
+    position: relative;
+  }
+  .step:first-child { border-radius: 16px 0 0 16px; }
+  .step:last-child { border-radius: 0 16px 16px 0; }
+  .step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px;
+    color: rgba(0,0,0,0.06);
+    line-height: 1;
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-left { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .footer-disclaimer {
+    font-size: 11px;
+    color: rgba(0,0,0,0.3);
+    margin-top: 4px;
+  }
+
+  /* ── SCROLL FADE IN ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 0 16px; }
+    .nav-links { display: none; }
+    footer { padding: 24px 16px; flex-direction: column; gap: 12px; }
+    .step:first-child { border-radius: 16px 16px 0 0; }
+    .step:last-child { border-radius: 0 0 16px 16px; }
+    .steps { grid-template-columns: 1fr; gap: 2px; }
+    /* 히어로 */
+    .hero { padding: 100px 20px 40px; }
+    .hero h1 { font-size: clamp(32px, 10vw, 52px); }
+    .hero-ko { font-size: 14px; }
+    .hero-desc { font-size: 13px; }
+    .hero-cta { flex-direction: column; align-items: center; gap: 10px; }
+    .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
+    /* 플랫폼 카드 2열 */
+    .platforms { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .platform-card { padding: 16px 12px; border-radius: 12px; }
+    .platform-name { font-size: 14px; }
+    .platform-sub { font-size: 11px; }
+    .platform-tags { gap: 3px; }
+    .tag { font-size: 9px; padding: 2px 6px; }
+    /* 체크리스트 배너 */
+    .section { padding: 40px 20px; }
+    .section-title { font-size: clamp(22px, 6vw, 36px); }
+  }
+  @media (max-width: 380px) {
+    .platforms { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">
+    <span class="logo-grape">🍇</span>
+    <span class="logo-text">포도알<span>줍줍</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#platforms">연습 플랫폼</a></li>
+    <li><a href="#how">이용 방법</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">티켓팅 연습 플랫폼 v2.0</div>
+  <h1>Ticket<br><em>Practice</em></h1>
+  <p class="hero-ko">실전 같은 티켓팅 연습, 포도알줍줍</p>
+  <p class="hero-desc">
+    실전처럼 연습하고, 실전에서 성공하세요.
+  </p>
+
+  <!-- PLATFORM CARDS -->
+  <div class="platforms" id="platforms">
+    <div class="platform-card tl">
+      <span class="platform-status status-ready">연습 가능</span>
+      <div class="platform-dot"></div>
+      <div class="platform-name">티켓링크</div>
+      <div style="display:flex;gap:6px;margin-top:14px;">
+        <a href="ticketlink-sports.html" onclick="localStorage.setItem('podoal_view','pc')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:8px;background:rgba(55,138,221,0.12);border:1px solid rgba(55,138,221,0.28);text-decoration:none;" onmouseover="this.style.background='rgba(55,138,221,0.22)'" onmouseout="this.style.background='rgba(55,138,221,0.12)'">
+          <span style="font-size:15px;">🖥</span>
+          <span style="font-size:11px;font-weight:700;color:#2471b8;">PC 버전</span>
+        </a>
+        <a href="ticketlink-sports.html" onclick="localStorage.setItem('podoal_view','mobile')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:8px;background:rgba(55,138,221,0.12);border:1px solid rgba(55,138,221,0.28);text-decoration:none;" onmouseover="this.style.background='rgba(55,138,221,0.22)'" onmouseout="this.style.background='rgba(55,138,221,0.12)'">
+          <span style="font-size:15px;">📱</span>
+          <span style="font-size:11px;font-weight:700;color:#2471b8;">앱/모바일</span>
+        </a>
+      </div>
+    </div>
+    <div class="platform-card ml" style="opacity:0.5;cursor:default;pointer-events:none;">
+      <span class="platform-status status-soon">준비 중</span>
+      <div class="platform-dot"></div>
+      <div class="platform-name">멜론티켓</div>
+      <div style="margin-top:14px;padding:10px;border-radius:8px;background:rgba(239,159,39,0.08);border:1px dashed rgba(239,159,39,0.25);text-align:center;font-size:11px;color:#EF9F27;">곧 오픈됩니다</div>
+    </div>
+    <div class="platform-card y2" style="opacity:0.5;cursor:default;pointer-events:none;">
+      <span class="platform-status status-soon">준비 중</span>
+      <div class="platform-dot"></div>
+      <div class="platform-name">예스24</div>
+      <div style="margin-top:14px;padding:10px;border-radius:8px;background:rgba(127,119,221,0.08);border:1px dashed rgba(127,119,221,0.25);text-align:center;font-size:11px;color:#7F77DD;">곧 오픈됩니다</div>
+    </div>
+    <div class="platform-card ip" style="opacity:0.5;cursor:default;pointer-events:none;">
+      <span class="platform-status status-soon">준비 중</span>
+      <div class="platform-dot"></div>
+      <div class="platform-name">NOL (인터파크)</div>
+      <div style="margin-top:14px;padding:10px;border-radius:8px;background:rgba(216,90,48,0.08);border:1px dashed rgba(216,90,48,0.25);text-align:center;font-size:11px;color:#D85A30;">곧 오픈됩니다</div>
+    </div>
+  </div>
+
+  <!-- 체크리스트 배너 -->
+  <!-- <a href="checklist.html" style="display:block;margin-top:20px;text-decoration:none;">
+    <div style="
+      background:linear-gradient(135deg,rgba(108,92,231,0.10) 0%,rgba(108,92,231,0.04) 100%);
+      border:1px solid rgba(108,92,231,0.22);border-radius:16px;
+      padding:20px 28px;display:flex;align-items:center;gap:18px;
+      transition:all 0.2s;cursor:pointer;
+    " onmouseover="this.style.background='linear-gradient(135deg,rgba(108,92,231,0.16) 0%,rgba(108,92,231,0.08) 100%)'"
+       onmouseout="this.style.background='linear-gradient(135deg,rgba(108,92,231,0.10) 0%,rgba(108,92,231,0.04) 100%)'">
+      <span style="font-size:36px;">🗒</span>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:700;color:#1a1824;margin-bottom:4px;">티켓팅 사전준비 체크리스트</div>
+        <div style="font-size:12px;color:#6b6882;line-height:1.6;">
+          본인인증 · 결제수단 등록 · 팝업 해제 · 반응속도 테스트까지<br>
+          15가지 항목을 체크하고 실전에 임하세요!
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#6c5ce7;white-space:nowrap;">시작하기 →</div>
+    </div>
+  </a> -->
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section fade-up" id="how">
+  <p class="section-label">이용 방법</p>
+  <h2 class="section-title">4단계로 끝내는<br>티켓팅 연습</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">플랫폼 선택</div>
+      <div class="step-desc">연습하고 싶은 티켓 사이트를 선택하세요. 각 플랫폼마다 UI와 흐름이 다릅니다.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">공연 선택</div>
+      <div class="step-desc">야구, 콘서트, 뮤지컬 등 원하는 장르의 가상 공연을 골라 예매를 시작합니다.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">실전 연습</div>
+      <div class="step-desc">오픈 대기 → 대기열 통과 → 좌석 선택 → 결제까지 실제와 동일하게 연습합니다.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">결과 확인</div>
+      <div class="step-desc">소요 시간과 단계별 처리 속도를 확인하고 실전에서 약한 부분을 보완하세요.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <strong style="color:var(--text);">🍇 포도알줍줍</strong><br>
+    티켓팅 연습 플랫폼
+    <p class="footer-disclaimer">이 사이트는 연습용으로 제작되었습니다. 실제 티켓 구매는 불가하며, 각 플랫폼과 관련이 없습니다.</p>
+  </div>
+</footer>
+
+<script>
+  // scroll fade
+  const obs = new IntersectionObserver(els => {
+    els.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+  // smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const t = document.querySelector(a.getAttribute('href'));
+      if(t) t.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+</script>
+</body>
+</html>

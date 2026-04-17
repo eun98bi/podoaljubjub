@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>멜론티켓 연습 — 포도알줍줍</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --mel:#00cd3c;--mel-dk:#00a830;--mel-lt:#f0fff5;
+  --black:#1a1a1a;--border:#e8e8e8;--bg:#f7f7f7;--text:#1a1a1a;
+}
+html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;}
+.screen{display:none;}.screen.active{display:block;}
+
+/* ══ 연습 배지 ══ */
+.practice-badge{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,0.75);color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:100px;z-index:9999;backdrop-filter:blur(10px);}
+.practice-bar{background:#fff8e1;border-bottom:2px solid #fbbf24;padding:7px 24px;font-size:11px;color:#78350f;display:flex;align-items:center;gap:6px;}
+
+/* ══════════════════════════════
+   실제 멜론티켓 헤더 구조
+   1단: 검정 상단바 (로고+검색+로그인)
+   2단: 흰 GNB바 (메뉴)
+══════════════════════════════ */
+
+/* 1단 상단 헤더 */
+.mel-top-bar{
+  background:#1a1a1a;height:56px;
+  display:flex;align-items:center;padding:0 24px;
+  position:sticky;top:0;z-index:200;
+}
+.mel-logo{display:flex;align-items:center;gap:6px;text-decoration:none;flex-shrink:0;}
+.mel-logo-mark{
+  width:32px;height:32px;
+  background:var(--mel);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.mel-logo-mark svg{width:18px;height:18px;fill:#fff;}
+.mel-logo-text{font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.02em;line-height:1;}
+.mel-logo-text em{color:var(--mel);font-style:normal;}
+
+/* 상단바 중앙 검색 */
+.mel-search-wrap{
+  flex:1;max-width:440px;margin:0 32px;
+}
+.mel-search{
+  display:flex;align-items:center;
+  background:#2a2a2a;border-radius:4px;height:36px;overflow:hidden;
+}
+.mel-search input{
+  flex:1;background:none;border:none;outline:none;padding:0 14px;
+  font-size:13px;color:#fff;font-family:'Noto Sans KR',sans-serif;
+}
+.mel-search input::placeholder{color:#666;}
+.mel-search-btn{
+  width:40px;height:36px;background:none;border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  border-left:1px solid #3a3a3a;
+}
+.mel-search-btn svg{width:16px;height:16px;fill:#999;}
+
+/* 상단바 우측 */
+.mel-top-right{margin-left:auto;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.mel-top-link{color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;text-decoration:none;white-space:nowrap;}
+.mel-top-link:hover{color:#fff;}
+.mel-top-link.login{
+  color:#fff;background:var(--mel);font-weight:700;
+  padding:5px 14px;border-radius:3px;font-size:12px;
+}
+.mel-top-link.login:hover{background:var(--mel-dk);}
+
+/* 2단 GNB */
+.mel-gnb-bar{
+  background:#fff;border-bottom:1px solid var(--border);
+  height:46px;display:flex;align-items:stretch;
+  padding:0 24px;
+  position:sticky;top:56px;z-index:190;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05);
+}
+.mel-gnb-item{
+  display:flex;align-items:center;padding:0 16px;
+  font-size:14px;font-weight:500;color:#555;cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;
+  margin-bottom:-1px;transition:all 0.12s;text-decoration:none;
+}
+.mel-gnb-item:hover{color:var(--text);}
+.mel-gnb-item.on{color:var(--text);font-weight:700;border-bottom-color:var(--mel);}
+
+/* 장르 서브탭 */
+.mel-genre-bar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.mel-genre-bar::-webkit-scrollbar{display:none;}
+.mel-genre-item{
+  padding:0 14px;height:40px;display:flex;align-items:center;
+  font-size:13px;font-weight:500;color:#888;cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-1px;
+}
+.mel-genre-item:hover{color:var(--mel-dk);}
+.mel-genre-item.on{color:var(--mel-dk);font-weight:700;border-bottom-color:var(--mel);}
+
+/* ══════ SCREEN 0: 메인 홈 ══════ */
+/* 대형 배너 슬라이더 */
+.mel-banner{
+  position:relative;overflow:hidden;background:#111;
+  height:360px;cursor:pointer;
+}
+.mel-banner-slide{
+  height:100%;display:flex;align-items:flex-end;
+  padding:36px 48px;color:#fff;
+  background:linear-gradient(135deg, #0d1b2e 0%, #1a2f50 40%, #0a1628 100%);
+  position:relative;
+}
+.mel-banner-slide::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 60%);
+}
+.mel-banner-content{position:relative;z-index:1;max-width:500px;}
+.mel-banner-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--mel);color:#fff;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:2px;margin-bottom:14px;
+}
+.mel-banner-title{font-size:28px;font-weight:700;line-height:1.3;margin-bottom:8px;letter-spacing:-0.02em;}
+.mel-banner-sub{font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:18px;line-height:1.6;}
+.mel-banner-cta{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--mel);color:#fff;font-size:13px;font-weight:700;
+  padding:10px 20px;border-radius:4px;cursor:pointer;border:none;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.mel-banner-nav{
+  position:absolute;bottom:16px;right:20px;
+  display:flex;align-items:center;gap:8px;
+}
+.mel-banner-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,0.4);cursor:pointer;
+}
+.mel-banner-dot.on{background:#fff;width:18px;border-radius:3px;}
+.mel-banner-arrows{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;gap:6px;}
+.mel-arrow{
+  width:36px;height:36px;background:rgba(0,0,0,0.45);border:none;
+  border-radius:50%;color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.mel-arrow:hover{background:rgba(0,0,0,0.7);}
+
+/* 컨텐츠 영역 */
+.mel-body{max-width:1100px;margin:0 auto;padding:28px 24px;}
+
+/* 섹션 헤더 */
+.mel-sec-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.mel-sec-title{
+  font-size:17px;font-weight:700;letter-spacing:-0.02em;
+  display:flex;align-items:center;gap:8px;
+}
+.mel-sec-title::before{content:'';width:3px;height:18px;background:var(--mel);border-radius:2px;}
+.mel-sec-more{font-size:12px;color:#888;cursor:pointer;display:flex;align-items:center;gap:3px;}
+.mel-sec-more:hover{color:#333;}
+
+/* 공연 카드 그리드 - 실제 멜론티켓 포스터형 */
+.mel-card-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;margin-bottom:40px;
+}
+.mel-card{cursor:pointer;position:relative;}
+.mel-card:hover .mel-card-poster{transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+/* 포스터 (실제 멜론은 세로형 이미지) */
+.mel-card-poster{
+  width:100%;aspect-ratio:3/4;border-radius:6px;overflow:hidden;
+  position:relative;transition:all 0.2s;
+  background:#1a1a2e;
+}
+.mel-card-poster-img{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;gap:8px;position:relative;
+}
+.mel-card-poster-icon{font-size:36px;line-height:1;}
+.mel-card-poster-name{font-size:12px;font-weight:700;text-align:center;padding:0 8px;line-height:1.4;}
+.mel-card-badge-wrap{
+  position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:3px;
+}
+.mel-badge{
+  display:inline-block;font-size:9px;font-weight:700;
+  padding:2px 6px;border-radius:2px;color:#fff;
+}
+.mel-badge.mel-only{background:var(--mel);}
+.mel-badge.hot{background:#e22228;}
+.mel-badge.new{background:#1565c0;}
+.mel-badge.soon{background:#666;}
+.mel-badge.end{background:#ff6d00;}
+/* 찜 버튼 */
+.mel-card-wish{
+  position:absolute;bottom:8px;right:8px;
+  width:28px;height:28px;background:rgba(0,0,0,0.5);
+  border-radius:50%;border:none;color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.mel-card-wish:hover{background:var(--mel);}
+/* 카드 텍스트 */
+.mel-card-info{padding:10px 2px 0;}
+.mel-card-title{font-size:12px;font-weight:700;line-height:1.4;margin-bottom:4px;color:#1a1a1a;letter-spacing:-0.01em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.mel-card-date{font-size:11px;color:#888;margin-bottom:2px;}
+.mel-card-place{font-size:11px;color:#aaa;}
+
+/* 랭킹 카드 (숫자 있음) */
+.mel-rank-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:40px;
+}
+.mel-rank-num{
+  position:absolute;top:8px;left:8px;
+  width:24px;height:24px;background:rgba(0,0,0,0.7);
+  border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;
+}
+
+/* 오픈 예정 배너형 */
+.mel-open-list{display:flex;flex-direction:column;gap:0;background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:40px;}
+.mel-open-row{
+  display:flex;align-items:center;gap:16px;padding:14px 18px;
+  border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background 0.1s;
+}
+.mel-open-row:last-child{border-bottom:none;}
+.mel-open-row:hover{background:#fafafa;}
+.mel-open-num{width:20px;font-size:13px;font-weight:700;color:#ddd;flex-shrink:0;}
+.mel-open-poster{
+  width:48px;height:64px;border-radius:4px;flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;
+}
+.mel-open-info{flex:1;}
+.mel-open-title{font-size:13px;font-weight:700;margin-bottom:3px;letter-spacing:-0.01em;}
+.mel-open-meta{font-size:11px;color:#888;}
+.mel-open-right{text-align:right;flex-shrink:0;}
+.mel-open-date-label{font-size:10px;color:#aaa;margin-bottom:2px;}
+.mel-open-date{font-size:12px;font-weight:700;color:var(--mel-dk);}
+.mel-open-badge{margin-top:4px;}
+
+/* ══════ SCREEN 1: 공연 상세 ══════ */
+/* 실제 멜론티켓: 포스터 좌측 + 정보 우측 2컬럼 */
+.mel-detail-body{max-width:1000px;margin:0 auto;padding:28px 24px;}
+.mel-detail-top{display:flex;gap:36px;margin-bottom:32px;}
+
+/* 포스터 영역 */
+.mel-poster-col{flex-shrink:0;width:220px;}
+.mel-poster-img{
+  width:220px;height:293px; /* 3:4 비율 */
+  border-radius:6px;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;position:relative;margin-bottom:10px;
+}
+.mel-poster-icon{font-size:56px;margin-bottom:10px;}
+.mel-poster-name{font-size:16px;font-weight:700;text-align:center;padding:0 12px;line-height:1.4;}
+.mel-poster-wish{
+  width:100%;height:40px;border:1.5px solid var(--border);
+  background:#fff;border-radius:4px;cursor:pointer;
+  font-size:13px;color:#555;display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:6px;
+}
+.mel-poster-wish:hover{border-color:var(--mel);color:var(--mel-dk);}
+.mel-poster-share{
+  width:100%;height:36px;background:none;border:1px solid #ddd;
+  border-radius:4px;cursor:pointer;font-size:12px;color:#888;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-family:'Noto Sans KR',sans-serif;
+}
+
+/* 정보 영역 */
+.mel-info-col{flex:1;min-width:0;}
+.mel-detail-genre{
+  display:inline-block;font-size:11px;font-weight:600;
+  padding:2px 8px;border-radius:2px;border:1px solid var(--mel);
+  color:var(--mel-dk);margin-bottom:10px;
+}
+.mel-detail-title{font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:1.35;margin-bottom:16px;}
+.mel-detail-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;}
+.mel-detail-table tr{border-bottom:1px solid #f0f0f0;}
+.mel-detail-table tr:last-child{border-bottom:none;}
+.mel-detail-table td{padding:8px 0;vertical-align:top;}
+.mel-detail-table td:first-child{width:72px;color:#888;font-weight:500;flex-shrink:0;}
+.mel-detail-price{color:#e22228;font-weight:700;font-size:14px;}
+.mel-detail-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;}
+.mel-dtag{font-size:10px;padding:3px 8px;border-radius:2px;background:#f5f5f5;color:#666;}
+.mel-dtag.mel-only{background:var(--mel-lt);color:var(--mel-dk);border:1px solid #b3f0c8;}
+
+/* 예매 박스 */
+.mel-book-box{
+  background:#fff;border:1px solid var(--border);border-radius:6px;
+  padding:20px;margin-bottom:16px;
+}
+.mel-book-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.mel-book-title{font-size:14px;font-weight:700;}
+.mel-server-time{font-size:12px;color:#888;display:flex;align-items:center;gap:5px;}
+.mel-server-time span{color:#e22228;font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* 자동전환 카운트다운 */
+.mel-countdown-box{
+  background:#111;border-radius:6px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;margin-bottom:14px;
+}
+.mel-countdown-info{flex:1;}
+.mel-countdown-label{font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:4px;}
+.mel-countdown-desc{font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6;}
+.mel-countdown-num{font-size:32px;font-weight:700;color:var(--mel);font-variant-numeric:tabular-nums;letter-spacing:-0.02em;flex-shrink:0;}
+.mel-countdown-num.open-flash{animation:openFlash 0.4s step-end infinite;}
+@keyframes openFlash{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+/* 예매하기 버튼 */
+.mel-btn-book{
+  width:100%;height:52px;background:var(--mel);border:none;
+  color:#fff;font-size:16px;font-weight:700;border-radius:4px;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background 0.15s;
+}
+.mel-btn-book:hover{background:var(--mel-dk);}
+.mel-btn-book:disabled{background:#ccc;cursor:not-allowed;}
+.mel-book-notice{font-size:11px;color:#888;line-height:1.7;margin-top:10px;}
+.mel-book-notice b{color:#555;}
+
+/* 탭 */
+.mel-dtab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:0;}
+.mel-dtab{padding:11px 18px;font-size:13px;font-weight:500;color:#888;border-bottom:2px solid transparent;cursor:pointer;}
+.mel-dtab.on{color:#1a1a1a;font-weight:700;border-bottom-color:var(--mel);}
+.mel-dtab-content{background:#fff;border:1px solid var(--border);border-top:none;padding:20px;font-size:13px;line-height:1.85;color:#444;}
+
+/* ══════ SCREEN 2: 회차 팝업 ══════ */
+.mel-pop-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.55);
+  display:flex;align-items:center;justify-content:center;z-index:500;
+}
+.mel-pop{
+  background:#fff;width:520px;max-width:95vw;
+  border-radius:6px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.25);
+}
+.mel-pop-head{
+  background:#1a1a1a;color:#fff;padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.mel-pop-title{font-size:15px;font-weight:700;}
+.mel-pop-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;opacity:0.7;line-height:1;}
+.mel-pop-close:hover{opacity:1;}
+.mel-pop-body{padding:20px;}
+.mel-pop-step{font-size:11px;color:#888;margin-bottom:14px;display:flex;align-items:center;gap:5px;}
+.mel-pop-step b{color:var(--mel-dk);}
+
+/* 날짜 탭 */
+.mel-date-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.mel-date-tab{
+  padding:7px 14px;border:1.5px solid var(--border);border-radius:4px;
+  font-size:12px;font-weight:500;color:#555;cursor:pointer;transition:all 0.12s;
+  text-align:center;
+}
+.mel-date-tab:hover{border-color:var(--mel);}
+.mel-date-tab.sel{border-color:var(--mel);background:var(--mel-lt);color:var(--mel-dk);font-weight:700;}
+.mel-date-tab .dt-dow{font-size:10px;color:#aaa;margin-top:1px;}
+.mel-date-tab.sel .dt-dow{color:var(--mel-dk);}
+
+/* 회차 목록 */
+.mel-session-list{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.mel-session-row{
+  display:flex;align-items:center;gap:12px;
+  border:1.5px solid var(--border);border-radius:4px;
+  padding:11px 14px;cursor:pointer;transition:all 0.12s;
+}
+.mel-session-row:hover{border-color:var(--mel);background:var(--mel-lt);}
+.mel-session-row.sel{border-color:var(--mel);background:var(--mel-lt);}
+.mel-session-time{font-size:14px;font-weight:700;min-width:70px;}
+.mel-session-status{font-size:11px;font-weight:600;}
+.avail-ok{color:var(--mel-dk);}
+.avail-few{color:#e65c00;}
+
+/* 매수 */
+.mel-qty-row{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;border-top:1px solid #f0f0f0;
+}
+.mel-qty-label{font-size:13px;font-weight:700;flex:1;}
+.mel-qty-ctrl{display:flex;align-items:center;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.mel-qty-btn{
+  width:36px;height:36px;background:#f8f8f8;border:none;
+  font-size:18px;cursor:pointer;color:#333;font-weight:500;
+}
+.mel-qty-btn:hover{background:#eee;}
+.mel-qty-val{width:42px;text-align:center;font-size:14px;font-weight:700;border-left:1px solid var(--border);border-right:1px solid var(--border);padding:8px 0;}
+
+.mel-pop-foot{padding:13px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.mel-btn-cancel{background:#fff;border:1px solid var(--border);color:#555;font-size:13px;padding:9px 20px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.mel-btn-next{background:var(--mel);border:none;color:#fff;font-size:13px;font-weight:700;padding:9px 26px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.mel-btn-next:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════ SCREEN 3: 좌석 선택 ══════ */
+.mel-seat-header{background:#1a1a1a;color:#fff;padding:10px 18px;}
+.mel-seat-header-t{font-size:13px;font-weight:700;}
+.mel-seat-header-s{font-size:11px;opacity:0.65;margin-top:2px;}
+.mel-seat-body{display:flex;height:calc(100vh - 56px - 46px - 42px);overflow:hidden;}
+.mel-seat-left{flex:1;overflow-y:auto;background:#fff;border-right:1px solid var(--border);}
+.mel-seat-right{width:248px;flex-shrink:0;background:#fafafa;display:flex;flex-direction:column;}
+.mel-seat-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 16px;background:#f5f5f5;border-bottom:1px solid #eee;font-size:12px;color:#666;
+}
+.mel-seat-toolbar strong{color:var(--mel-dk);}
+.mel-zone-bar{display:flex;overflow-x:auto;border-bottom:1px solid #eee;padding:0 14px;}
+.mel-zone-bar::-webkit-scrollbar{display:none;}
+.mel-zone-item{
+  padding:0 12px;height:36px;display:flex;align-items:center;
+  font-size:12px;font-weight:500;color:#888;border-bottom:2px solid transparent;
+  cursor:pointer;white-space:nowrap;margin-bottom:-1px;
+}
+.mel-zone-item:hover{color:var(--mel-dk);}
+.mel-zone-item.on{color:var(--mel-dk);border-bottom-color:var(--mel);font-weight:700;}
+.mel-stage-label{
+  background:#444;color:#fff;text-align:center;font-size:11px;font-weight:700;
+  padding:7px;margin:12px 16px;border-radius:3px;letter-spacing:0.1em;
+}
+.mel-seat-sec{padding:10px 14px 6px;}
+.mel-seat-sec-hd{
+  font-size:12px;font-weight:700;margin-bottom:8px;padding-bottom:6px;
+  border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;
+}
+.mel-gpill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.mel-seat-rows{margin-bottom:10px;}
+.mel-seat-row-r{display:flex;align-items:center;gap:3px;margin-bottom:3px;}
+.mel-seat-rn{width:16px;font-size:9px;color:#ccc;text-align:center;flex-shrink:0;}
+.mel-sbtn{
+  width:18px;height:18px;border-radius:2px;border:1.5px solid transparent;
+  cursor:pointer;font-size:0;display:inline-block;transition:all 0.1s;
+}
+.mel-sbtn.sv{background:#fce4ec;border-color:#e91e63;}
+.mel-sbtn.sr{background:#fff5f5;border-color:#e53935;}
+.mel-sbtn.sp{background:#e8f5e9;border-color:#388e3c;}
+.mel-sbtn.ss{background:#e3f2fd;border-color:#1976d2;}
+.mel-sbtn.sv:hover,.mel-sbtn.sr:hover,.mel-sbtn.sp:hover,.mel-sbtn.ss:hover{transform:scale(1.3);z-index:5;}
+.mel-sbtn.sv:hover{background:#e91e63;}
+.mel-sbtn.sr:hover{background:#e53935;}
+.mel-sbtn.sp:hover{background:#388e3c;}
+.mel-sbtn.ss:hover{background:#1976d2;}
+.mel-sbtn.taken{background:#eeeeee;border-color:#e0e0e0;cursor:not-allowed;}
+.mel-sbtn.mysel{background:var(--mel)!important;border-color:var(--mel)!important;transform:scale(1.1);}
+.mel-seat-legend{padding:10px 14px 12px;display:flex;flex-wrap:wrap;gap:8px;}
+.mel-leg{display:flex;align-items:center;gap:4px;font-size:10px;color:#666;}
+.mel-lsw{width:12px;height:12px;border-radius:2px;border:1.5px solid transparent;}
+/* 우측 패널 */
+.mel-ph{background:#1a1a1a;color:#fff;padding:10px 13px;font-size:12px;font-weight:700;}
+.mel-pb{flex:1;padding:11px 13px;overflow-y:auto;}
+.mel-pb-lbl{font-size:10px;font-weight:700;color:#bbb;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:7px;}
+.mel-sellist{min-height:60px;border:1px dashed #ddd;border-radius:4px;padding:6px;margin-bottom:10px;}
+.mel-nosel{font-size:12px;color:#bbb;text-align:center;padding:10px 0;}
+.mel-selitem{display:flex;align-items:center;justify-content:space-between;background:var(--mel-lt);border:1px solid #b3f0c8;border-radius:3px;padding:4px 8px;margin-bottom:3px;}
+.mel-selitem-txt{font-size:11px;color:var(--mel-dk);font-weight:500;}
+.mel-seldel{background:none;border:none;color:#aaa;cursor:pointer;font-size:13px;line-height:1;}
+.mel-seldel:hover{color:var(--mel-dk);}
+.mel-pp{border-top:1px solid #eee;padding:10px 13px;}
+.mel-pp-row{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:4px;}
+.mel-pp-tot{display:flex;justify-content:space-between;font-size:14px;font-weight:700;border-top:1px solid #eee;padding-top:7px;margin-top:3px;}
+.mel-pp-amt{color:var(--mel-dk);}
+.mel-pf{padding:10px 13px;border-top:1px solid #eee;}
+.mel-btn-conf{width:100%;height:42px;background:var(--mel);color:#fff;font-size:13px;font-weight:700;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.mel-btn-conf:hover{background:var(--mel-dk);}
+.mel-btn-conf:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════ SCREEN 4: 결제 ══════ */
+.mel-pay-wrap{max-width:700px;margin:0 auto;padding:24px 20px;}
+.mel-pay-sec-title{font-size:14px;font-weight:700;border-left:3px solid var(--mel);padding-left:10px;margin-bottom:11px;margin-top:20px;}
+.mel-pay-sec-title:first-of-type{margin-top:0;}
+.mel-pay-card{background:#fff;border:1px solid var(--border);border-radius:5px;padding:16px 18px;margin-bottom:4px;}
+.mel-pay-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.mel-pay-tbl td{padding:7px 0;border-bottom:1px solid #f5f5f5;vertical-align:top;}
+.mel-pay-tbl tr:last-child td{border-bottom:none;}
+.mel-pay-tbl td:first-child{width:90px;color:#888;font-weight:500;}
+.mel-pay-hl{color:var(--mel-dk);font-weight:700;}
+.mel-pm-list{display:flex;flex-direction:column;gap:5px;}
+.mel-pm{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:4px;padding:10px 13px;cursor:pointer;transition:all 0.12s;}
+.mel-pm:hover{border-color:var(--mel);}
+.mel-pm.on{border-color:var(--mel);background:var(--mel-lt);}
+.mel-pm input[type=radio]{accent-color:var(--mel);}
+.mel-pm-nm{font-size:13px;font-weight:700;}
+.mel-pm-dc{font-size:11px;color:#aaa;}
+.mel-price-sum{background:#f9f9f9;border:1px solid var(--border);border-radius:5px;padding:16px;margin:16px 0 12px;}
+.mel-ps-row{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px;}
+.mel-ps-tot{display:flex;justify-content:space-between;font-size:18px;font-weight:700;border-top:1px solid #e0e0e0;padding-top:12px;margin-top:4px;}
+.mel-ps-amt{color:var(--mel-dk);}
+.mel-agree{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#555;margin-bottom:12px;}
+.mel-agree input{accent-color:var(--mel);margin-top:2px;flex-shrink:0;}
+.mel-btn-pay{
+  width:100%;height:52px;background:var(--mel);color:#fff;
+  font-size:17px;font-weight:700;border:none;border-radius:4px;
+  cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+}
+.mel-btn-pay:hover{background:var(--mel-dk);}
+.mel-btn-pay:disabled{background:#ccc;cursor:not-allowed;}
+
+/* ══════ SCREEN 5: 완료 ══════ */
+.mel-done-wrap{min-height:calc(100vh - 102px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:40px 20px;}
+.mel-done-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:40px 30px;max-width:440px;width:100%;text-align:center;}
+.mel-done-ico{font-size:52px;margin-bottom:14px;}
+.mel-done-h{font-size:22px;font-weight:700;color:var(--mel-dk);margin-bottom:6px;}
+.mel-done-sub{font-size:13px;color:#888;line-height:1.7;margin-bottom:22px;}
+.mel-done-tkt{background:#f9f9f9;border:1px solid #eee;border-radius:6px;padding:16px;margin-bottom:16px;text-align:left;}
+.mel-dt-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px dashed #eee;}
+.mel-dt-row:last-child{border-bottom:none;}
+.mel-dt-l{color:#aaa;}.mel-dt-v{font-weight:700;}
+.mel-stats{background:var(--mel-lt);border:1px solid #b3f0c8;border-radius:6px;padding:14px;margin-bottom:16px;text-align:left;}
+.mel-stats-h{font-size:12px;font-weight:700;color:var(--mel-dk);margin-bottom:8px;}
+.mel-sr{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#15803d;}
+.mel-sr .tv{font-weight:700;}
+.mel-done-btns{display:flex;gap:8px;}
+.btn-mel-retry{flex:1;height:44px;background:#fff;border:1px solid var(--border);color:#333;font-size:13px;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-mel-home{flex:1;height:44px;background:var(--mel);border:none;color:#fff;font-size:13px;font-weight:700;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* 뷰 전환 토글바 */
+#viewToggleBar{
+  background:#111;border-bottom:1px solid #2a2a2a;
+  padding:0 16px;height:38px;
+  display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:9999;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.vtb-logo{font-size:11px;font-weight:700;color:#6c5ce7;}
+.vtb-div{width:1px;height:16px;background:#2a2a2a;flex-shrink:0;}
+.vtb-grp{display:flex;gap:2px;background:#222;border-radius:6px;padding:2px;flex-shrink:0;}
+.vtb-btn{
+  padding:4px 12px;border-radius:5px;border:none;
+  background:none;color:#666;font-size:11px;font-weight:500;
+  cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.12s;
+}
+.vtb-btn.on{background:#fff;color:#1a1a1a;font-weight:700;}
+.vtb-tip{margin-left:auto;font-size:10px;color:#444;white-space:nowrap;overflow:hidden;}
+
+/* 모바일 프레임 */
+body.view-pc #mobileOuter{display:none!important;}
+body.view-pc .pc-wrap{display:block!important;}
+body.view-mobile .pc-wrap{display:none!important;}
+body.view-mobile #mobileOuter{display:flex!important;}
+#mobileOuter{
+  display:none;justify-content:center;align-items:flex-start;
+  padding:24px 20px 40px;background:#0d0d0d;min-height:calc(100vh - 38px);
+}
+.mf{
+  width:390px;min-height:844px;background:var(--bg);
+  border-radius:44px;overflow:hidden;position:relative;flex-shrink:0;
+  box-shadow:0 0 0 10px #1a1a1a,0 0 0 12px #2a2a2a,0 40px 80px rgba(0,0,0,0.85);
+}
+.mf::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:34px;background:#1a1a1a;border-radius:0 0 20px 20px;z-index:1000;
+}
+.mf-status{
+  height:44px;background:#1a1a1a;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 24px 8px;font-size:12px;font-weight:600;color:#fff;
+  position:relative;z-index:100;flex-shrink:0;
+}
+.mf-scroll{height:calc(844px - 44px - 50px - 50px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative;}
+.mf-scroll::-webkit-scrollbar{display:none;}
+
+/* 반응형 */
+@media(max-width:900px){.mel-card-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:680px){
+  .mel-card-grid{grid-template-columns:repeat(3,1fr);}
+  .mel-rank-grid{grid-template-columns:repeat(4,1fr);}
+  .mel-detail-top{flex-direction:column;}
+  .mel-poster-col{width:100%;display:flex;flex-direction:column;align-items:center;}
+  .mel-poster-img{width:160px;height:213px;}
+}
+@media(max-width:480px){
+  .mel-card-grid{grid-template-columns:repeat(2,1fr);}
+  .mel-rank-grid{grid-template-columns:repeat(3,1fr);}
+  .mel-top-bar{padding:0 14px;height:50px;}
+  .mel-search-wrap{margin:0 12px;}
+  .mel-gnb-bar{padding:0 10px;}
+  .mel-gnb-item{padding:0 10px;font-size:13px;}
+  .mel-body{padding:16px 12px;}
+  .mel-banner{height:240px;}
+  .mel-banner-title{font-size:20px;}
+}
+</style>
+</head>
+<body class="view-pc">
+
+<!-- 뷰 전환 토글바 -->
+<div id="viewToggleBar">
+  <span class="vtb-logo">🍇 포도알줍줍</span>
+  <span class="vtb-div"></span>
+  <div class="vtb-grp">
+    <button id="vtbPc" class="vtb-btn on" onclick="setView('pc')">🖥 PC</button>
+    <button id="vtbMob" class="vtb-btn" onclick="setView('mobile')">📱 모바일</button>
+  </div>
+  <span id="vtbTip" class="vtb-tip">💻 PC+📱 동시접속 가능 — 멜론 이중전략</span>
+</div>
+
+<!-- 모바일 프레임 -->
+<div id="mobileOuter">
+  <div class="mf">
+    <div class="mf::before"></div>
+    <div class="mf-status">
+      <span id="mfTime">10:00</span>
+      <span>▐▐▐ ≋ 🔋</span>
+    </div>
+    <div id="mfInfoBanner" style="background:#0d2011;padding:8px 12px;font-size:10px;color:rgba(255,255,255,0.8);line-height:1.65;border-bottom:2px solid #00cd3c;display:flex;gap:6px;flex-shrink:0;">
+      <span>📱</span><span><b style="color:#86efac;">멜론 모바일:</b> PC+폰 동시접속 가능. 팝업 대신 하단 시트로 열림. 오픈 시 자동 전환.</span>
+    </div>
+    <div class="mf-scroll" id="mfScroll"></div>
+    <!-- 하단 탭바 -->
+    <div style="height:50px;background:#fff;border-top:1px solid #e0e0e0;display:flex;align-items:center;color:#888;font-family:'Noto Sans KR',sans-serif;flex-shrink:0;">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🏠</span><span style="font-size:9px;font-weight:500;">홈</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;color:#00a830;"><span style="font-size:18px;line-height:1;">🎤</span><span style="font-size:9px;font-weight:500;color:#00a830;">공연</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">🔖</span><span style="font-size:9px;font-weight:500;">MY티켓</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">❤️</span><span style="font-size:9px;font-weight:500;">찜</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;"><span style="font-size:18px;line-height:1;">👤</span><span style="font-size:9px;font-weight:500;">MY</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PC 콘텐츠 -->
+<div class="pc-wrap">
+<div class="practice-badge">🍇 포도알줍줍 연습</div>
+
+<!-- ══════ SCREEN 0: 메인 홈 ══════ -->
+<div class="screen active" id="sc0">
+  <!-- 1단 상단 헤더 -->
+  <header class="mel-top-bar">
+    <a href="index.html" class="mel-logo">
+      <div class="mel-logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <span class="mel-logo-text">melon<em>ticket</em></span>
+    </a>
+    <div class="mel-search-wrap">
+      <div class="mel-search">
+        <input type="text" placeholder="아티스트, 공연명, 장소 검색">
+        <button class="mel-search-btn">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="mel-top-right">
+      <a class="mel-top-link">고객센터</a>
+      <a class="mel-top-link">마이티켓</a>
+      <a class="mel-top-link login">로그인</a>
+    </div>
+  </header>
+  <!-- 2단 GNB -->
+  <nav class="mel-gnb-bar">
+    <a class="mel-gnb-item on">공연·전시</a>
+    <a class="mel-gnb-item">스포츠</a>
+    <a class="mel-gnb-item">아티스트</a>
+    <a class="mel-gnb-item">이벤트</a>
+    <a class="mel-gnb-item">마이티켓</a>
+  </nav>
+  <div class="practice-bar">⚡ <strong>연습 모드</strong> — 멜론티켓 핵심: 오픈 시 <strong>자동으로 예매 페이지 이동</strong>. PC+모바일 동시접속 가능.</div>
+  <!-- 장르 서브탭 -->
+  <div class="mel-genre-bar">
+    <div class="mel-genre-item on" onclick="switchGenre(this)">전체</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">콘서트</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">뮤지컬</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">클래식·오페라</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">연극</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">전시·행사</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">아동·가족</div>
+    <div class="mel-genre-item" onclick="switchGenre(this)">스포츠</div>
+  </div>
+
+  <!-- 대형 배너 슬라이더 -->
+  <div class="mel-banner" id="mainBanner">
+    <div class="mel-banner-slide" id="bannerSlide">
+      <div class="mel-banner-content">
+        <div class="mel-banner-tag">
+          <span>●</span> 멜론티켓 단독
+        </div>
+        <div class="mel-banner-title" id="bannerTitle">에스파 2026 CONCERT<br>'Black Mamba RETURNS'</div>
+        <div class="mel-banner-sub" id="bannerSub">2026.06.14(일) ~ 06.15(월) · 잠실실내체육관<br>멜론티켓 단독 예매 — 오픈 D-3</div>
+        <button class="mel-banner-cta" onclick="goToDetail('aespa')">예매하기 →</button>
+      </div>
+    </div>
+    <div class="mel-banner-nav">
+      <div class="mel-banner-dot on" onclick="setBanner(0)"></div>
+      <div class="mel-banner-dot" onclick="setBanner(1)"></div>
+      <div class="mel-banner-dot" onclick="setBanner(2)"></div>
+    </div>
+    <div class="mel-banner-arrows">
+      <button class="mel-arrow" onclick="prevBanner()">‹</button>
+      <button class="mel-arrow" onclick="nextBanner()">›</button>
+    </div>
+  </div>
+
+  <div class="mel-body">
+
+    <!-- 실시간 랭킹 -->
+    <div class="mel-sec-head">
+      <div class="mel-sec-title">실시간 예매 랭킹</div>
+      <div class="mel-sec-more">전체보기 ›</div>
+    </div>
+    <div class="mel-rank-grid" id="rankGrid"></div>
+
+    <!-- 오픈 예정 -->
+    <div class="mel-sec-head">
+      <div class="mel-sec-title">오픈 예정</div>
+      <div class="mel-sec-more">더보기 ›</div>
+    </div>
+    <div class="mel-open-list" id="openList"></div>
+
+    <!-- 멜론티켓 추천 -->
+    <div class="mel-sec-head" style="margin-top:12px;">
+      <div class="mel-sec-title">지금 예매 가능</div>
+      <div class="mel-sec-more">전체보기 ›</div>
+    </div>
+    <div class="mel-card-grid" id="showGrid"></div>
+
+  </div>
+</div>
+
+<!-- ══════ SCREEN 1: 공연 상세 ══════ -->
+<div class="screen" id="sc1">
+  <header class="mel-top-bar">
+    <a href="index.html" class="mel-logo">
+      <div class="mel-logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div>
+      <span class="mel-logo-text">melon<em>ticket</em></span>
+    </a>
+    <div class="mel-top-right">
+      <button onclick="sc(0)" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">← 목록</button>
+      <a class="mel-top-link login">로그인</a>
+    </div>
+  </header>
+  <nav class="mel-gnb-bar">
+    <a class="mel-gnb-item on">공연·전시</a>
+    <a class="mel-gnb-item">스포츠</a>
+    <a class="mel-gnb-item">아티스트</a>
+    <a class="mel-gnb-item">이벤트</a>
+    <a class="mel-gnb-item">마이티켓</a>
+  </nav>
+  <div class="practice-bar">⚡ <strong>멜론 핵심</strong> — 오픈 카운트다운 후 자동으로 예매 창이 열립니다!</div>
+
+  <div class="mel-detail-body">
+    <div class="mel-detail-top">
+      <!-- 포스터 -->
+      <div class="mel-poster-col">
+        <div class="mel-poster-img" id="detailPosterImg">
+          <div class="mel-poster-icon" id="detailPosterIcon">🎤</div>
+          <div class="mel-poster-name" id="detailPosterName"></div>
+        </div>
+        <button class="mel-poster-wish">♡ 찜하기</button>
+        <button class="mel-poster-share">⬆ 공유하기</button>
+      </div>
+      <!-- 정보 -->
+      <div class="mel-info-col">
+        <div class="mel-detail-genre" id="detailGenre">콘서트</div>
+        <div class="mel-detail-title" id="detailTitle">공연명</div>
+        <table class="mel-detail-table">
+          <tr><td>기간</td><td id="detailDate">—</td></tr>
+          <tr><td>장소</td><td id="detailPlace">—</td></tr>
+          <tr><td>주최</td><td id="detailHost">—</td></tr>
+          <tr><td>가격</td><td class="mel-detail-price" id="detailPrice">—</td></tr>
+          <tr><td>관람연령</td><td>전체 관람가</td></tr>
+        </table>
+        <div class="mel-detail-tags" id="detailTags"></div>
+
+        <!-- 예매 박스 -->
+        <div class="mel-book-box">
+          <div class="mel-book-head">
+            <span class="mel-book-title">온라인 예매</span>
+            <div class="mel-server-time">서버시간 <span id="serverTime">--:--:--</span></div>
+          </div>
+          <!-- 자동전환 카운트다운 -->
+          <div class="mel-countdown-box">
+            <div class="mel-countdown-info">
+              <div class="mel-countdown-label">예매 오픈까지</div>
+              <div class="mel-countdown-desc">시간이 되면 <strong style="color:#86efac;">자동으로 예매 창이 열립니다</strong><br>새로고침 ❌ — 그냥 기다리세요!</div>
+            </div>
+            <div class="mel-countdown-num" id="autoTimer">00:05</div>
+          </div>
+          <button class="mel-btn-book" id="btnBook" onclick="openMelonPop()">
+            예매하기
+          </button>
+          <div class="mel-book-notice">
+            • 멜론티켓은 <b>다기기·다브라우저 동시접속 가능</b> — PC+모바일 병행 전략 활용<br>
+            • 팝업 차단이 해제되어 있어야 예매 창이 열립니다<br>
+            • 좌석 선택 후 <b>5분 이내</b> 결제 완료 필수
+          </div>
+        </div>
+
+        <div class="mel-dtab-bar">
+          <div class="mel-dtab on">공연정보</div>
+          <div class="mel-dtab">좌석안내</div>
+          <div class="mel-dtab">예매안내</div>
+          <div class="mel-dtab">취소·환불</div>
+        </div>
+        <div class="mel-dtab-content">
+          <p id="detailDesc">공연 소개가 여기에 표시됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 2: 회차 팝업 ══════ -->
+<div class="screen" id="sc2">
+  <header class="mel-top-bar">
+    <a href="index.html" class="mel-logo"><div class="mel-logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div><span class="mel-logo-text">melon<em>ticket</em></span></a>
+  </header>
+  <div style="filter:blur(2px);opacity:0.3;pointer-events:none;background:var(--bg);min-height:200px;padding:20px;"><div style="background:#fff;height:100px;border-radius:6px;border:1px solid var(--border);"></div></div>
+  <div class="mel-pop-overlay">
+    <div class="mel-pop">
+      <div class="mel-pop-head">
+        <span class="mel-pop-title" id="popTitle">날짜·회차 선택</span>
+        <button class="mel-pop-close" onclick="sc(1)">×</button>
+      </div>
+      <div class="mel-pop-body">
+        <div class="mel-pop-step"><b>STEP 1</b> 날짜 선택</div>
+        <div class="mel-date-tabs" id="dateTabs"></div>
+        <div id="sessionArea" style="display:none;">
+          <div class="mel-pop-step" style="margin-top:14px;"><b>STEP 2</b> 회차 선택</div>
+          <div class="mel-session-list" id="sessionList"></div>
+        </div>
+        <div class="mel-qty-row">
+          <span class="mel-qty-label">매수 선택 (최대 4매)</span>
+          <div class="mel-qty-ctrl">
+            <button class="mel-qty-btn" onclick="changeQty(-1)">−</button>
+            <div class="mel-qty-val" id="qtyVal">1</div>
+            <button class="mel-qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="mel-pop-foot">
+        <button class="mel-btn-cancel" onclick="sc(1)">취소</button>
+        <button class="mel-btn-next" id="btnNext" disabled onclick="goToSeat()">다음</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 3: 좌석 선택 ══════ -->
+<div class="screen" id="sc3">
+  <header class="mel-top-bar">
+    <a href="index.html" class="mel-logo"><div class="mel-logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div><span class="mel-logo-text">melon<em>ticket</em></span></a>
+  </header>
+  <div class="mel-seat-header">
+    <div class="mel-seat-header-t" id="seatTitle">좌석 선택</div>
+    <div class="mel-seat-header-s" id="seatSub"></div>
+  </div>
+  <div class="mel-seat-body">
+    <div class="mel-seat-left">
+      <div class="mel-seat-toolbar">
+        <span>구역 클릭 후 좌석 선택 · 최대 <strong id="maxQtyLabel">1매</strong></span>
+        <button style="background:#fff;border:1px solid var(--border);color:#555;font-size:11px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">자동 배정</button>
+      </div>
+      <div class="mel-zone-bar">
+        <div class="mel-zone-item on" onclick="setZone(this,'all')">전체</div>
+        <div class="mel-zone-item" onclick="setZone(this,'vip')">VIP</div>
+        <div class="mel-zone-item" onclick="setZone(this,'r')">R석</div>
+        <div class="mel-zone-item" onclick="setZone(this,'p')">P석</div>
+        <div class="mel-zone-item" onclick="setZone(this,'s')">S석</div>
+      </div>
+      <div class="mel-stage-label">▲ 무대</div>
+      <div id="seatSections"></div>
+      <div class="mel-seat-legend">
+        <div class="mel-leg"><div class="mel-lsw" style="background:#fce4ec;border-color:#e91e63;"></div>VIP</div>
+        <div class="mel-leg"><div class="mel-lsw" style="background:#fff5f5;border-color:#e53935;"></div>R석</div>
+        <div class="mel-leg"><div class="mel-lsw" style="background:#e8f5e9;border-color:#388e3c;"></div>P석</div>
+        <div class="mel-leg"><div class="mel-lsw" style="background:#e3f2fd;border-color:#1976d2;"></div>S석</div>
+        <div class="mel-leg"><div class="mel-lsw" style="background:#eee;border-color:#ddd;"></div>매진</div>
+        <div class="mel-leg"><div class="mel-lsw" style="background:var(--mel);border-color:var(--mel);"></div>선택</div>
+      </div>
+    </div>
+    <div class="mel-seat-right">
+      <div class="mel-ph">선택 좌석 정보</div>
+      <div class="mel-pb">
+        <div class="mel-pb-lbl">선택한 좌석</div>
+        <div class="mel-sellist" id="selList"><div class="mel-nosel">좌석을 클릭하세요</div></div>
+        <div class="mel-pb-lbl">공연</div>
+        <div style="font-size:11px;color:#555;line-height:1.8;" id="seatGameInfo"></div>
+      </div>
+      <div class="mel-pp">
+        <div class="mel-pp-row"><span>티켓 금액</span><span id="ppTkt">0원</span></div>
+        <div class="mel-pp-row"><span>예매 수수료</span><span id="ppFee">0원</span></div>
+        <div class="mel-pp-tot"><span>합계</span><span class="mel-pp-amt" id="ppTot">0원</span></div>
+      </div>
+      <div class="mel-pf">
+        <button class="mel-btn-conf" id="btnConf" disabled onclick="goToPay()">선택 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 4: 결제 ══════ -->
+<div class="screen" id="sc4">
+  <header class="mel-top-bar">
+    <a href="index.html" class="mel-logo"><div class="mel-logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div><span class="mel-logo-text">melon<em>ticket</em></span></a>
+    <span style="color:rgba(255,255,255,0.5);font-size:12px;margin-left:12px;">결제하기</span>
+  </header>
+  <div class="mel-pay-wrap">
+    <div style="font-size:11px;color:#bbb;margin-bottom:14px;">STEP 3 / 3 — 결제</div>
+    <div class="mel-pay-sec-title">주문 정보</div>
+    <div class="mel-pay-card">
+      <table class="mel-pay-tbl">
+        <tr><td>공연명</td><td id="payTitle">—</td></tr>
+        <tr><td>일시</td><td id="payDate">—</td></tr>
+        <tr><td>장소</td><td id="payPlace">—</td></tr>
+        <tr><td>좌석</td><td class="mel-pay-hl" id="paySeat">—</td></tr>
+        <tr><td>매수</td><td id="payCnt">—</td></tr>
+      </table>
+    </div>
+    <div class="mel-pay-sec-title">결제 수단</div>
+    <div class="mel-pay-card">
+      <div class="mel-pm-list">
+        <label class="mel-pm on" onclick="selPm(this)"><input type="radio" name="pm" checked><div><div class="mel-pm-nm">카카오페이</div><div class="mel-pm-dc">멜론 연동 간편결제</div></div></label>
+        <label class="mel-pm" onclick="selPm(this)"><input type="radio" name="pm"><div><div class="mel-pm-nm">신용·체크카드</div><div class="mel-pm-dc">국내 전체 카드</div></div></label>
+        <label class="mel-pm" onclick="selPm(this)"><input type="radio" name="pm"><div><div class="mel-pm-nm">무통장입금</div><div class="mel-pm-dc">당일 자정까지 입금 (미입금 시 자동취소)</div></div></label>
+        <label class="mel-pm" onclick="selPm(this)"><input type="radio" name="pm"><div><div class="mel-pm-nm">네이버페이</div><div class="mel-pm-dc">네이버페이 포인트</div></div></label>
+      </div>
+    </div>
+    <div class="mel-price-sum">
+      <div class="mel-ps-row"><span>티켓 금액</span><span id="payTkt">0원</span></div>
+      <div class="mel-ps-row"><span>예매 수수료</span><span id="payFee">0원</span></div>
+      <div class="mel-ps-tot"><span>총 결제 금액</span><span class="mel-ps-amt" id="payTot">0원</span></div>
+    </div>
+    <div class="mel-agree"><input type="checkbox" id="agreeChk" onchange="togglePay()"><label for="agreeChk">결제 정보를 확인하였으며 결제에 동의합니다. (필수)</label></div>
+    <button class="mel-btn-pay" id="btnPay" disabled onclick="goToDone()">결제하기</button>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 5: 완료 ══════ -->
+<div class="screen" id="sc5">
+  <header class="mel-top-bar">
+    <a href="index.html" class="mel-logo"><div class="mel-logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div><span class="mel-logo-text">melon<em>ticket</em></span></a>
+  </header>
+  <div class="mel-done-wrap">
+    <div class="mel-done-card">
+      <div class="mel-done-ico">✅</div>
+      <div class="mel-done-h">연습 완료!</div>
+      <div class="mel-done-sub">멜론티켓 예매 전 과정 완료!<br>다기기 동시접속 전략도 기억하세요.</div>
+      <div class="mel-done-tkt">
+        <div class="mel-dt-row"><span class="mel-dt-l">공연</span><span class="mel-dt-v" id="dGame">—</span></div>
+        <div class="mel-dt-row"><span class="mel-dt-l">일시</span><span class="mel-dt-v" id="dDate">—</span></div>
+        <div class="mel-dt-row"><span class="mel-dt-l">좌석</span><span class="mel-dt-v" id="dSeat">—</span></div>
+        <div class="mel-dt-row"><span class="mel-dt-l">결제금액</span><span class="mel-dt-v" style="color:var(--mel-dk);" id="dPrice">—</span></div>
+      </div>
+      <div class="mel-stats">
+        <div class="mel-stats-h">⏱ 단계별 소요 시간</div>
+        <div class="mel-sr"><span>공연 선택</span><span class="tv" id="stShow">—</span></div>
+        <div class="mel-sr"><span>회차·좌석 선택</span><span class="tv" id="stSeat">—</span></div>
+        <div class="mel-sr"><span>결제 완료</span><span class="tv" id="stPay">—</span></div>
+        <div class="mel-sr" style="border-top:1px solid #b3f0c8;padding-top:5px;margin-top:4px;font-weight:700;"><span>총 소요</span><span class="tv" id="stTot">—</span></div>
+      </div>
+      <div class="mel-done-btns">
+        <button class="btn-mel-retry" onclick="restartAll()">다시 연습</button>
+        <button class="btn-mel-home" onclick="location.href='index.html'">홈으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /pc-wrap -->
+
+<script>
+/* ════════════════════════════════
+   데이터
+════════════════════════════════ */
+const SHOWS={
+  aespa:{title:"에스파 2026 CONCERT 'Black Mamba RETURNS'",genre:'콘서트',icon:'🎤',
+    bg:'background:linear-gradient(160deg,#0d1b2e 0%,#1a2f50 100%)',
+    dates:[{d:'06.14',dow:'일'},{d:'06.15',dow:'월'}],times:['18:00','17:00'],
+    place:'잠실실내체육관',host:'SM엔터테인먼트',
+    price:{vip:143000,r:110000,p:99000,s:88000},
+    tags:['멜론단독','HOT'],desc:'에스파의 단독 콘서트. 스파이럴 스테이지와 혁신적 퍼포먼스.'},
+  bigbang:{title:"BIGBANG WORLD TOUR 'STILL ALIVE IN SEOUL'",genre:'콘서트',icon:'🎸',
+    bg:'background:linear-gradient(160deg,#1565c0 0%,#0d47a1 100%)',
+    dates:[{d:'07.04',dow:'토'},{d:'07.05',dow:'일'}],times:['19:00','18:00'],
+    place:'고척스카이돔',host:'YG엔터테인먼트',
+    price:{vip:143000,r:110000,p:99000,s:88000},
+    tags:['HOT'],desc:'BIGBANG 월드투어 서울 공연.'},
+  iu:{title:"IU 콘서트 HEREH WORLD TOUR",genre:'콘서트',icon:'🎵',
+    bg:'background:linear-gradient(160deg,#880e4f 0%,#c2185b 100%)',
+    dates:[{d:'08.01',dow:'토'},{d:'08.02',dow:'일'}],times:['19:00','18:00'],
+    place:'KSPO돔',host:'EDAM엔터테인먼트',
+    price:{vip:143000,r:110000,p:99000,s:88000},
+    tags:['SOLO'],desc:'IU 단독 콘서트.'},
+  bts:{title:"BTS 2026 PERMISSION TO DANCE AGAIN",genre:'콘서트',icon:'💜',
+    bg:'background:linear-gradient(160deg,#4a148c 0%,#7b1fa2 100%)',
+    dates:[{d:'09.19',dow:'토'},{d:'09.20',dow:'일'},{d:'09.21',dow:'월'}],times:['19:00','18:00','17:00'],
+    place:'서울월드컵경기장',host:'BIGHIT MUSIC',
+    price:{vip:143000,r:121000,p:110000,s:99000},
+    tags:['HOT','멜론단독'],desc:'BTS 2026 세계 투어 서울 공연.'},
+  musical1:{title:"뮤지컬 〈레미제라블〉 2026 내한공연",genre:'뮤지컬',icon:'🎭',
+    bg:'background:linear-gradient(160deg,#b71c1c 0%,#e53935 100%)',
+    dates:[{d:'05.01',dow:'금'},{d:'05.02',dow:'토'},{d:'05.03',dow:'일'}],times:['19:30','14:00','14:00'],
+    place:'블루스퀘어 신한카드홀',host:'공연기획사',
+    price:{vip:130000,r:110000,p:90000,s:60000},
+    tags:['멜론단독'],desc:'세계 최장 뮤지컬 레미제라블 내한.'},
+  musical2:{title:"뮤지컬 〈위키드〉 Korea Tour",genre:'뮤지컬',icon:'🧙',
+    bg:'background:linear-gradient(160deg,#2e7d32 0%,#388e3c 100%)',
+    dates:[{d:'04.11',dow:'토'},{d:'04.12',dow:'일'}],times:['14:00','14:00'],
+    place:'샤롯데씨어터',host:'샤롯데씨어터',
+    price:{vip:110000,r:99000,p:77000,s:55000},
+    tags:[],desc:'브로드웨이 뮤지컬 위키드 한국투어.'},
+};
+
+const BANNERS=[
+  {key:'aespa',title:"에스파 2026 CONCERT<br>'Black Mamba RETURNS'",sub:'2026.06.14(일) ~ 06.15(월) · 잠실실내체육관<br>멜론티켓 단독 예매 — 오픈 D-3'},
+  {key:'bts',title:"BTS 2026<br>PERMISSION TO DANCE AGAIN",sub:'2026.09.19(토) ~ 09.21(월) · 서울월드컵경기장<br>멜론티켓 단독 예매'},
+  {key:'iu',title:"IU 콘서트<br>HEREH WORLD TOUR",sub:'2026.08.01(토) ~ 08.02(일) · KSPO돔<br>예매 오픈 예정'},
+];
+
+const ZONES=[
+  {key:'vip',name:'VIP석',gc:'sv',rows:['VIP1','VIP2'],cols:14,tr:0.55,pr:'vip'},
+  {key:'r',name:'R석',gc:'sr',rows:['R1','R2','R3','R4'],cols:18,tr:0.48,pr:'r'},
+  {key:'p',name:'P석',gc:'sp',rows:['P1','P2','P3','P4','P5'],cols:20,tr:0.40,pr:'p'},
+  {key:'s',name:'S석',gc:'ss',rows:['S1','S2','S3','S4','S5','S6'],cols:22,tr:0.32,pr:'s'},
+];
+const FEE=1000;
+
+/* 상태 */
+let MS={show:null,date:null,session:null,seats:[],qty:1,t:{}};
+let tkMap={};
+let autoIv=null,autoSec=5;
+
+/* ────── 공통 ────── */
+function sc(n){
+  document.querySelectorAll('.pc-wrap .screen').forEach(s=>s.classList.remove('active'));
+  const t=document.getElementById('sc'+n); if(t) t.classList.add('active');
+  window.scrollTo(0,0);
+  const clone=document.getElementById('mfClone');
+  if(clone){
+    const pcs=Array.from(document.querySelectorAll('.pc-wrap .screen'));
+    const idx=pcs.findIndex(s=>s.id==='sc'+n);
+    clone.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const cls=clone.querySelectorAll('.screen');
+    if(idx>=0&&cls[idx]) cls[idx].classList.add('active');
+    const mfs=document.getElementById('mfScroll'); if(mfs) mfs.scrollTo(0,0);
+  }
+}
+
+/* ────── 서버 시간 ────── */
+(function tick(){
+  const n=new Date();
+  const el=document.getElementById('serverTime');
+  if(el) el.textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+  setTimeout(tick,1000);
+})();
+
+/* ────── 배너 슬라이더 ────── */
+let bannerIdx=0,bannerAuto;
+const bannerBgs={
+  aespa:'background:linear-gradient(135deg,#0d1b2e 0%,#1a2f50 40%,#0a1628 100%)',
+  bts:'background:linear-gradient(135deg,#1a0030 0%,#4a148c 60%,#1a0030 100%)',
+  iu:'background:linear-gradient(135deg,#2d0020 0%,#880e4f 60%,#1a0015 100%)',
+};
+function setBanner(i){
+  bannerIdx=i;
+  const b=BANNERS[i];
+  const slide=document.getElementById('bannerSlide');
+  slide.style.cssText=bannerBgs[b.key]+';height:100%;display:flex;align-items:flex-end;padding:36px 48px;color:#fff;position:relative;transition:all 0.4s;';
+  document.getElementById('bannerTitle').innerHTML=b.title;
+  document.getElementById('bannerSub').innerHTML=b.sub;
+  document.querySelectorAll('.mel-banner-dot').forEach((d,di)=>d.classList.toggle('on',di===i));
+}
+function nextBanner(){setBanner((bannerIdx+1)%BANNERS.length);}
+function prevBanner(){setBanner((bannerIdx-1+BANNERS.length)%BANNERS.length);}
+bannerAuto=setInterval(nextBanner,4000);
+document.getElementById('mainBanner')?.addEventListener('mouseenter',()=>clearInterval(bannerAuto));
+document.getElementById('mainBanner')?.addEventListener('mouseleave',()=>{ bannerAuto=setInterval(nextBanner,4000); });
+
+/* ────── 공연 카드 렌더링 ────── */
+const SHOW_KEYS=['aespa','bts','iu','bigbang','musical1','musical2'];
+const RANK_KEYS=['bts','aespa','iu','bigbang','musical1'];
+
+function renderCards(){
+  // 랭킹
+  const rg=document.getElementById('rankGrid');
+  if(rg){
+    rg.innerHTML='';
+    RANK_KEYS.forEach((k,i)=>{
+      const s=SHOWS[k];
+      const card=document.createElement('div');
+      card.className='mel-card';
+      card.onclick=()=>goToDetail(k);
+      const minP=Math.min(...Object.values(s.price));
+      const badges=s.tags.map(t=>`<span class="mel-badge ${t==='멜론단독'?'mel-only':'hot'}">${t}</span>`).join('');
+      card.innerHTML=`
+        <div class="mel-card-poster">
+          <div class="mel-card-poster-img" style="${s.bg}">
+            <div class="mel-card-poster-icon">${s.icon}</div>
+            <div class="mel-card-poster-name">${s.title.substring(0,18)}</div>
+          </div>
+          <div class="mel-rank-num">${i+1}</div>
+          <div class="mel-card-badge-wrap">${badges}</div>
+          <button class="mel-card-wish">♡</button>
+        </div>
+        <div class="mel-card-info">
+          <div class="mel-card-title">${s.title}</div>
+          <div class="mel-card-date">${s.dates.map(d=>`${d.d}(${d.dow})`).join(' ~ ')}</div>
+          <div class="mel-card-place">${minP.toLocaleString()}원~</div>
+        </div>`;
+      rg.appendChild(card);
+    });
+  }
+  // 오픈 예정
+  const ol=document.getElementById('openList');
+  if(ol){
+    ol.innerHTML='';
+    ['iu','bts','bigbang'].forEach((k,i)=>{
+      const s=SHOWS[k];
+      const row=document.createElement('div');
+      row.className='mel-open-row';
+      row.onclick=()=>goToDetail(k);
+      row.innerHTML=`
+        <div class="mel-open-num">${i+1}</div>
+        <div class="mel-open-poster" style="${s.bg}">${s.icon}</div>
+        <div class="mel-open-info">
+          <div class="mel-open-title">${s.title}</div>
+          <div class="mel-open-meta">${s.genre} · ${s.place}</div>
+        </div>
+        <div class="mel-open-right">
+          <div class="mel-open-date-label">오픈 예정</div>
+          <div class="mel-open-date">2026.${s.dates[0].d}(${s.dates[0].dow})</div>
+          <div class="mel-open-badge"><span class="mel-badge soon">오픈예정</span></div>
+        </div>`;
+      ol.appendChild(row);
+    });
+  }
+  // 전체 카드
+  const sg=document.getElementById('showGrid');
+  if(sg){
+    sg.innerHTML='';
+    SHOW_KEYS.forEach(k=>{
+      const s=SHOWS[k];
+      const card=document.createElement('div');
+      card.className='mel-card';
+      card.onclick=()=>goToDetail(k);
+      const minP=Math.min(...Object.values(s.price));
+      const badges=s.tags.map(t=>`<span class="mel-badge ${t==='멜론단독'?'mel-only':t==='HOT'?'hot':'new'}">${t}</span>`).join('');
+      card.innerHTML=`
+        <div class="mel-card-poster">
+          <div class="mel-card-poster-img" style="${s.bg}">
+            <div class="mel-card-poster-icon">${s.icon}</div>
+            <div class="mel-card-poster-name">${s.title.substring(0,20)}</div>
+          </div>
+          <div class="mel-card-badge-wrap">${badges}</div>
+          <button class="mel-card-wish">♡</button>
+        </div>
+        <div class="mel-card-info">
+          <div class="mel-card-title">${s.title}</div>
+          <div class="mel-card-date">${s.dates.map(d=>`${d.d}(${d.dow})`).join(' ~ ')}</div>
+          <div class="mel-card-place">${s.place} · ${minP.toLocaleString()}원~</div>
+        </div>`;
+      sg.appendChild(card);
+    });
+  }
+}
+renderCards();
+
+function switchGenre(el){
+  document.querySelectorAll('.mel-genre-item').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ────── 공연 상세 ────── */
+function goToDetail(key){
+  const s=SHOWS[key];
+  MS.show=s;MS.t.start=Date.now();MS.t.showEnd=Date.now();
+  // 포스터
+  const pi=document.getElementById('detailPosterImg');
+  pi.style.cssText=s.bg+';width:220px;height:293px;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;margin-bottom:10px;';
+  document.getElementById('detailPosterIcon').textContent=s.icon;
+  document.getElementById('detailPosterName').textContent=s.title.substring(0,24);
+  document.getElementById('detailGenre').textContent=s.genre;
+  document.getElementById('detailTitle').textContent=s.title;
+  document.getElementById('detailDate').textContent=s.dates.map(d=>`2026.${d.d}(${d.dow})`).join(' ~ ');
+  document.getElementById('detailPlace').textContent=s.place;
+  document.getElementById('detailHost').textContent=s.host;
+  const minP=Math.min(...Object.values(s.price));
+  const maxP=Math.max(...Object.values(s.price));
+  document.getElementById('detailPrice').textContent=`${minP.toLocaleString()}원 ~ ${maxP.toLocaleString()}원`;
+  document.getElementById('detailDesc').textContent=s.desc;
+  // 태그
+  const tags=document.getElementById('detailTags');
+  tags.innerHTML=s.tags.map(t=>`<span class="mel-dtag ${t==='멜론단독'?'mel-only':''}">${t}</span>`).join('');
+  // 카운트다운 시작
+  startAutoCountdown(key);
+  sc(1);
+}
+
+function startAutoCountdown(key){
+  clearInterval(autoIv); autoSec=5;
+  const el=document.getElementById('autoTimer');
+  const btn=document.getElementById('btnBook');
+  el.classList.remove('open-flash');
+  btn.textContent='예매하기';btn.disabled=false;
+  el.textContent=`00:0${autoSec}`;
+  autoIv=setInterval(()=>{
+    autoSec--;
+    if(autoSec>0){ el.textContent=`00:0${autoSec}`; }
+    else{
+      clearInterval(autoIv);
+      el.textContent='오픈!';el.classList.add('open-flash');
+      btn.textContent='🎉 자동으로 예매창이 열립니다';
+      setTimeout(()=>openMelonPop(),900);
+    }
+  },1000);
+}
+
+/* ────── 회차 팝업 ────── */
+function openMelonPop(){
+  clearInterval(autoIv);
+  MS.t.popOpen=Date.now();
+  const s=MS.show;
+  document.getElementById('popTitle').textContent=s.title.substring(0,20)+'... 날짜·회차 선택';
+  // 날짜 탭
+  const tabs=document.getElementById('dateTabs');
+  tabs.innerHTML='';
+  s.dates.forEach((d,i)=>{
+    const tab=document.createElement('div');
+    tab.className='mel-date-tab';
+    tab.innerHTML=`<div>2026.${d.d}</div><div class="dt-dow">${d.dow}요일</div>`;
+    tab.onclick=()=>{
+      document.querySelectorAll('.mel-date-tab').forEach(t=>t.classList.remove('sel'));
+      tab.classList.add('sel');
+      MS.date=d; MS.session=null;
+      document.getElementById('btnNext').disabled=true;
+      renderSessions(d,s.times[i]);
+    };
+    tabs.appendChild(tab);
+  });
+  MS.qty=1; document.getElementById('qtyVal').textContent='1';
+  document.getElementById('sessionArea').style.display='none';
+  document.getElementById('btnNext').disabled=true;
+  sc(2);
+}
+function renderSessions(d,time){
+  const avail=Math.random()>0.3?'많음':'적음';
+  const list=document.getElementById('sessionList');
+  list.innerHTML='';
+  const row=document.createElement('div');
+  row.className='mel-session-row';
+  row.innerHTML=`<span class="mel-session-time">${time}</span><span class="mel-session-status ${avail==='많음'?'avail-ok':'avail-few'}">잔여 ${avail}</span>`;
+  row.onclick=()=>{
+    document.querySelectorAll('.mel-session-row').forEach(r=>r.classList.remove('sel'));
+    row.classList.add('sel');
+    MS.session={date:d,time};
+    document.getElementById('btnNext').disabled=false;
+  };
+  list.appendChild(row);
+  document.getElementById('sessionArea').style.display='block';
+}
+function changeQty(d){ MS.qty=Math.max(1,Math.min(4,MS.qty+d)); document.getElementById('qtyVal').textContent=MS.qty; }
+
+/* ────── 좌석 선택 ────── */
+function goToSeat(){
+  MS.t.seatStart=Date.now(); MS.seats=[];
+  tkMap={};
+  ZONES.forEach(z=>z.rows.forEach(r=>{for(let c=1;c<=z.cols;c++) tkMap[`${z.key}-${r}-${c}`]=Math.random()<z.tr?'taken':'avail';}));
+  const s=MS.show;
+  document.getElementById('seatTitle').textContent=`${s.title.substring(0,20)}... — 좌석 선택`;
+  document.getElementById('seatSub').textContent=`${s.place} | 2026.${MS.session.date.d}(${MS.session.date.dow}) ${MS.session.time}`;
+  document.getElementById('seatGameInfo').innerHTML=`${s.title}<br>${s.place}<br>2026.${MS.session.date.d} ${MS.session.time}`;
+  document.getElementById('maxQtyLabel').textContent=`${MS.qty}매`;
+  buildSections('all'); updatePanel();
+  sc(3);
+}
+function setZone(el,key){
+  document.querySelectorAll('.mel-zone-item').forEach(z=>z.classList.remove('on'));el.classList.add('on');
+  buildSections(key);
+}
+function buildSections(zk){
+  const wrap=document.getElementById('seatSections'); wrap.innerHTML='';
+  const filt=zk==='all'?ZONES:ZONES.filter(z=>z.key===zk);
+  const gps={vip:'#fce4ec',r:'#fff5f5',p:'#e8f5e9',s:'#e3f2fd'};
+  const gbc={vip:'#e91e63',r:'#e53935',p:'#388e3c',s:'#1976d2'};
+  const gnm={vip:'VIP',r:'R석',p:'P석',s:'S석'};
+  filt.forEach(zone=>{
+    const sec=document.createElement('div'); sec.className='mel-seat-sec';
+    const pr=MS.show.price[zone.pr];
+    sec.innerHTML=`<div class="mel-seat-sec-hd"><span>${zone.name}</span><span class="mel-gpill" style="background:${gps[zone.pr]};color:${gbc[zone.pr]};">${pr.toLocaleString()}원</span></div>`;
+    const rows=document.createElement('div'); rows.className='mel-seat-rows';
+    zone.rows.forEach(r=>{
+      const re=document.createElement('div'); re.className='mel-seat-row-r';
+      const rn=document.createElement('div'); rn.className='mel-seat-rn'; rn.textContent=r.replace(/[A-Z]+/,''); re.appendChild(rn);
+      for(let c=1;c<=zone.cols;c++){
+        const id=`${zone.key}-${r}-${c}`;
+        const b=document.createElement('div');
+        const tk=tkMap[id], ms=MS.seats.some(s=>s.id===id);
+        b.className=`mel-sbtn ${tk?'taken':(ms?'mysel':zone.gc)}`;
+        b.title=`${r} ${c}번`;
+        if(!tk) b.onclick=()=>toggleSeat(id,zone,r,c,b);
+        re.appendChild(b);
+      }
+      rows.appendChild(re);
+    });
+    sec.appendChild(rows); wrap.appendChild(sec);
+  });
+}
+function toggleSeat(id,zone,row,col,btn){
+  const idx=MS.seats.findIndex(s=>s.id===id);
+  if(idx>=0){MS.seats.splice(idx,1);tkMap[id]='avail';btn.className=`mel-sbtn ${zone.gc}`;}
+  else{
+    if(MS.seats.length>=MS.qty){alert(`${MS.qty}매를 이미 선택했습니다.`);return;}
+    MS.seats.push({id,zone:zone.key,row,col,price:MS.show.price[zone.pr]});
+    tkMap[id]='mysel';btn.className='mel-sbtn mysel';
+  }
+  updatePanel();
+}
+function updatePanel(){
+  const list=document.getElementById('selList');
+  if(!MS.seats.length){list.innerHTML='<div class="mel-nosel">좌석을 클릭하세요</div>';}
+  else{list.innerHTML='';MS.seats.forEach((s,i)=>{const el=document.createElement('div');el.className='mel-selitem';el.innerHTML=`<span class="mel-selitem-txt">${s.row} ${s.col}번</span><button class="mel-seldel" onclick="remSeat(${i})">×</button>`;list.appendChild(el);});}
+  const tkt=MS.seats.reduce((a,s)=>a+s.price,0),fee=MS.seats.length*FEE;
+  document.getElementById('ppTkt').textContent=tkt.toLocaleString()+'원';
+  document.getElementById('ppFee').textContent=fee.toLocaleString()+'원';
+  document.getElementById('ppTot').textContent=(tkt+fee).toLocaleString()+'원';
+  document.getElementById('btnConf').disabled=MS.seats.length===0;
+}
+function remSeat(i){MS.seats.splice(i,1);buildSections(document.querySelector('.mel-zone-item.on')?.dataset?.zone||'all');updatePanel();}
+
+/* ────── 결제 ────── */
+function goToPay(){
+  MS.t.seatEnd=Date.now();MS.t.payStart=Date.now();
+  const s=MS.show,tkt=MS.seats.reduce((a,ss)=>a+ss.price,0),fee=MS.seats.length*FEE;
+  const sl=MS.seats.map(s=>`${s.row} ${s.col}번`).join(', ');
+  document.getElementById('payTitle').textContent=s.title;
+  document.getElementById('payDate').textContent=`2026.${MS.session.date.d}(${MS.session.date.dow}) ${MS.session.time}`;
+  document.getElementById('payPlace').textContent=s.place;
+  document.getElementById('paySeat').textContent=sl;
+  document.getElementById('payCnt').textContent=MS.seats.length+'매';
+  document.getElementById('payTkt').textContent=tkt.toLocaleString()+'원';
+  document.getElementById('payFee').textContent=fee.toLocaleString()+'원';
+  document.getElementById('payTot').textContent=(tkt+fee).toLocaleString()+'원';
+  sc(4);
+}
+function selPm(el){el.closest('.mel-pm-list').querySelectorAll('.mel-pm').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function togglePay(){document.getElementById('btnPay').disabled=!document.getElementById('agreeChk').checked;}
+
+/* ────── 완료 ────── */
+function goToDone(){
+  MS.t.payEnd=Date.now();
+  const s=MS.show,tkt=MS.seats.reduce((a,ss)=>a+ss.price,0),fee=MS.seats.length*FEE;
+  const sl=MS.seats.map(s=>`${s.row} ${s.col}번`).join(', ');
+  document.getElementById('dGame').textContent=s.title;
+  document.getElementById('dDate').textContent=`2026.${MS.session.date.d}(${MS.session.date.dow}) ${MS.session.time}`;
+  document.getElementById('dSeat').textContent=sl;
+  document.getElementById('dPrice').textContent=(tkt+fee).toLocaleString()+'원';
+  const fmt=ms=>{if(!ms||ms<0)return '—';const ss=Math.floor(ms/1000);return ss<60?`${ss}초`:`${Math.floor(ss/60)}분 ${ss%60}초`;};
+  const T=MS.t;
+  document.getElementById('stShow').textContent=fmt(T.showEnd-T.start);
+  document.getElementById('stSeat').textContent=fmt(T.seatEnd-T.seatStart);
+  document.getElementById('stPay').textContent=fmt(T.payEnd-T.payStart);
+  document.getElementById('stTot').textContent=fmt(T.payEnd-T.start);
+  sc(5);
+}
+
+function restartAll(){
+  clearInterval(autoIv); MS={show:null,date:null,session:null,seats:[],qty:1,t:{}};
+  document.getElementById('agreeChk').checked=false;
+  document.getElementById('btnPay').disabled=true;
+  sc(0);
+}
+
+/* ════ 모바일 뷰 전환 ════ */
+const MOB_CSS_MEL_STR = `
+  #mfClone .screen{display:none;}
+  #mfClone .screen.active{display:block;}
+  #mfClone .mel-top-bar{height:44px!important;padding:0 12px!important;}
+  #mfClone .mel-logo-text{font-size:14px!important;}
+  #mfClone .mel-search-wrap{display:none!important;}
+  #mfClone .mel-top-right .mel-top-link:not(.login){display:none!important;}
+  #mfClone .mel-top-link.login{font-size:11px!important;padding:3px 10px!important;}
+  #mfClone .mel-gnb-bar{height:38px!important;padding:0 8px!important;top:44px!important;}
+  #mfClone .mel-gnb-item{padding:0 9px!important;font-size:12px!important;}
+  #mfClone .mel-genre-bar{padding:0 6px!important;}
+  #mfClone .mel-genre-item{padding:0 10px!important;font-size:11px!important;height:36px!important;}
+  #mfClone .practice-bar{font-size:9px!important;padding:5px 10px!important;}
+  #mfClone .mel-banner{height:180px!important;}
+  #mfClone .mel-banner-slide{padding:20px 16px!important;}
+  #mfClone .mel-banner-title{font-size:15px!important;}
+  #mfClone .mel-banner-sub{font-size:10px!important;margin-bottom:10px!important;}
+  #mfClone .mel-banner-cta{font-size:11px!important;padding:7px 12px!important;}
+  #mfClone .mel-body{padding:14px 10px!important;}
+  #mfClone .mel-card-grid{grid-template-columns:repeat(2,1fr)!important;gap:8px!important;}
+  #mfClone .mel-rank-grid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;}
+  #mfClone .mel-card-poster-icon{font-size:24px!important;}
+  #mfClone .mel-card-poster-name{font-size:10px!important;}
+  #mfClone .mel-card-title{font-size:10px!important;}
+  #mfClone .mel-card-date,.mel-card-place{font-size:9px!important;}
+  #mfClone .mel-open-row{padding:10px 12px!important;gap:10px!important;}
+  #mfClone .mel-open-title{font-size:12px!important;}
+  #mfClone .mel-sec-title{font-size:14px!important;}
+  #mfClone .mel-detail-top{flex-direction:column!important;gap:14px!important;}
+  #mfClone .mel-poster-col{width:100%!important;display:flex!important;flex-direction:column!important;align-items:center!important;}
+  #mfClone .mel-poster-img{width:140px!important;height:186px!important;}
+  #mfClone .mel-detail-body{padding:12px 10px!important;}
+  #mfClone .mel-detail-title{font-size:16px!important;}
+  #mfClone .mel-book-box{padding:14px!important;}
+  #mfClone .mel-countdown-box{flex-wrap:wrap!important;gap:8px!important;padding:12px!important;}
+  #mfClone .mel-countdown-num{font-size:26px!important;}
+  #mfClone .mel-btn-book{height:46px!important;font-size:14px!important;}
+  #mfClone .mel-seat-body{flex-direction:column!important;height:auto!important;overflow:visible!important;}
+  #mfClone .mel-seat-left{border-right:none!important;border-bottom:1px solid var(--border)!important;}
+  #mfClone .mel-seat-right{width:100%!important;}
+  #mfClone .mel-pay-wrap{padding:12px 10px!important;max-width:100%!important;}
+  #mfClone .mel-done-wrap{padding:20px 10px!important;}
+  #mfClone .mel-done-card{padding:24px 14px!important;}
+  #mfClone .mel-pop-overlay{align-items:flex-end!important;padding:0!important;}
+  #mfClone .mel-pop{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0!important;max-height:85vh!important;overflow-y:auto!important;}
+  #mfClone .practice-badge{display:none!important;}
+  #mfClone .mel-pf{position:sticky!important;bottom:0!important;background:#fff!important;z-index:50!important;border-top:1px solid var(--border)!important;}
+`;
+
+function setView(mode){
+  const isM=mode==='mobile';
+  document.body.className=isM?'view-mobile':'view-pc';
+  document.getElementById('vtbPc').classList.toggle('on',!isM);
+  document.getElementById('vtbMob').classList.toggle('on',isM);
+  document.getElementById('vtbTip').textContent=isM
+    ?'📱 멜론: PC+모바일 동시 가능 — 이중전략!'
+    :'💻 PC+📱 동시접속 가능 — 멜론 이중전략';
+  const mo=document.getElementById('mobileOuter');
+  const pw=document.querySelector('.pc-wrap');
+  if(isM){
+    mo.style.display='flex'; pw.style.display='none';
+    const sc=document.getElementById('mfScroll');
+    if(!sc.hasChildNodes()){
+      if(!document.getElementById('mob-css-mel')){
+        const st=document.createElement('style');st.id='mob-css-mel';st.textContent=MOB_CSS_MEL_STR;
+        document.head.appendChild(st);
+      }
+      const clone=pw.cloneNode(true);
+      clone.classList.remove('pc-wrap');clone.id='mfClone';
+      clone.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+      sc.appendChild(clone);
+      // 초기 active 화면 동기화
+      const initA=document.querySelector('.pc-wrap .screen.active');
+      if(initA){
+        const pcs=Array.from(document.querySelectorAll('.pc-wrap .screen'));
+        const idx=pcs.indexOf(initA);
+        const cls=clone.querySelectorAll('.screen');
+        cls.forEach(s=>s.classList.remove('active'));
+        if(idx>=0&&cls[idx]) cls[idx].classList.add('active');
+      }
+    }
+  } else {
+    mo.style.display='none'; pw.style.display='block';
+  }
+  const n=new Date(); const el=document.getElementById('mfTime');
+  if(el) el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  try{localStorage.setItem('podoal_view',mode);}catch(e){}
+}
+setInterval(()=>{const n=new Date();const el=document.getElementById('mfTime');if(el) el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');},30000);
+try{const s=localStorage.getItem('podoal_view');if(s)setView(s);else setView('pc');}catch(e){setView('pc');}
+</script>
+</body>
+</html>

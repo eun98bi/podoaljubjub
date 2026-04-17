@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>티켓링크 — 포도알줍줍</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --red:#e22228;--text:#1a1a1a;--muted:#888;
+  --border:#e8e8e8;--bg:#f5f5f5;
+}
+html,body{
+  font-family:'Noto Sans KR',sans-serif;font-size:14px;
+  color:var(--text);background:#fff;
+  min-height:100vh;
+}
+
+/* ── 전체 앱 래퍼 (모바일 프레임) ── */
+.app{
+  max-width:430px;margin:0 auto;
+  background:#fff;min-height:100vh;
+  position:relative;
+  padding-bottom:64px;
+}
+
+/* 데스크탑에서 폰 느낌 주기 */
+@media(min-width:431px){
+  body{background:#e0e0e0;}
+  .app{
+    margin:0 auto;
+    box-shadow:0 0 30px rgba(0,0,0,0.25);
+    min-height:100vh;
+  }
+}
+
+/* ── 연습 안내 바 ── */
+.pbar{
+  background:#fffbeb;border-bottom:2px solid #fbbf24;
+  padding:6px 14px;font-size:11px;color:#78350f;
+  display:flex;align-items:center;gap:5px;
+  position:sticky;top:0;z-index:300;
+}
+
+/* ── 앱 상단 헤더 ── */
+.app-hd{
+  background:#fff;
+  padding:10px 14px 0;
+  border-bottom:1px solid var(--border);
+}
+.app-hd-top{
+  display:flex;align-items:center;justify-content:space-between;
+  height:44px;
+}
+.app-logo{
+  font-size:20px;font-weight:900;letter-spacing:-0.04em;
+  color:#1a1a1a;text-decoration:none;line-height:1;
+}
+.app-logo .lt{font-weight:300;}
+.app-hd-icons{display:flex;gap:6px;}
+.app-hd-icon-btn{
+  width:38px;height:38px;display:flex;align-items:center;
+  justify-content:center;border:none;background:none;
+  cursor:pointer;font-size:18px;color:#333;
+}
+
+/* 공연/전시 | 스포츠 탭 */
+.top-cat-tabs{
+  display:flex;border-bottom:1px solid var(--border);
+  margin-top:4px;
+}
+.top-cat-tab{
+  flex:1;text-align:center;padding:10px 0;
+  font-size:15px;font-weight:500;color:#aaa;
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.12s;
+}
+.top-cat-tab.on{
+  color:var(--text);font-weight:700;
+  border-bottom-color:var(--text);
+}
+
+/* ── 배너 캐러셀 ── */
+.banner-wrap{
+  position:relative;overflow:hidden;
+  width:100%;aspect-ratio:16/9;
+  background:#1a2240;
+  cursor:pointer;
+}
+.banner-slide{
+  width:100%;height:100%;
+  display:flex;align-items:flex-end;
+  padding:20px 16px;
+  position:relative;
+}
+.banner-bg{
+  position:absolute;inset:0;
+  object-fit:cover;width:100%;height:100%;
+}
+.banner-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+}
+.banner-txt{position:relative;z-index:2;color:#fff;}
+.banner-title{font-size:22px;font-weight:900;line-height:1.25;letter-spacing:-0.02em;}
+.banner-date{font-size:12px;margin-top:5px;opacity:0.9;}
+.banner-sub{font-size:12px;opacity:0.8;margin-top:1px;}
+.banner-count-badge{
+  position:absolute;bottom:12px;right:12px;z-index:3;
+  background:rgba(0,0,0,0.4);color:#fff;
+  font-size:12px;padding:3px 10px;border-radius:100px;
+}
+
+/* ── 카테고리 칩 탭 ── */
+.cat-section{
+  padding:12px 14px 0;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  padding-bottom:10px;
+}
+.cat-row{display:flex;gap:7px;flex-wrap:wrap;}
+.cat-chip{
+  padding:6px 14px;border-radius:100px;
+  border:1px solid var(--border);
+  font-size:13px;font-weight:500;color:#444;
+  cursor:pointer;transition:all 0.12s;
+  white-space:nowrap;
+}
+.cat-chip.on{
+  background:#1a1a1a;color:#fff;
+  border-color:#1a1a1a;
+}
+.cat-chip:hover:not(.on){background:#f5f5f5;}
+
+/* ── 팀 로고 그리드 ── */
+.team-section{
+  background:#fff;
+  padding:14px 14px 6px;
+  border-bottom:1px solid var(--border);
+}
+.team-scroll{
+  display:flex;gap:4px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding-bottom:8px;
+}
+.team-scroll::-webkit-scrollbar{display:none;}
+.team-item{
+  display:flex;flex-direction:column;align-items:center;
+  gap:7px;padding:6px 10px;
+  cursor:pointer;border-radius:8px;
+  transition:background 0.12s;flex-shrink:0;
+  text-decoration:none;
+}
+.team-item:hover{background:#f5f5f5;}
+.team-logo-circle{
+  width:60px;height:60px;border-radius:12px;
+  background:#fff;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.team-logo-inner{
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;
+  text-align:center;line-height:1.2;
+}
+.team-nm{font-size:12px;font-weight:500;color:#333;white-space:nowrap;}
+
+/* 구단 색상 */
+.logo-lg{background:linear-gradient(135deg,#c8102e,#001489);}
+.logo-samsung{background:linear-gradient(135deg,#074ca1,#1a5caa);}
+.logo-hanwha{background:linear-gradient(135deg,#f05a28,#ff7043);}
+.logo-kt{background:linear-gradient(135deg,#000,#333);}
+.logo-ssg{background:linear-gradient(135deg,#ce0e2d,#00205b);}
+.logo-nc{background:linear-gradient(135deg,#071d49,#0e3d78);}
+.logo-lotte{background:linear-gradient(135deg,#002561,#e31837);}
+.logo-kia{background:linear-gradient(135deg,#ea0029,#000);}
+.logo-doosan{background:linear-gradient(135deg,#131230,#2a2876);}
+.logo-hanhwa{background:linear-gradient(135deg,#f05a28,#c44214);}
+
+/* ── 이벤트 카드 ── */
+.events-section{
+  background:var(--bg);
+  padding:8px 0;
+}
+.event-card{
+  background:#fff;margin:0 14px 8px;
+  border-radius:10px;overflow:hidden;
+  border:1px solid var(--border);
+  display:flex;align-items:stretch;
+  cursor:pointer;text-decoration:none;color:var(--text);
+  transition:box-shadow 0.15s;
+  position:relative;min-height:80px;
+}
+.event-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+.event-card-img{
+  width:100px;flex-shrink:0;
+  background:#e8e8e8;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.event-card-img-inner{
+  width:100%;height:100%;
+  background:linear-gradient(135deg,#ddd,#c8c8c8);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+}
+.event-card-body{flex:1;padding:12px 14px;}
+.event-card-title{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:5px;}
+.event-card-date{font-size:12px;color:#666;margin-bottom:3px;}
+.event-card-place{font-size:11px;color:#999;}
+.event-card-actions{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:6px;
+}
+.event-action-btn{
+  width:32px;height:32px;border-radius:50%;
+  background:#f5f5f5;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;
+}
+
+/* ── 하단 네비게이션 ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:#fff;border-top:1px solid var(--border);
+  display:flex;z-index:500;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:8px 4px 6px;
+  cursor:pointer;text-decoration:none;color:#999;
+  transition:color 0.12s;
+}
+.nav-item.on{color:var(--red);}
+.nav-icon{font-size:22px;line-height:1;margin-bottom:2px;}
+.nav-label{font-size:10px;font-weight:500;}
+
+/* ── 떠있는 버튼 ── */
+.fab-group{
+  position:fixed;right:calc(50% - 215px);bottom:80px;
+  display:flex;flex-direction:column;gap:8px;
+  z-index:400;
+}
+@media(max-width:430px){.fab-group{right:12px;}}
+.fab-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:#fff;border:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;cursor:pointer;color:#555;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- 연습 안내 -->
+  <div class="pbar">⚡ <strong>연습 모드:</strong> 티켓링크 UI를 재현한 티켓팅 연습 페이지입니다.</div>
+
+  <!-- 앱 헤더 -->
+  <header class="app-hd">
+    <div class="app-hd-top">
+      <a href="ticketlink.html" class="app-logo">TICKET<span class="lt">LINK</span></a>
+      <div class="app-hd-icons">
+        <button class="app-hd-icon-btn" title="검색">🔍</button>
+        <button class="app-hd-icon-btn" title="알림">🔔</button>
+      </div>
+    </div>
+    <div class="top-cat-tabs">
+      <div class="top-cat-tab" onclick="location.href='#'">공연/전시</div>
+      <div class="top-cat-tab on">스포츠</div>
+    </div>
+  </header>
+
+  <!-- 배너 캐러셀 -->
+  <div class="banner-wrap" id="bannerWrap" onclick="nextBanner()">
+    <div class="banner-slide" id="bannerSlide">
+      <div class="banner-grad"></div>
+      <div class="banner-txt" id="bannerTxt">
+        <div class="banner-title" id="bannerTitle">BNK 금융 2025~2026<br>여자프로농구 플레이오프</div>
+        <div class="banner-date" id="bannerDate">2026.04.08 - 2026.04.17</div>
+        <div class="banner-sub" id="bannerSub">WKBL 플레이오프</div>
+      </div>
+    </div>
+    <div class="banner-count-badge" id="bannerCount">1 / 7</div>
+  </div>
+
+  <!-- 카테고리 칩 -->
+  <div class="cat-section">
+    <div class="cat-row">
+      <div class="cat-chip on" onclick="selectCat(this,'baseball')">야구</div>
+      <div class="cat-chip" onclick="selectCat(this,'soccer')">축구</div>
+      <div class="cat-chip" onclick="selectCat(this,'handball')">핸드볼</div>
+      <div class="cat-chip" onclick="selectCat(this,'icehockey')">아이스하키</div>
+      <div class="cat-chip" onclick="selectCat(this,'basketball')">농구</div>
+      <div class="cat-chip" onclick="selectCat(this,'volleyball')">배구</div>
+      <div class="cat-chip" onclick="selectCat(this,'esports')">e스포츠&amp;게임</div>
+    </div>
+  </div>
+
+  <!-- 팀 로고 -->
+  <div class="team-section">
+    <div class="team-scroll">
+      <a class="team-item" href="ticketlink-sports.html?team=lg">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-lg">LG<br>TWINS</div></div>
+        <span class="team-nm">LG트윈스</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=hanwha">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-hanwha">HW<br>Eagles</div></div>
+        <span class="team-nm">한화이글스</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=samsung">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-samsung">SS<br>Lions</div></div>
+        <span class="team-nm">삼성 라이온즈</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=kt">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-kt">kt<br>wiz</div></div>
+        <span class="team-nm">kt wiz</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=ssg">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-ssg">SSG<br>Landers</div></div>
+        <span class="team-nm">SSG랜더스</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=nc">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-nc">NC<br>Dinos</div></div>
+        <span class="team-nm">NC다이노스</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=lotte">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-lotte">LOTTE<br>Giants</div></div>
+        <span class="team-nm">롯데자이언츠</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=kia">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-kia">KIA<br>Tigers</div></div>
+        <span class="team-nm">KIA타이거즈</span>
+      </a>
+      <a class="team-item" href="ticketlink-sports.html?team=doosan">
+        <div class="team-logo-circle"><div class="team-logo-inner logo-doosan">Doosan<br>Bears</div></div>
+        <span class="team-nm">두산베어스</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 이벤트 카드 목록 -->
+  <div class="events-section">
+
+    <a class="event-card" href="ticketlink-sports.html?team=samsung">
+      <div class="event-card-img">
+        <div class="event-card-img-inner" style="background:linear-gradient(135deg,#074ca1,#b8d0f8);">🦁</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-title">홋카이도 닛폰햄 파이터즈<br>정규리그 지정석</div>
+        <div class="event-card-date">2026.03.31 - 2026.09.24</div>
+        <div class="event-card-place">에스콘 필드 홋카이도</div>
+      </div>
+      <div class="event-card-actions">
+        <div class="event-action-btn">↻</div>
+        <div class="event-action-btn">↑</div>
+      </div>
+    </a>
+
+    <a class="event-card" href="ticketlink-sports.html?team=lg">
+      <div class="event-card-img">
+        <div class="event-card-img-inner" style="background:linear-gradient(135deg,#001489,#c8102e);">⚾</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-title">2026 KBO 리그<br>LG 트윈스 홈경기</div>
+        <div class="event-card-date">2026.03.22 - 2026.10.03</div>
+        <div class="event-card-place">잠실야구장</div>
+      </div>
+      <div class="event-card-actions">
+        <div class="event-action-btn">↻</div>
+      </div>
+    </a>
+
+    <a class="event-card" href="ticketlink-sports.html?team=hanwha">
+      <div class="event-card-img">
+        <div class="event-card-img-inner" style="background:linear-gradient(135deg,#f05a28,#ffd700);">🦅</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-title">2026 KBO 리그<br>한화 이글스 홈경기</div>
+        <div class="event-card-date">2026.03.22 - 2026.10.03</div>
+        <div class="event-card-place">한화생명이글스파크</div>
+      </div>
+      <div class="event-card-actions">
+        <div class="event-action-btn">↻</div>
+      </div>
+    </a>
+
+    <a class="event-card" href="ticketlink-sports.html?team=samsung">
+      <div class="event-card-img">
+        <div class="event-card-img-inner" style="background:linear-gradient(135deg,#074ca1,#1a5caa);">🦁</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-title">2026 KBO 리그<br>삼성 라이온즈 홈경기</div>
+        <div class="event-card-date">2026.03.22 - 2026.10.03</div>
+        <div class="event-card-place">대구 삼성라이온즈파크</div>
+      </div>
+      <div class="event-card-actions">
+        <div class="event-action-btn">↻</div>
+      </div>
+    </a>
+
+    <a class="event-card" href="ticketlink-sports.html?team=kt">
+      <div class="event-card-img">
+        <div class="event-card-img-inner" style="background:linear-gradient(135deg,#111,#444);">🧡</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-title">2026 KBO 리그<br>kt wiz 홈경기</div>
+        <div class="event-card-date">2026.03.22 - 2026.10.03</div>
+        <div class="event-card-place">수원 kt wiz파크</div>
+      </div>
+      <div class="event-card-actions">
+        <div class="event-action-btn">↻</div>
+      </div>
+    </a>
+
+  </div>
+
+</div><!-- /.app -->
+
+<!-- 하단 네비 -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="#">
+    <div class="nav-icon">☰</div>
+    <div class="nav-label">카테고리</div>
+  </a>
+  <a class="nav-item" href="#">
+    <div class="nav-icon">🔍</div>
+    <div class="nav-label">검색</div>
+  </a>
+  <a class="nav-item on" href="ticketlink.html">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">홈</div>
+  </a>
+  <a class="nav-item" href="#">
+    <div class="nav-icon">🎫</div>
+    <div class="nav-label">티켓</div>
+  </a>
+  <a class="nav-item" href="#">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">마이</div>
+  </a>
+</nav>
+
+<!-- 떠있는 버튼 -->
+<div class="fab-group">
+  <div class="fab-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+</div>
+
+<script>
+// 배너 데이터
+const banners = [
+  {title:'BNK 금융 2025~2026\n여자프로농구 플레이오프', date:'2026.04.08 - 2026.04.17', sub:'WKBL 플레이오프', bg:'linear-gradient(135deg,#1a2240 0%,#2a3f6e 50%,#1a2240 100%)'},
+  {title:'2026 KBO 리그\nLG 트윈스 홈경기', date:'2026.03.22 - 2026.10.03', sub:'잠실야구장', bg:'linear-gradient(135deg,#001489 0%,#c8102e 100%)'},
+  {title:'2026 KBO 리그\n삼성 라이온즈 홈경기', date:'2026.03.22 - 2026.10.03', sub:'대구 삼성라이온즈파크', bg:'linear-gradient(135deg,#074ca1 0%,#1a5caa 100%)'},
+  {title:'2026 KBO 리그\n한화 이글스 홈경기', date:'2026.03.22 - 2026.10.03', sub:'한화생명이글스파크', bg:'linear-gradient(135deg,#c44214 0%,#f05a28 100%)'},
+  {title:'2026 KBO 리그\nkt wiz 홈경기', date:'2026.03.22 - 2026.10.03', sub:'수원 kt wiz파크', bg:'linear-gradient(135deg,#111 0%,#333 100%)'},
+  {title:'신한 SOL Bank 25-26\n핸드볼 H리그', date:'2025.11.15 - 2026.05.05', sub:'순차오픈', bg:'linear-gradient(135deg,#1a2240 0%,#0d4d8a 100%)'},
+  {title:'홋카이도 닛폰햄 파이터즈\n정규리그 지정석', date:'2026.03.31 - 2026.09.24', sub:'에스콘 필드 홋카이도', bg:'linear-gradient(135deg,#1b3a6b 0%,#4a7fc1 100%)'},
+];
+let curBanner = 0;
+
+function renderBanner(){
+  const b = banners[curBanner];
+  const wrap = document.getElementById('bannerWrap');
+  wrap.style.background = b.bg;
+  document.getElementById('bannerTitle').innerHTML = b.title.replace('\n','<br>');
+  document.getElementById('bannerDate').textContent = b.date;
+  document.getElementById('bannerSub').textContent = b.sub;
+  document.getElementById('bannerCount').textContent = (curBanner+1) + ' / ' + banners.length;
+}
+
+function nextBanner(){
+  curBanner = (curBanner+1) % banners.length;
+  renderBanner();
+}
+
+// 3초마다 자동 넘기기
+setInterval(nextBanner, 3000);
+
+// 카테고리 칩 선택
+function selectCat(el, cat){
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  if(cat === 'baseball'){
+    // 현재 페이지 유지
+  } else {
+    alert('준비 중입니다.');
+    el.classList.remove('on');
+    document.querySelector('.cat-chip').classList.add('on');
+  }
+}
+</script>
+</body>
+</html>

@@ -13,6 +13,15 @@
 }
 html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:#fff;min-height:100vh;}
 
+/* ── 전체 앱 래퍼 (모바일 프레임) ── */
+.app{max-width:430px;margin:0 auto;background:#fff;min-height:100vh;position:relative;}
+
+/* 데스크탑에서 폰 느낌 주기 */
+@media(min-width:431px){
+  body{background:#e0e0e0;}
+  .app{box-shadow:0 0 30px rgba(0,0,0,0.25);}
+}
+
 /* 완료 화면 */
 .ccard{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px 16px;width:100%;text-align:center;}
 .cico{width:66px;height:66px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:32px;}
@@ -59,7 +68,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .m-team-name{font-size:11px;font-weight:600;color:#333;text-align:center;line-height:1.35;}
 
 /* 하단 네비게이션 */
-.m-bottom-nav{position:fixed;bottom:0;left:0;right:0;height:56px;background:#fff;border-top:1px solid #e8e8e8;display:flex;z-index:200;}
+.m-bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:56px;background:#fff;border-top:1px solid #e8e8e8;display:flex;z-index:200;}
 .m-bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-size:10px;color:#aaa;}
 .m-bn-item.active{color:#1a1a1a;}
 .m-bn-icon{font-size:20px;line-height:1;}
@@ -127,10 +136,10 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 
 /* 직접선택 시트맵 */
 .ds-seat-map{overflow:auto;background:#f0f0f0;padding:10px 6px;-webkit-overflow-scrolling:touch;}
-.ds-row{display:flex;align-items:center;gap:2px;margin-bottom:2px;}
+.ds-row{display:flex;align-items:center;gap:1px;margin-bottom:1px;}
 .ds-rn{width:22px;font-size:9px;color:#aaa;text-align:right;flex-shrink:0;padding-right:3px;}
 .ds-rn-r{width:22px;font-size:9px;color:#aaa;flex-shrink:0;padding-left:3px;}
-.ds-seat{width:13px;height:13px;border-radius:2px;border:none;cursor:pointer;flex-shrink:0;transition:box-shadow 0.1s,border-radius 0.1s;}
+.ds-seat{width:11px;height:11px;border-radius:2px;border:none;cursor:pointer;flex-shrink:0;transition:box-shadow 0.1s,border-radius 0.1s;}
 .ds-seat.chosen{border-radius:50%;box-shadow:0 0 0 2.5px #1a1a1a;}
 .ds-seat:disabled{cursor:default;}
 /* 직접선택 분할 패널 */
@@ -146,7 +155,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .ds-sel-badge{background:#1a1a1a;color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:100px;cursor:pointer;}
 
 /* 하단 예매 버튼 */
-.m-seat-btns{position:sticky;bottom:0;background:#fff;border-top:1px solid #e0e0e0;display:flex;z-index:90;}
+.m-seat-btns{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid #e0e0e0;display:flex;z-index:90;}
 .m-auto-btn,.m-direct-btn{flex:1;height:52px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.12s;}
 .m-auto-btn{background:#1a1a1a;color:#fff;border-right:1px solid #333;}
 .m-auto-btn:disabled{background:#e8e8e8;color:#bbb;cursor:default;}
@@ -219,7 +228,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .app-logo{font-size:20px;font-weight:900;letter-spacing:-0.04em;color:#1a1a1a;text-decoration:none;line-height:1;}
 .app-logo .lt{font-weight:300;}
 .app-hd-icons{display:flex;gap:6px;}
-.app-hd-icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;font-size:18px;color:#333;}
+.app-hd-home-link{display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #ddd;border-radius:100px;font-size:12px;font-weight:600;color:#555;text-decoration:none;white-space:nowrap;}
 .top-cat-tabs{display:flex;margin-top:4px;}
 .top-cat-tab{flex:1;text-align:center;padding:10px 0;font-size:15px;font-weight:500;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;}
 .top-cat-tab.on{color:#1a1a1a;font-weight:700;border-bottom-color:#1a1a1a;}
@@ -300,6 +309,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 </head>
 <body>
 
+<div class="app">
 <div id="mfScroll">
 
   <!-- ════ SCREEN A: 스포츠 홈 ════ -->
@@ -309,8 +319,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
       <div class="app-hd-top">
         <span class="app-logo">TICKET<span class="lt">LINK</span></span>
         <div class="app-hd-icons">
-          <button class="app-hd-icon-btn" title="검색">🔍</button>
-          <button class="app-hd-icon-btn" title="알림">🔔</button>
+          <a href="../../index.html" class="app-hd-home-link">🍇 메인</a>
         </div>
       </div>
       <div class="top-cat-tabs">
@@ -477,8 +486,8 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
     </div>
     <div class="m-stadium-map" id="mStadiumMap">
       <img id="mStadiumImg" src="" alt="구장 좌석 배치도"
-        style="width:100%;display:block;object-fit:cover;cursor:zoom-in;"
-        onclick="mToggleMapZoom(this)">
+        style="width:100%;display:block;object-fit:cover;cursor:pointer;"
+        onclick="mSelectOutfieldZone()">
       <button class="m-map-fullscreen-btn" onclick="mToggleMapZoom(document.getElementById('mStadiumImg'))" title="전체화면">⤢</button>
       <div id="mMapZoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;align-items:center;justify-content:center;"
         onclick="this.style.display='none'">
@@ -784,6 +793,11 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 
 <script>
 const FEE=1000;
+const TICKET_TYPES=[
+  {id:'normal', name:'일반', mult:1.0, icon:null},
+  {id:'samsung', name:'삼성라이온즈카드(일반)', mult:1.0, icon:'?'},
+  {id:'child', name:'어린이회원 가족할인 쿠폰(일반)', mult:0.5, icon:'v'},
+];
 const DW=['일','월','화','수','목','금','토'];
 const TEAMS={
   lg:     {name:'LG트윈스',     stadium:'서울 잠실야구장',        emoji:'🦁',opp:['두산 베어스','NC 다이노스','키움 히어로즈','KT 위즈']},
@@ -840,19 +854,19 @@ const TEAM_ZONES={
     {key:'vip',name:'으뜸병원 중앙 테이블석',      grade:'vip',gc:'v',price:45000,rows:['A','B'],                     cols:10,tr:0.30},
     {key:'3b', name:'이수그룹 3루 테이블석',        grade:'vip',gc:'v',price:42000,rows:['가','나','다'],               cols:8, tr:0.28},
     {key:'1b', name:'이수페타시스 1루 테이블석',    grade:'vip',gc:'v',price:42000,rows:['1','2','3'],                 cols:8, tr:0.27},
-    {key:'3b', name:'3루 익사이팅석',              grade:'r',  gc:'r',price:38000,rows:['①','②','③'],              cols:14,tr:0.45},
-    {key:'1b', name:'1루 익사이팅석',              grade:'r',  gc:'r',price:38000,rows:['ㄱ','ㄴ','ㄷ'],             cols:14,tr:0.42},
-    {key:'1b', name:'블루존',                      grade:'r',  gc:'r',price:25000,rows:['B1','B2','B3'],             cols:16,tr:0.40},
-    {key:'3b', name:'3루 내야지정석',              grade:'s',  gc:'s',price:20000,rows:['1','2','3','4','5'],         cols:18,tr:0.50},
-    {key:'out',name:'원정응원석',                  grade:'s',  gc:'s',price:15000,rows:['A','B'],                     cols:16,tr:0.35},
-    {key:'1b', name:'1루 내야지정석',              grade:'s',  gc:'s',price:20000,rows:['가','나','다','라','마'],      cols:18,tr:0.48},
+    {key:'3b', name:'3루 익사이팅석',              grade:'r',  gc:'r',price:38000,rows:['①','②','③','④','⑤','⑥','⑦'],              cols:20,tr:0.45},
+    {key:'1b', name:'1루 익사이팅석',              grade:'r',  gc:'r',price:38000,rows:['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ'],             cols:20,tr:0.42},
+    {key:'1b', name:'블루존',                      grade:'r',  gc:'r',price:25000,rows:['B1','B2','B3','B4','B5','B6'],             cols:22,tr:0.40},
+    {key:'3b', name:'3루 내야지정석',              grade:'s',  gc:'s',price:20000,rows:Array.from({length:20},(_,i)=>(i+1).toString()),cols:28,tr:0.50},
+    {key:'out',name:'원정응원석',                  grade:'s',  gc:'s',price:15000,rows:Array.from({length:22},(_,i)=>(i+13).toString()),cols:52,tr:0.35},
+    {key:'1b', name:'1루 내야지정석',              grade:'s',  gc:'s',price:20000,rows:Array.from({length:20},(_,i)=>(i+1).toString()),cols:28,tr:0.48},
     {key:'sky',name:'SKY 요기보 패밀리존(4인)',     grade:'vip',gc:'v',price:36000,rows:['F1','F2'],                   cols:8, tr:0.40},
-    {key:'sky',name:'SKY 블루존',                  grade:'s',  gc:'s',price:18000,rows:['SB1','SB2','SB3','SB4'],     cols:12,tr:0.40},
-    {key:'sky',name:'중앙 SKY 상단지정석',          grade:'s',  gc:'s',price:15000,rows:['C1','C2','C3'],              cols:12,tr:0.45},
-    {key:'sky',name:'3루 SKY 상단지정석',           grade:'free',gc:'f',price:12000,rows:['L1','L2','L3'],             cols:12,tr:0.50},
-    {key:'sky',name:'1루 SKY 상단지정석',           grade:'free',gc:'f',price:12000,rows:['R1','R2','R3'],             cols:12,tr:0.50},
-    {key:'sky',name:'SKY 하단지정석',              grade:'free',gc:'f',price:12000,rows:['S1','S2','S3','S4'],         cols:14,tr:0.55},
-    {key:'out',name:'외야 지정석',                 grade:'free',gc:'f',price:10000,rows:['Ⅰ','Ⅱ','Ⅲ','Ⅳ'],          cols:24,tr:0.30},
+    {key:'sky',name:'SKY 블루존',                  grade:'s',  gc:'s',price:18000,rows:['SB1','SB2','SB3','SB4','SB5','SB6','SB7','SB8'],cols:18,tr:0.40},
+    {key:'sky',name:'중앙 SKY 상단지정석',          grade:'s',  gc:'s',price:15000,rows:['C1','C2','C3','C4','C5','C6','C7'],cols:18,tr:0.45},
+    {key:'sky',name:'3루 SKY 상단지정석',           grade:'free',gc:'f',price:12000,rows:['L1','L2','L3','L4','L5','L6','L7','L8'],cols:16,tr:0.50},
+    {key:'sky',name:'1루 SKY 상단지정석',           grade:'free',gc:'f',price:12000,rows:['R1','R2','R3','R4','R5','R6','R7','R8'],cols:16,tr:0.50},
+    {key:'sky',name:'SKY 하단지정석',              grade:'free',gc:'f',price:12000,rows:Array.from({length:10},(_,i)=>'S'+(i+1)),cols:20,tr:0.55},
+    {key:'out',name:'외야 지정석',                 grade:'free',gc:'f',price:10000,rows:Array.from({length:15},(_,i)=>(i+1).toString()),cols:36,tr:0.30},
     {key:'out',name:'외야패밀리석(2인/3인/4인)',    grade:'free',gc:'f',price:12000,rows:['P1','P2','P3'],              cols:8, tr:0.45},
     {key:'out',name:'외야테이블석(4인)',            grade:'free',gc:'f',price:14000,rows:['T1','T2'],                   cols:6, tr:0.40},
     {key:'out',name:'외야테이블석(8인)',            grade:'free',gc:'f',price:14000,rows:['T1'],                       cols:4, tr:0.50},
@@ -944,6 +958,8 @@ const ZONE_COLORS={
   '스카이박스':'#4a148c',
 };
 const GRADE_DOT_DEFAULT={v:'#9c27b0',r:'#ef5350',s:'#1e88e5',free:'#66bb6a',f:'#66bb6a'};
+const ZONE_SEAT_MULT={out:40,'1b':15,'3b':15,vip:4,sky:8,wc:1};
+function getZoneCnt(z,rows){const r=rows||z.rows;return Math.round(r.length*z.cols*(1-z.tr)*(ZONE_SEAT_MULT[z.key]||10));}
 
 const CAPTCHA_POOL=['GRDPA','XKWQB','MTZVF','HLNJC','BPYRE','SDGWK','VFMQZ'];
 let captchaAnswer='';
@@ -1233,11 +1249,12 @@ function mBuildGradeList(){
   // Restore UI if coming from direct select mode
   if(dsMode){
     dsMode=false;
+    dsGridShowing=false;
     const cancelBar=document.querySelector('.m-cancel-bar');
     if(cancelBar)cancelBar.style.display='';
     const stadiumMap=document.getElementById('mStadiumMap');
     const imgSrc=TEAM_SEAT_IMG[mCurrentTeam]||'';
-    stadiumMap.innerHTML=`<img id="mStadiumImg" src="${imgSrc}" alt="구장 좌석 배치도" style="width:100%;display:block;object-fit:cover;cursor:zoom-in;" onclick="mToggleMapZoom(this)"><button class="m-map-fullscreen-btn" onclick="mToggleMapZoom(document.getElementById('mStadiumImg'))" title="전체화면">⤢</button><div id="mMapZoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;align-items:center;justify-content:center;" onclick="this.style.display='none'"><img id="mStadiumImgZoom" src="${imgSrc}" alt="구장 좌석 배치도" style="max-width:100%;max-height:100%;object-fit:contain;"></div>`;
+    stadiumMap.innerHTML=`<img id="mStadiumImg" src="${imgSrc}" alt="구장 좌석 배치도" style="width:100%;display:block;object-fit:cover;cursor:pointer;" onclick="mSelectOutfieldZone()"><button class="m-map-fullscreen-btn" onclick="mToggleMapZoom(document.getElementById('mStadiumImg'))" title="전체화면">⤢</button><div id="mMapZoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;align-items:center;justify-content:center;" onclick="this.style.display='none'"><img id="mStadiumImgZoom" src="${imgSrc}" alt="구장 좌석 배치도" style="max-width:100%;max-height:100%;object-fit:contain;"></div>`;
     const gradeHeader=document.querySelector('.m-grade-header');
     gradeHeader.innerHTML='<div class="m-grade-dropdown">등급 선택 <span style="font-size:11px;">▼</span></div><button class="m-grade-refresh" onclick="mRefreshGrades()">↻</button>';
     const autoBtn=document.getElementById('mAutoBtn');
@@ -1250,7 +1267,7 @@ function mBuildGradeList(){
   document.getElementById('mDirectBtn').disabled=true;
   container.innerHTML='';
   currentZones.forEach((z,idx)=>{
-    const cnt=Math.round(z.rows.length*z.cols*(1-z.tr));
+    const cnt=getZoneCnt(z);
     const color=ZONE_COLORS[z.name]||GRADE_DOT_DEFAULT[z.gc]||'#aaa';
     const row=document.createElement('div');
     row.className='m-grade-row';
@@ -1264,7 +1281,7 @@ function mBuildGradeList(){
         container.querySelectorAll('.m-grade-row').forEach(r=>{r.style.background='#fff';r.style.borderLeft='none';});
         row.style.background='#fff5f5';
         row.style.borderLeft='3px solid #e22228';
-        mSelectedGrade={gc:z.gc,grade:z.grade,names:[z.name],totalSeats:cnt,price:z.price,zone:z};
+        mSelectedGrade={gc:z.gc,grade:z.grade,names:[z.name],totalSeats:getZoneCnt(z),price:z.price,zone:z};
         document.getElementById('mAutoBtn').disabled=false;
         document.getElementById('mDirectBtn').disabled=false;
       };
@@ -1314,36 +1331,30 @@ function mQtyConfirm(){
   mToPayment();
 }
 
-let dsMode=false,dsZone=null,dsSecRows=null;
+let dsMode=false,dsZone=null,dsSecRows=null,dsGridShowing=false;
 
 function mDirectSelect(){
   dsMode=true;
   dsZone=mSelectedGrade?mSelectedGrade.zone:null;
   dsSecRows=null;
 
-  // Hide cancel bar
-  const cancelBar=document.querySelector('.m-cancel-bar');
-  if(cancelBar)cancelBar.style.display='none';
+  // Keep stadium photo as-is; seat grid appears only when a zone is picked
+  dsGridShowing=false;
 
-  // Replace stadium map with scrollable seat grid
-  const stadiumMap=document.getElementById('mStadiumMap');
-  stadiumMap.innerHTML='<div id="dsSeatMap" class="ds-seat-map" style="max-height:42vh;"></div>';
-
-  // Update grade header: left = grade dropdown (clicking goes back), right = selected badge + refresh
+  // Update grade header: left = grade dropdown, right = selected badge + refresh
   const gradeHeader=document.querySelector('.m-grade-header');
   gradeHeader.innerHTML=`
-    <div class="m-grade-dropdown" onclick="mBuildGradeList()" style="gap:6px;">
-      <span style="font-size:18px;line-height:1;color:#555;">‹</span>
+    <div class="m-grade-dropdown">
       등급 선택 <span style="font-size:11px;">▼</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <div id="dsSelBadge" class="ds-sel-badge" style="display:none;">선택된 좌석 0 ▼</div>
+      <div id="dsSelBadge" style="display:none;background:#e22228;color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px;cursor:pointer;">선택된 좌석 0 ▼</div>
       <button class="m-grade-refresh" onclick="dsRefreshMap()">↻</button>
     </div>`;
 
-  // Build split panel in grade list container (height = 180px scrollable)
+  // Build split panel in grade list container
   const gradeList=document.getElementById('mGradeList');
-  gradeList.innerHTML=`<div class="ds-panel" style="height:180px;">
+  gradeList.innerHTML=`<div class="ds-panel" style="height:220px;">
     <div class="ds-grade-panel" id="dsGradePanel"></div>
     <div class="ds-zone-panel" id="dsZonePanel"></div>
   </div>`;
@@ -1363,7 +1374,7 @@ function buildDSGradePanel(){
   if(!panel)return;
   panel.innerHTML='';
   currentZones.forEach((z,idx)=>{
-    const cnt=Math.round(z.rows.length*z.cols*(1-z.tr));
+    const cnt=getZoneCnt(z);
     const color=ZONE_COLORS[z.name]||GRADE_DOT_DEFAULT[z.gc]||'#aaa';
     const item=document.createElement('div');
     item.className='ds-gi'+(cnt===0?' disabled':'');
@@ -1376,21 +1387,21 @@ function buildDSGradePanel(){
         panel.querySelectorAll('.ds-gi').forEach(el=>el.classList.remove('on'));
         item.classList.add('on');
         dsZone=z;dsSecRows=null;
+        dsRestorePhoto();
         buildDSZonePanel(z);
-        buildDSSeatMap(z,null);
       };
     }
     panel.appendChild(item);
   });
   // Auto-select: use pre-selected grade zone or first available
-  const autoZone=dsZone||currentZones.find(z=>Math.round(z.rows.length*z.cols*(1-z.tr))>0);
+  const autoZone=dsZone||currentZones.find(z=>getZoneCnt(z)>0);
   if(autoZone){
     dsZone=autoZone;
     const zIdx=currentZones.indexOf(autoZone);
     const el=panel.querySelector(`[data-gi="${zIdx}"]`);
     if(el)el.classList.add('on');
     buildDSZonePanel(autoZone);
-    buildDSSeatMap(autoZone,null);
+    // Do NOT show seat grid on auto-select; user picks a sub-zone first
   }
 }
 
@@ -1403,18 +1414,18 @@ function buildDSZonePanel(zone){
   const zIdx=currentZones.indexOf(zone)+1;
   for(let i=0;i<rows.length;i+=secSize){
     const secRows=rows.slice(i,i+secSize);
-    const avail=Math.round(secRows.length*zone.cols*(1-zone.tr));
+    const avail=getZoneCnt(zone,secRows);
     const secName=`${zIdx}-${Math.floor(i/secSize)+1}구역`;
     const item=document.createElement('div');
     item.className='ds-zi';
     item.dataset.si=i;
     item.innerHTML=`<div style="font-size:12px;font-weight:500;color:#333;">${secName}</div>
-      <div style="font-size:13px;font-weight:700;color:#e22228;margin-top:1px;">${avail}석</div>`;
+      <div style="font-size:13px;font-weight:700;color:#e22228;margin-top:1px;">${avail.toLocaleString()}석</div>`;
     item.onclick=()=>{
       panel.querySelectorAll('.ds-zi').forEach(el=>el.classList.remove('on'));
       item.classList.add('on');
       dsSecRows=secRows;
-      buildDSSeatMap(zone,secRows);
+      dsSwitchToSeatGrid(zone,secRows);
     };
     panel.appendChild(item);
   }
@@ -1476,7 +1487,45 @@ function dsUpdateSelectionState(){
   if(dirBtn){dirBtn.disabled=n===0;}
 }
 
-function dsRefreshMap(){if(dsZone)buildDSSeatMap(dsZone,dsSecRows);}
+function dsRefreshMap(){if(dsZone&&dsGridShowing)buildDSSeatMap(dsZone,dsSecRows);}
+
+function dsSwitchToSeatGrid(zone,filterRows){
+  const stadiumMap=document.getElementById('mStadiumMap');
+  if(!dsGridShowing){
+    const mapH=Math.round(window.innerHeight*0.44)||320;
+    stadiumMap.innerHTML=`<div id="dsSeatMap" class="ds-seat-map" style="height:${mapH}px;"></div>`;
+    dsGridShowing=true;
+  }
+  buildDSSeatMap(zone,filterRows);
+}
+
+function dsRestorePhoto(){
+  if(!dsGridShowing)return;
+  const stadiumMap=document.getElementById('mStadiumMap');
+  const imgSrc=TEAM_SEAT_IMG[mCurrentTeam]||'';
+  stadiumMap.innerHTML=`<img id="mStadiumImg" src="${imgSrc}" alt="구장 좌석 배치도" style="width:100%;display:block;object-fit:cover;cursor:pointer;" onclick="mSelectOutfieldZone()"><button class="m-map-fullscreen-btn" onclick="mToggleMapZoom(document.getElementById('mStadiumImg'))" title="전체화면">⤢</button><div id="mMapZoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;align-items:center;justify-content:center;" onclick="this.style.display='none'"><img id="mStadiumImgZoom" src="${imgSrc}" alt="구장 좌석 배치도" style="max-width:100%;max-height:100%;object-fit:contain;"></div>`;
+  dsGridShowing=false;
+}
+
+function mSelectOutfieldZone(){
+  const outZone=currentZones.find(z=>Math.round(z.rows.length*z.cols*(1-z.tr))>0);
+  if(!outZone)return;
+  const idx=currentZones.indexOf(outZone);
+  const container=document.getElementById('mGradeList');
+  if(!container)return;
+  const cnt=getZoneCnt(outZone);
+  if(cnt===0)return;
+  container.querySelectorAll('.m-grade-row').forEach(r=>{r.style.background='#fff';r.style.borderLeft='none';});
+  const targetRow=container.querySelector(`[data-zone-idx="${idx}"]`);
+  if(targetRow){
+    targetRow.style.background='#fff5f5';
+    targetRow.style.borderLeft='3px solid #e22228';
+    targetRow.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  mSelectedGrade={gc:outZone.gc,grade:outZone.grade,names:[outZone.name],totalSeats:cnt,price:outZone.price,zone:outZone};
+  document.getElementById('mAutoBtn').disabled=false;
+  document.getElementById('mDirectBtn').disabled=false;
+}
 
 function mToPayment(){
   if(S.seats.length===0){alert('좌석을 선택해주세요.');return;}
@@ -1494,25 +1543,27 @@ function mToPayment(){
   const ttContainer=el('mTicketTypes');
   if(ttContainer){
     ttContainer.innerHTML='';
-    const seenNames=new Set();
-    zoneSeatsCopy.forEach(seat=>{
-      if(seenNames.has(seat.name))return;
-      seenNames.add(seat.name);
-      const zone=currentZones.find(z=>z.name===seat.name);
-      if(!zone)return;
-      let opts='';
-      for(let i=0;i<=S.targetQty;i++) opts+=`<option value="${i}">${i}</option>`;
-      const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;padding:14px;border-bottom:1px solid #f5f5f5;background:#fff;';
-      row.innerHTML=`
-        <div style="flex:1;font-size:14px;font-weight:500;color:#1a1a1a;">${seat.name}</div>
-        <div style="font-size:14px;font-weight:700;color:#1a1a1a;margin-right:14px;">${zone.price.toLocaleString()}원</div>
-        <select data-tt-name="${seat.name}" onchange="mTTQtyChange(this,'${seat.name}')"
-          style="height:36px;border:1px solid #ccc;border-radius:4px;font-size:14px;font-family:'Noto Sans KR',sans-serif;padding:0 8px;min-width:56px;color:#1a1a1a;background:#fff;">
-          ${opts}
-        </select>`;
-      ttContainer.appendChild(row);
-    });
+    const firstZone=currentZones.find(z=>z.name===firstSeat.name)||currentZones[0];
+    if(firstZone){
+      TICKET_TYPES.forEach(tt=>{
+        const price=Math.round(firstZone.price*tt.mult);
+        let opts='';
+        for(let i=0;i<=S.targetQty;i++) opts+=`<option value="${i}">${i}</option>`;
+        let iconHtml='';
+        if(tt.icon==='?') iconHtml=`<button onclick="event.stopPropagation()" style="margin-left:6px;width:20px;height:20px;border:1px solid #aaa;border-radius:3px;background:#fff;font-size:11px;color:#555;cursor:pointer;flex-shrink:0;">?</button>`;
+        else if(tt.icon==='v') iconHtml=`<button onclick="event.stopPropagation()" style="margin-left:6px;width:20px;height:20px;border:1px solid #aaa;border-radius:3px;background:#fff;font-size:11px;color:#555;cursor:pointer;flex-shrink:0;">∨</button>`;
+        const row=document.createElement('div');
+        row.style.cssText='display:flex;align-items:center;padding:14px;border-bottom:1px solid #f5f5f5;background:#fff;';
+        row.innerHTML=`
+          <div style="flex:1;display:flex;align-items:center;font-size:14px;font-weight:500;color:#1a1a1a;">${tt.name}${iconHtml}</div>
+          <div style="font-size:14px;font-weight:700;color:#1a1a1a;margin-right:14px;flex-shrink:0;">${price.toLocaleString()}원</div>
+          <select data-tt-id="${tt.id}" data-zone="${firstZone.name}" data-price="${price}" onchange="mTTQtyChange(this)"
+            style="height:36px;border:1px solid #ccc;border-radius:4px;font-size:14px;font-family:'Noto Sans KR',sans-serif;padding:0 8px;min-width:56px;color:#1a1a1a;background:#fff;">
+            ${opts}
+          </select>`;
+        ttContainer.appendChild(row);
+      });
+    }
   }
   mUpdateTicketTotal();
   const nextBtn=el('mBtnNext');
@@ -1520,16 +1571,19 @@ function mToPayment(){
   msc('mscE');
 }
 
-function mTTQtyChange(sel,zoneName){
+function mTTQtyChange(sel){
+  const ttId=sel.dataset.ttId;
+  const zoneName=sel.dataset.zone;
+  const price=parseInt(sel.dataset.price)||0;
   const zone=currentZones.find(z=>z.name===zoneName);
   if(!zone)return;
   const v=parseInt(sel.value)||0;
-  const others=S.seats.filter(s=>s.name!==zoneName);
+  const others=S.seats.filter(s=>s.ttId!==ttId);
   const newSeats=[];
   for(let i=0;i<v;i++){
     const row=zone.rows[Math.floor(Math.random()*zone.rows.length)];
     const col=Math.floor(Math.random()*zone.cols)+1;
-    newSeats.push({id:`${zone.name}-${row}${col}`,grade:zone.grade,name:zone.name,row,col,price:zone.price});
+    newSeats.push({id:`${zone.name}-${row}${col}`,grade:zone.grade,name:zone.name,row,col,price,ttId});
   }
   S.seats=[...others,...newSeats];
   mUpdateTicketTotal();
@@ -1637,5 +1691,6 @@ if(mBannerInterval)clearInterval(mBannerInterval);
 mBannerInterval=setInterval(mNextBanner,3000);
 (()=>{const p=new URLSearchParams(location.search),tm=p.get('team');if(tm&&TEAMS[tm])mGoToTeam(tm);})();
 </script>
+</div><!-- /.app -->
 </body>
 </html>

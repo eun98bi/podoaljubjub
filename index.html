@@ -108,27 +108,7 @@
     padding: 100px 24px 60px;
   }
 
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: rgba(108,92,231,0.10);
-    border: 1px solid rgba(108,92,231,0.25);
-    color: var(--accent2);
-    font-size: 12px;
-    font-weight: 500;
-    padding: 5px 14px 5px 10px;
-    border-radius: 100px;
-    margin-bottom: 32px;
-    letter-spacing: 0.02em;
-  }
-  .hero-badge::before {
-    content: '';
-    width: 6px; height: 6px;
-    background: var(--accent2);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
+  
   @keyframes pulse {
     0%,100% { opacity:1; transform:scale(1); }
     50% { opacity:0.5; transform:scale(0.7); }
@@ -429,7 +409,7 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">티켓팅 연습 플랫폼 v2.0</div>
+  
   <h1>Ticket<br><em>Practice</em></h1>
   <p class="hero-ko">실전 같은 티켓팅 연습, 포도알줍줍</p>
   <p class="hero-desc">
@@ -473,7 +453,8 @@
     </div>
   </div>
 
-	<p class="hero-desc" style="font-size:10px;">
+  <br>
+  <p class="hero-desc" style="font-size:10px;">
     "이 사이트 배너는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
   </p>
 

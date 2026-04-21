@@ -15,12 +15,12 @@
 html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);background:var(--bg);min-height:100vh;}
 
 /* ── 유틸바 ── */
-.util-bar{background:#fff;border-bottom:1px solid var(--border);height:34px;display:flex;align-items:center;padding:0 20px;font-size:12px;color:var(--muted);}
+/* .util-bar{background:#fff;border-bottom:1px solid var(--border);height:34px;display:flex;align-items:center;padding:0 20px;font-size:12px;color:var(--muted);}
 .util-right{margin-left:auto;display:flex;}
 .util-lk{color:#555;padding:0 10px;border-left:1px solid #eee;cursor:pointer;font-size:12px;}
 .util-lk:first-child{border-left:none;}
 .util-payco{color:var(--blue);font-weight:700;padding:0 10px;border-left:1px solid #eee;font-size:12px;cursor:pointer;}
-.util-flag{font-size:14px;margin-right:4px;}
+.util-flag{font-size:14px;margin-right:4px;} */
 
 /* ── 메인 헤더 ── */
 .main-hd{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:60px;gap:20px;position:sticky;top:0;z-index:200;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
@@ -30,10 +30,8 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .gnb-item{display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:500;color:#aaa;cursor:pointer;border-bottom:3px solid transparent;text-decoration:none;transition:all 0.12s;white-space:nowrap;}
 .gnb-item:hover{color:#333;}
 .gnb-item.on{color:var(--text);font-weight:700;border-bottom-color:var(--text);}
-.hd-search{margin-left:auto;display:flex;align-items:center;border:1px solid #ccc;border-radius:4px;overflow:hidden;height:36px;min-width:200px;}
-.hd-search input{flex:1;border:none;outline:none;padding:0 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text);}
-.hd-search input::placeholder{color:#bbb;}
-.hd-search-btn{background:none;border:none;border-left:1px solid #eee;width:36px;height:36px;cursor:pointer;font-size:16px;color:#888;}
+.hd-home-link{margin-left:auto;display:flex;align-items:center;gap:5px;padding:6px 14px;border:1px solid #ccc;border-radius:4px;font-size:13px;font-weight:600;color:#555;text-decoration:none;white-space:nowrap;transition:background 0.12s;}
+.hd-home-link:hover{background:#f5f5f5;color:#1a1a1a;}
 
 /* ── 스포츠 서브탭 ── */
 .sport-sub{background:#fff;border-bottom:2px solid #e0e0e0;padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:60px;z-index:190;}
@@ -67,13 +65,6 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .team-circle{width:54px;height:54px;border-radius:50%;background:#fff;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:26px;}
 .team-nm{font-size:12px;font-weight:500;color:#333;text-align:center;}
 
-/* ── 이벤트 카드 ── */
-.event-row{display:flex;gap:12px;margin-bottom:28px;}
-.ev-card{flex:1;border-radius:6px;padding:18px 20px;cursor:pointer;min-height:86px;display:flex;flex-direction:column;justify-content:space-between;transition:opacity 0.15s;text-decoration:none;color:#fff;}
-.ev-card:hover{opacity:0.88;}
-.ev-card-title{font-size:14px;font-weight:700;line-height:1.4;}
-.ev-card-meta{font-size:11px;opacity:0.7;margin-top:6px;}
-
 @media(max-width:900px){
   .team-grid{grid-template-columns:repeat(4,1fr);}
 }
@@ -81,7 +72,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 </head>
 <body>
 
-<div class="util-bar">
+<!-- <div class="util-bar">
   <span class="util-flag">🇰🇷</span><span style="font-size:12px;color:#555;">한국어 ▾</span>
   <div class="util-right">
     <span class="util-lk">로그인</span>
@@ -91,7 +82,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
     <span class="util-payco">PAYCO</span>
     <span class="util-lk">관계사 ▾</span>
   </div>
-</div>
+</div> -->
 
 <header class="main-hd">
   <a href="index.html" class="tl-logo"><span class="lt">ticket</span>LINK</a>
@@ -99,10 +90,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
     <a class="gnb-item" href="#" onclick="alert('준비 중입니다.');return false;">공연/전시</a>
     <a class="gnb-item on" href="sports.html">스포츠</a>
   </nav>
-  <div class="hd-search">
-    <input type="text" placeholder="검색어를 입력해 주세요.">
-    <button class="hd-search-btn">🔍</button>
-  </div>
+  <a href="../../index.html" class="hd-home-link">🍇 포도알줍줍 메인으로</a>
 </header>
 
 <div class="sport-sub">
@@ -140,26 +128,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
     <a class="team-item" href="sports.html?team=kt"><div class="team-circle">🖤</div><div class="team-nm">kt wiz</div></a>
   </div>
 
-  <!-- 이벤트 카드 -->
-  <div class="sec-lbl">SPECIAL</div>
-  <div class="event-row">
-    <a class="ev-card" href="sports.html?team=lg" style="background:linear-gradient(135deg,#001489,#c8102e);">
-      <div class="ev-card-title">2026 KBO 리그<br>LG 트윈스 홈경기</div>
-      <div class="ev-card-meta">2026.03.22 - 2026.10.03 | 잠실야구장</div>
-    </a>
-    <a class="ev-card" href="sports.html?team=hanwha" style="background:linear-gradient(135deg,#c44214,#f05a28);">
-      <div class="ev-card-title">2026 KBO 리그<br>한화 이글스 홈경기</div>
-      <div class="ev-card-meta">2026.03.22 - 2026.10.03 | 한화생명이글스파크</div>
-    </a>
-    <a class="ev-card" href="sports.html?team=samsung" style="background:linear-gradient(135deg,#074ca1,#1a5caa);">
-      <div class="ev-card-title">2026 KBO 리그<br>삼성 라이온즈 홈경기</div>
-      <div class="ev-card-meta">2026.03.22 - 2026.10.03 | 대구 삼성라이온즈파크</div>
-    </a>
-    <a class="ev-card" href="sports.html?team=kt" style="background:linear-gradient(135deg,#111,#333);">
-      <div class="ev-card-title">2026 KBO 리그<br>kt wiz 홈경기</div>
-      <div class="ev-card-meta">2026.03.22 - 2026.10.03 | 수원 kt wiz파크</div>
-    </a>
-  </div>
+  
 
 </div>
 

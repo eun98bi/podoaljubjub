@@ -16,12 +16,12 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .screen{display:none;} .screen.active{display:block;}
 
 /* ── 유틸바 ── */
-.util-bar{background:#fff;border-bottom:1px solid var(--border);height:34px;display:flex;align-items:center;padding:0 20px;font-size:12px;color:var(--muted);}
+/* .util-bar{background:#fff;border-bottom:1px solid var(--border);height:34px;display:flex;align-items:center;padding:0 20px;font-size:12px;color:var(--muted);}
 .util-right{margin-left:auto;display:flex;}
 .util-lk{color:#555;padding:0 10px;border-left:1px solid #eee;cursor:pointer;font-size:12px;}
 .util-lk:first-child{border-left:none;}
 .util-payco{color:var(--blue);font-weight:700;padding:0 10px;border-left:1px solid #eee;font-size:12px;cursor:pointer;}
-.util-flag{font-size:14px;margin-right:4px;}
+.util-flag{font-size:14px;margin-right:4px;} */
 
 /* ── 메인 헤더 ── */
 .main-hd{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:60px;gap:20px;position:sticky;top:0;z-index:200;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
@@ -31,10 +31,8 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 .gnb-item{display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:500;color:#aaa;cursor:pointer;border-bottom:3px solid transparent;text-decoration:none;transition:all 0.12s;white-space:nowrap;}
 .gnb-item:hover{color:#333;}
 .gnb-item.on{color:var(--text);font-weight:700;border-bottom-color:var(--text);}
-.hd-search{margin-left:auto;display:flex;align-items:center;border:1px solid #ccc;border-radius:4px;overflow:hidden;height:36px;min-width:200px;}
-.hd-search input{flex:1;border:none;outline:none;padding:0 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text);}
-.hd-search input::placeholder{color:#bbb;}
-.hd-search-btn{background:none;border:none;border-left:1px solid #eee;width:36px;height:36px;cursor:pointer;font-size:16px;color:#888;}
+.hd-home-link{margin-left:auto;display:flex;align-items:center;gap:5px;padding:6px 14px;border:1px solid #ccc;border-radius:4px;font-size:13px;font-weight:600;color:#555;text-decoration:none;white-space:nowrap;transition:background 0.12s;}
+.hd-home-link:hover{background:#f5f5f5;color:#1a1a1a;}
 
 /* ── 스포츠 서브탭 ── */
 .sport-sub{background:#fff;border-bottom:2px solid #e0e0e0;padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:60px;z-index:190;}
@@ -357,24 +355,21 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 
 <!-- SCREEN A: 스포츠 메인 -->
 <div class="screen active" id="scA">
-  <div class="util-bar">
+  <!-- <div class="util-bar">
     <span class="util-flag">🇰🇷</span><span style="font-size:12px;color:#555;">한국어 ▾</span>
     <div class="util-right">
       <span class="util-lk">로그인</span><span class="util-lk">예매확인/취소</span>
       <span class="util-lk">회원가입</span><span class="util-lk">고객센터</span>
       <span class="util-payco">PAYCO</span><span class="util-lk">관계사 ▾</span>
     </div>
-  </div>
+  </div> -->
   <header class="main-hd">
     <a href="index.html" class="tl-logo"><span class="lt">ticket</span>LINK</a>
     <nav class="gnb">
       <a class="gnb-item" href="index.html">공연/전시</a>
       <a class="gnb-item on">스포츠</a>
     </nav>
-    <div class="hd-search">
-      <input type="text" placeholder="검색어를 입력해 주세요.">
-      <button class="hd-search-btn">🔍</button>
-    </div>
+    <a href="../../index.html" class="hd-home-link">🍇 포도알줍줍 메인으로</a>
   </header>
   <div class="sport-sub">
     <div class="sport-sub-item on">야구<span class="star">★</span></div>
@@ -469,24 +464,21 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 
 <!-- SCREEN B: 구단 상세 + 경기 목록 -->
 <div class="screen" id="scB">
-  <div class="util-bar">
+  <!-- <div class="util-bar">
     <span class="util-flag">🇰🇷</span><span style="font-size:12px;color:#555;">한국어 ▾</span>
     <div class="util-right">
       <span class="util-lk">로그인</span><span class="util-lk">예매확인/취소</span>
       <span class="util-lk">회원가입</span><span class="util-lk">고객센터</span>
       <span class="util-payco">PAYCO</span><span class="util-lk">관계사 ▾</span>
     </div>
-  </div>
+  </div> -->
   <header class="main-hd">
     <a href="index.html" class="tl-logo"><span class="lt">ticket</span>LINK</a>
     <nav class="gnb">
       <a class="gnb-item" href="index.html">공연/전시</a>
       <a class="gnb-item on">스포츠</a>
     </nav>
-    <div class="hd-search">
-      <input type="text" placeholder="검색어를 입력해 주세요.">
-      <button class="hd-search-btn">🔍</button>
-    </div>
+    <a href="../../index.html" class="hd-home-link">🍇 포도알줍줍 메인으로</a>
   </header>
   <div class="sport-sub">
     <div class="sport-sub-item on">야구<span class="star">★</span></div>

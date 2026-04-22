@@ -230,18 +230,25 @@ html,body{
     </div>
   </header>
 
-  <!-- 배너 캐러셀 -->
-  <div class="banner-wrap" id="bannerWrap" onclick="nextBanner()">
-    <div class="banner-slide" id="bannerSlide">
-      <div class="banner-grad"></div>
-      <div class="banner-txt" id="bannerTxt">
-        <div class="banner-title" id="bannerTitle">BNK 금융 2025~2026<br>여자프로농구 플레이오프</div>
-        <div class="banner-date" id="bannerDate">2026.04.08 - 2026.04.17</div>
-        <div class="banner-sub" id="bannerSub">WKBL 플레이오프</div>
-      </div>
+  <!-- 쿠팡 파트너스 배너 -->
+  <div id="cpqOuter" style="overflow:hidden;width:100%;background:#fff;">
+    <div id="cpqInner" style="width:680px;transform-origin:left top;">
+      <script src="https://ads-partners.coupang.com/g.js"></script>
+      <script>
+        new PartnersCoupang.G({"id":982793,"template":"carousel","trackingCode":"AF9566167","width":"680","height":"140","tsource":""});
+      </script>
     </div>
-    <div class="banner-count-badge" id="bannerCount">1 / 7</div>
   </div>
+  <p style="font-size:10px;color:#bbb;padding:3px 14px 6px;text-align:right;background:#fff;">이 배너는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+  <script>
+    (function(){
+      var outer = document.getElementById('cpqOuter');
+      var inner = document.getElementById('cpqInner');
+      var scale = outer.offsetWidth / 680;
+      inner.style.transform = 'scale(' + scale + ')';
+      outer.style.height = Math.ceil(140 * scale) + 'px';
+    })();
+  </script>
 
   <!-- 카테고리 칩 -->
   <div class="cat-section">
@@ -311,36 +318,6 @@ html,body{
 </div>
 
 <script>
-// 배너 데이터
-const banners = [
-  {title:'BNK 금융 2025~2026\n여자프로농구 플레이오프', date:'2026.04.08 - 2026.04.17', sub:'WKBL 플레이오프', bg:'linear-gradient(135deg,#1a2240 0%,#2a3f6e 50%,#1a2240 100%)'},
-  {title:'2026 KBO 리그\nLG 트윈스 홈경기', date:'2026.03.22 - 2026.10.03', sub:'잠실야구장', bg:'linear-gradient(135deg,#001489 0%,#c8102e 100%)'},
-  {title:'2026 KBO 리그\n삼성 라이온즈 홈경기', date:'2026.03.22 - 2026.10.03', sub:'대구 삼성라이온즈파크', bg:'linear-gradient(135deg,#074ca1 0%,#1a5caa 100%)'},
-  {title:'2026 KBO 리그\n한화 이글스 홈경기', date:'2026.03.22 - 2026.10.03', sub:'한화생명이글스파크', bg:'linear-gradient(135deg,#c44214 0%,#f05a28 100%)'},
-  {title:'2026 KBO 리그\nkt wiz 홈경기', date:'2026.03.22 - 2026.10.03', sub:'수원 kt wiz파크', bg:'linear-gradient(135deg,#111 0%,#333 100%)'},
-  {title:'신한 SOL Bank 25-26\n핸드볼 H리그', date:'2025.11.15 - 2026.05.05', sub:'순차오픈', bg:'linear-gradient(135deg,#1a2240 0%,#0d4d8a 100%)'},
-  {title:'홋카이도 닛폰햄 파이터즈\n정규리그 지정석', date:'2026.03.31 - 2026.09.24', sub:'에스콘 필드 홋카이도', bg:'linear-gradient(135deg,#1b3a6b 0%,#4a7fc1 100%)'},
-];
-let curBanner = 0;
-
-function renderBanner(){
-  const b = banners[curBanner];
-  const wrap = document.getElementById('bannerWrap');
-  wrap.style.background = b.bg;
-  document.getElementById('bannerTitle').innerHTML = b.title.replace('\n','<br>');
-  document.getElementById('bannerDate').textContent = b.date;
-  document.getElementById('bannerSub').textContent = b.sub;
-  document.getElementById('bannerCount').textContent = (curBanner+1) + ' / ' + banners.length;
-}
-
-function nextBanner(){
-  curBanner = (curBanner+1) % banners.length;
-  renderBanner();
-}
-
-// 3초마다 자동 넘기기
-setInterval(nextBanner, 3000);
-
 // 카테고리 칩 선택
 function selectCat(el, cat){
   document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('on'));

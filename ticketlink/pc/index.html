@@ -109,14 +109,13 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 
 <div class="sports-body">
 
-  <!-- 배너 -->
-  <div class="banner-slot" id="bannerSlot" onclick="nextBanner()">
-    <div class="banner-slot-grad"></div>
-    <div class="banner-slot-txt">
-      <div class="banner-slot-title" id="bannerTitle">BNK 금융 2025~2026<br>여자프로농구 플레이오프</div>
-      <div class="banner-slot-sub" id="bannerSub">2026.04.08 - 2026.04.17 | WKBL 플레이오프</div>
-    </div>
-    <div class="banner-count" id="bannerCount">1 / 7</div>
+  <!-- 쿠팡 파트너스 배너 -->
+  <div style="margin-bottom:28px;">
+    <script src="https://ads-partners.coupang.com/g.js"></script>
+    <script>
+      new PartnersCoupang.G({"id":982793,"template":"carousel","trackingCode":"AF9566167","width":"680","height":"140","tsource":""});
+    </script>
+    <p style="font-size:10px;color:#bbb;margin-top:4px;text-align:right;">이 배너는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
   </div>
 
   <!-- 팀 그리드 -->
@@ -134,27 +133,5 @@ html,body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text)
 
 <div class="practice-badge" style="position:fixed;bottom:18px;right:18px;background:rgba(0,0,0,0.72);color:#fff;font-size:11px;font-weight:600;padding:7px 13px;border-radius:100px;z-index:9999;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);">🍇 포도알줍줍 연습 모드</div>
 
-<script>
-const BANNERS = [
-  {title:'BNK 금융 2025~2026\n여자프로농구 플레이오프', sub:'2026.04.08 - 2026.04.17 | WKBL 플레이오프', bg:'linear-gradient(135deg,#1a2240 0%,#2a3f6e 50%,#1a2240 100%)'},
-  {title:'2026 KBO 리그\nLG 트윈스 홈경기', sub:'2026.03.22 - 2026.10.03 | 잠실야구장', bg:'linear-gradient(135deg,#001489 0%,#c8102e 100%)'},
-  {title:'2026 KBO 리그\n삼성 라이온즈 홈경기', sub:'2026.03.22 - 2026.10.03 | 대구 삼성라이온즈파크', bg:'linear-gradient(135deg,#074ca1 0%,#1a5caa 100%)'},
-  {title:'2026 KBO 리그\n한화 이글스 홈경기', sub:'2026.03.22 - 2026.10.03 | 한화생명이글스파크', bg:'linear-gradient(135deg,#c44214 0%,#f05a28 100%)'},
-  {title:'2026 KBO 리그\nkt wiz 홈경기', sub:'2026.03.22 - 2026.10.03 | 수원 kt wiz파크', bg:'linear-gradient(135deg,#111 0%,#333 100%)'},
-  {title:'신한 SOL Bank 25-26\n핸드볼 H리그', sub:'2025.11.15 - 2026.05.05 | 순차오픈', bg:'linear-gradient(135deg,#1a2240 0%,#0d4d8a 100%)'},
-  {title:'홋카이도 닛폰햄 파이터즈\n정규리그 지정석', sub:'2026.03.31 - 2026.09.24 | 에스콘 필드 홋카이도', bg:'linear-gradient(135deg,#1b3a6b 0%,#4a7fc1 100%)'},
-];
-let cur = 0;
-function renderBanner(){
-  const b = BANNERS[cur];
-  document.getElementById('bannerSlot').style.background = b.bg;
-  document.getElementById('bannerTitle').innerHTML = b.title.replace('\n','<br>');
-  document.getElementById('bannerSub').textContent = b.sub;
-  document.getElementById('bannerCount').textContent = (cur+1) + ' / ' + BANNERS.length;
-}
-function nextBanner(){cur=(cur+1)%BANNERS.length;renderBanner();}
-renderBanner();
-setInterval(nextBanner,3000);
-</script>
 </body>
 </html>

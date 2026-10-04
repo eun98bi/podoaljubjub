@@ -1,0 +1,295 @@
+/* ================================================================
+   포도알줍줍 — 공통 스타일 (메인 · 소개 · 개인정보처리방침 · 가이드)
+================================================================ */
+
+:root {
+  --bg: #f5f3ff;
+  --surface: #ffffff;
+  --surface2: #ede9ff;
+  --border: rgba(0,0,0,0.09);
+  --text: #1a1824;
+  --muted: #6b6882;
+  --accent: #6c5ce7;
+  --accent2: #4f3fba;
+  --green: #00a67a;
+  --amber: #b86d00;
+  --pink: #c92b6a;
+  --radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+a { color: inherit; }
+
+/* ── 배경 그라데이션 ── */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(108,92,231,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 80% 80%, rgba(0,180,130,0.07) 0%, transparent 70%);
+}
+
+/* ── NAV ── */
+.site-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 60px;
+  background: rgba(245,243,255,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-grape { font-size: 22px; line-height: 1; }
+.logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.logo-text span { color: var(--accent2); }
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover,
+.nav-links a.on { color: var(--text); }
+
+/* ── 버튼 ── */
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+}
+.btn-primary:hover {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(108,92,231,0.4);
+}
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: var(--surface2);
+  border-color: rgba(0,0,0,0.15);
+}
+
+/* ── SECTION ── */
+.section {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 72px 24px;
+}
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent2);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'DM Serif Display', 'Noto Sans KR', serif;
+  font-size: clamp(26px, 4.5vw, 40px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 36px;
+  color: var(--text);
+}
+.section-title.ko {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: clamp(22px, 4vw, 32px);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── 본문 문서형 페이지 (소개 · 개인정보) ── */
+.doc {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 108px 24px 72px;
+}
+.doc h1 {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.doc .doc-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 40px;
+}
+.doc h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 36px 0 12px;
+  letter-spacing: -0.01em;
+}
+.doc p,
+.doc li {
+  font-size: 15px;
+  color: #3a3748;
+  line-height: 1.8;
+}
+.doc p + p { margin-top: 10px; }
+.doc ul { padding-left: 20px; margin-top: 8px; }
+.doc li + li { margin-top: 4px; }
+.doc .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-top: 16px;
+}
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.doc th,
+.doc td {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.doc th { background: var(--surface2); font-weight: 600; }
+.doc td { background: var(--surface); }
+
+/* ── 광고 / 제휴 영역 ── */
+.ad-slot {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+.ad-disclosure {
+  font-size: 10px;
+  color: rgba(0,0,0,0.38);
+  margin-top: 6px;
+}
+
+/* ── FOOTER ── */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 32px 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-left { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.footer-left strong { color: var(--text); }
+.footer-disclaimer {
+  font-size: 11px;
+  color: rgba(0,0,0,0.38);
+  margin-top: 4px;
+}
+.footer-links {
+  display: flex;
+  gap: 18px;
+  list-style: none;
+  font-size: 12px;
+}
+.footer-links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.footer-links a:hover { color: var(--text); text-decoration: underline; }
+
+/* ── SCROLL FADE IN ── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-up { opacity: 1; transform: none; transition: none; }
+}
+
+@media (max-width: 600px) {
+  .site-nav { padding: 0 16px; }
+  .nav-links { gap: 14px; }
+  .nav-links a { font-size: 12px; }
+  .section { padding: 48px 16px; }
+  .doc { padding: 88px 16px 48px; }
+  .ad-slot { padding: 0 16px; }
+  .site-footer { padding: 24px 16px; flex-direction: column; gap: 12px; }
+}
+@media (max-width: 380px) {
+  .nav-links .nav-hide-xs { display: none; }
+}

@@ -57,3 +57,34 @@ export function drawCaptcha(canvas, text) {
     ctx.stroke();
   }
 }
+
+// 한글 자판 상태로 친 글자를 두벌식 자판 위치의 영문으로 되돌린다. (ㅎㄱ엠 → GRDPA)
+const KEY = {
+  ㅂ: 'Q', ㅈ: 'W', ㄷ: 'E', ㄱ: 'R', ㅅ: 'T', ㅛ: 'Y', ㅕ: 'U', ㅑ: 'I', ㅐ: 'O', ㅔ: 'P',
+  ㅁ: 'A', ㄴ: 'S', ㅇ: 'D', ㄹ: 'F', ㅎ: 'G', ㅗ: 'H', ㅓ: 'J', ㅏ: 'K', ㅣ: 'L',
+  ㅋ: 'Z', ㅌ: 'X', ㅊ: 'C', ㅍ: 'V', ㅠ: 'B', ㅜ: 'N', ㅡ: 'M',
+  ㅃ: 'Q', ㅉ: 'W', ㄸ: 'E', ㄲ: 'R', ㅆ: 'T', ㅒ: 'O', ㅖ: 'P',
+  ㅘ: 'HK', ㅙ: 'HO', ㅚ: 'HL', ㅝ: 'NJ', ㅞ: 'NP', ㅟ: 'NL', ㅢ: 'ML',
+  ㄳ: 'RT', ㄵ: 'SW', ㄶ: 'SG', ㄺ: 'FR', ㄻ: 'FA', ㄼ: 'FQ', ㄽ: 'FT', ㄾ: 'FX', ㄿ: 'FV', ㅀ: 'FG', ㅄ: 'QT',
+};
+const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+const JUNG = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ';
+const JONG = ['', ...'ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ'];
+
+export const hasHangul = s => /[ㄱ-ㅣ가-힣]/.test(s);
+
+export function normalizeCaptchaInput(raw) {
+  let out = '';
+  for (const ch of raw) {
+    const code = ch.charCodeAt(0);
+    if (code >= 0xac00 && code <= 0xd7a3) {
+      const i = code - 0xac00;
+      out += KEY[CHO[Math.floor(i / 588)]] + KEY[JUNG[Math.floor((i % 588) / 28)]] + (JONG[i % 28] ? KEY[JONG[i % 28]] : '');
+    } else if (KEY[ch]) {
+      out += KEY[ch];
+    } else {
+      out += ch;
+    }
+  }
+  return out.toUpperCase().replace(/[^A-Z]/g, '');
+}

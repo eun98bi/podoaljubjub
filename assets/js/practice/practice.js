@@ -7,7 +7,7 @@ import { TEAMS } from '../data/teams.js';
 import { PLATFORMS, LEVELS, OPEN_DELAY_SEC, FEE_PER_TICKET } from '../data/platforms.js';
 import { $, $$, esc, won, clock, dateLabel, sec, mmss, dialog, toast, setLayerRoot } from './ui.js';
 import { SeatMap } from './seats.js';
-import { newCaptcha, drawCaptcha } from './captcha.js';
+import { newCaptcha, drawCaptcha, normalizeCaptchaInput, hasHangul } from './captcha.js';
 import { loadRecords, saveRecord, bestRecord } from '../records.js';
 
 /* ── 설정 읽기 ── */
@@ -399,7 +399,8 @@ function renderSeat(body) {
     const input = $('#capInput', body);
     input.focus();
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitCaptcha(); } });
-    input.addEventListener('input', () => { input.value = input.value.toUpperCase().replace(/[^A-Z]/g, ''); });
+    // 입력 중에는 값을 고치지 않는다. 한글 조합이나 모바일 키보드 입력이 깨지기 때문.
+    input.addEventListener('input', () => { $('#capKo', body).hidden = !hasHangul(input.value); });
   }
 }
 
@@ -457,9 +458,10 @@ function captchaHTML() {
           <canvas id="capCanvas" width="280" height="80" aria-label="보안문자 이미지"></canvas>
           <button class="cap-refresh" data-act="cap-refresh" aria-label="새 보안문자">↻</button>
         </div>
-        <input id="capInput" class="cap-input" maxlength="6" autocomplete="off" autocapitalize="characters"
-          spellcheck="false" placeholder="문자를 입력해주세요" aria-label="보안문자 입력">
+        <input id="capInput" class="cap-input" maxlength="12" autocomplete="off" autocapitalize="characters"
+          autocorrect="off" lang="en" inputmode="text" spellcheck="false" placeholder="문자를 입력해주세요" aria-label="보안문자 입력">
         <p class="cap-hint">대소문자 구분 없이 입력하세요.</p>
+        <p class="cap-ko" id="capKo" hidden>한글로 입력되고 있어요. 한/영 키를 눌러 영문으로 바꿔주세요.</p>
         <div class="cap-btns">
           <button class="btn-line" data-act="win-close">날짜 다시 선택</button>
           <button class="btn-dark" data-act="cap-submit">입력 완료</button>
@@ -470,7 +472,7 @@ function captchaHTML() {
 
 async function submitCaptcha() {
   const input = $('#capInput', winEl);
-  const v = (input?.value || '').trim().toUpperCase();
+  const v = normalizeCaptchaInput(input?.value || '');
   if (!v) { await dialog('보안문자를 입력해주세요.'); input?.focus(); return; }
   if (v !== S.captcha) {
     S.n.captchaWrong++;

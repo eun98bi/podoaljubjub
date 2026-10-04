@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>야구 예매 연습 — 포도알줍줍</title>
+<meta name="description" content="정각 오픈, 대기열, 보안문자, 좌석 선택, 결제까지 실제 순서대로 야구 티켓팅을 연습하세요.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/practice.css">
+</head>
+<body class="practice">
+
+<header class="pbar">
+  <a class="pbar-logo" href="../index.html">🍇 <span>포도알줍줍</span></a>
+  <span class="pbar-info" id="pbarInfo"></span>
+  <span class="pbar-cd" id="pbarCountdown"></span>
+  <span class="pbar-clock" title="서버시간">서버시간 <b id="pbarClock">--:--:--</b></span>
+  <div class="pbar-opts">
+    <div class="segs" id="pbarLevel" aria-label="난이도"></div>
+    <div class="segs" id="pbarDevice" aria-label="기기"></div>
+    <a class="pbar-restart" id="pbarRestart" href="#">↻ 처음부터</a>
+  </div>
+</header>
+
+<div class="stage" id="stage">
+  <div class="app" id="app"></div>
+</div>
+
+<aside class="practice-ad">
+  <script src="https://ads-partners.coupang.com/g.js"></script>
+  <script>
+    if (window.PartnersCoupang) new PartnersCoupang.G({"id":982793,"template":"carousel","trackingCode":"AF9566167","width":"680","height":"140","tsource":""});
+  </script>
+  <p>이 배너는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+</aside>
+
+<noscript><p style="padding:24px;text-align:center;">연습 화면을 보려면 자바스크립트를 켜주세요.</p></noscript>
+<script type="module" src="../assets/js/practice/practice.js"></script>
+</body>
+</html>

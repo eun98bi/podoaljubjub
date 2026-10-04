@@ -1,0 +1,255 @@
+/* ================================================================
+   포도알줍줍 — 메인 페이지
+================================================================ */
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 128px 24px 48px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 100px;
+  margin-bottom: 22px;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(43px, 7.2vw, 79px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.hero h1 em { font-style: italic; color: var(--accent2); }
+.hero-ko {
+  font-size: clamp(18px, 2.9vw, 25px);
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+.hero-desc {
+  max-width: 540px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ── 예매처 ── */
+.pf {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+}
+.pf-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pf-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.pf-name { font-size: 22px; font-weight: 900; letter-spacing: -0.03em; }
+.pf-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+.pf-status.ready { background: rgba(0,210,160,0.12); color: var(--green); border: 1px solid rgba(0,210,160,0.28); }
+.pf-status.soon { background: rgba(255,169,77,0.12); color: var(--amber); border: 1px solid rgba(255,169,77,0.28); }
+.pf-tags { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.pf-tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: var(--surface2);
+  color: var(--accent2);
+}
+.pf-desc { font-size: 14px; color: var(--muted); margin: 10px 0 18px; line-height: 1.7; }
+.pf-tips {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 18px;
+  font-size: 13px;
+  color: #4a4760;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.pf-tips li { padding-left: 16px; position: relative; line-height: 1.6; }
+.pf-tips li::before { content: '•'; position: absolute; left: 4px; color: var(--accent); }
+
+.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.team-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.team-card:hover { border-color: rgba(108,92,231,0.35); box-shadow: 0 10px 28px rgba(108,92,231,0.12); transform: translateY(-2px); }
+.team-emoji {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.team-name { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+.team-venue { font-size: 12px; color: var(--muted); margin: 2px 0 12px; }
+.team-btns { display: flex; gap: 6px; width: 100%; }
+.team-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--accent2);
+  background: rgba(108,92,231,0.08);
+  border: 1px solid rgba(108,92,231,0.22);
+  transition: background 0.15s;
+}
+.team-btn:hover { background: rgba(108,92,231,0.18); }
+.pf-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+.pf-soon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.pf-soon { padding: 20px; border-radius: 16px; }
+.pf-soon .pf-name { font-size: 17px; }
+.pf-soon .pf-desc { font-size: 13px; margin: 8px 0 0; }
+.pf-soon .pf-tags { margin-left: 0; margin-top: 10px; }
+
+/* ── 내 기록 ── */
+.rec-box {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-top: 12px;
+}
+.rec-box .rec-ico { font-size: 26px; }
+.rec-box .rec-main { flex: 1; font-size: 14px; color: var(--muted); }
+.rec-box .rec-main b { color: var(--text); font-size: 17px; }
+.rec-box a { font-size: 13px; font-weight: 700; color: var(--accent2); text-decoration: none; white-space: nowrap; }
+
+/* ── 연습 순서 ── */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+}
+.step-num { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--accent); line-height: 1; margin-bottom: 10px; }
+.step-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.01em; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.step a { color: var(--accent2); font-weight: 600; text-decoration: none; }
+.step a:hover { text-decoration: underline; }
+
+/* ── 난이도 ── */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.level {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.level-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.level ul { list-style: none; font-size: 13px; color: var(--muted); line-height: 1.9; }
+.level b { color: var(--text); font-weight: 600; }
+
+/* ── 흐름 ── */
+.flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.flow-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.flow-arrow { color: var(--muted); font-size: 12px; }
+.flow-desc { font-size: 14px; color: var(--muted); margin-top: 18px; line-height: 1.8; }
+
+/* ── 체크리스트 배너 ── */
+.check-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(135deg, #4c1d95 0%, #6c5ce7 100%);
+  color: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.check-banner:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(76,29,149,0.35); }
+.check-banner-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.check-banner-sub { font-size: 13px; opacity: 0.85; }
+.check-banner-go { flex-shrink: 0; background: #fff; color: var(--accent2); font-weight: 700; font-size: 13px; padding: 10px 18px; border-radius: 10px; }
+
+/* ── FAQ ── */
+.faq details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 20px; }
+.faq details + details { margin-top: 8px; }
+.faq summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 16px 0;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; color: var(--muted); font-size: 20px; font-weight: 300; }
+.faq details[open] summary::after { content: '−'; }
+.faq p { font-size: 14px; color: var(--muted); line-height: 1.8; padding-bottom: 18px; }
+
+@media (max-width: 760px) {
+  .pf { padding: 20px 16px; border-radius: 16px; }
+  .pf-tags { margin-left: 0; width: 100%; }
+  .pf-tips { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .pf-soon-grid, .steps, .levels { grid-template-columns: 1fr; gap: 8px; }
+}
+@media (max-width: 600px) {
+  .hero { padding: 100px 16px 32px; }
+  .hero h1 { font-size: clamp(36px, 11vw, 52px); }
+  .hero-desc { font-size: 14px; }
+  .hero-cta { flex-direction: column; align-items: stretch; width: 100%; max-width: 300px; }
+  .team-card { padding: 16px 10px 12px; }
+  .check-banner { flex-direction: column; align-items: flex-start; padding: 22px 20px; }
+  .rec-box { padding: 16px; gap: 12px; }
+}
+@media (max-width: 340px) {
+  .team-grid { grid-template-columns: 1fr; }
+}

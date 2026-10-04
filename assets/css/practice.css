@@ -525,3 +525,9 @@ button { cursor: pointer; }
 .res-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 22px 0 12px; }
 .res-btns a { height: 40px; }
 .res-card > .muted { text-align: center; }
+
+/* ── 제휴 배너 ── */
+.practice-ad { padding: 20px 16px 28px; text-align: center; overflow: hidden; background: #f2f2f5; }
+.stage.dev-mobile + .practice-ad { background: #2a2733; }
+.practice-ad iframe { max-width: 100%; }
+.practice-ad p { font-size: 10px; color: #999; margin-top: 6px; }

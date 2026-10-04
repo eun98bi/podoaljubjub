@@ -293,3 +293,4 @@ a { color: inherit; }
 @media (max-width: 380px) {
   .nav-links .nav-hide-xs { display: none; }
 }
+.doc .ad-disclosure { font-size: 10px; color: rgba(0,0,0,0.38); line-height: 1.5; }

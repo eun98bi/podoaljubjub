@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>내 기록 — 포도알줍줍</title>
+<meta name="description" content="티켓팅 연습 기록: 난이도별 최고 기록, 단계별 소요시간, 최근 연습 내역.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/base.css">
+<style>
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 28px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+  .tile span { display: block; font-size: 12px; color: var(--muted); }
+  .tile b { display: block; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .tile small { font-size: 12px; color: var(--muted); }
+  .rec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .rec-head h2 { margin: 0; }
+  .btn-clear { font-size: 12px; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-family: inherit; }
+  .btn-clear:hover { color: var(--pink); border-color: var(--pink); }
+  .tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .rec-tbl { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+  .rec-tbl th, .rec-tbl td { padding: 10px 9px; text-align: right; border-bottom: 1px solid var(--border); }
+  .rec-tbl th { background: var(--surface2); font-weight: 600; font-size: 12px; color: #4a4760; }
+  .rec-tbl th:nth-child(-n+4), .rec-tbl td:nth-child(-n+4) { text-align: left; }
+  .rec-tbl tr:last-child td { border-bottom: none; }
+  .rec-tbl td { font-variant-numeric: tabular-nums; }
+  .ok { color: var(--green); font-weight: 700; }
+  .fail { color: var(--pink); font-weight: 700; }
+  .total { font-weight: 700; }
+  .empty { text-align: center; padding: 48px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+  .empty p { color: var(--muted); margin: 8px 0 18px; }
+  @media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav class="site-nav">
+  <a href="index.html" class="logo">
+    <span class="logo-grape">🍇</span>
+    <span class="logo-text">포도알<span>줍줍</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#platforms">연습하기</a></li>
+    <li><a href="records.html" class="on">내 기록</a></li>
+    <li><a href="guide/checklist.html">체크리스트</a></li>
+    <li class="nav-hide-xs"><a href="about.html">소개</a></li>
+  </ul>
+</nav>
+
+<main class="doc" style="max-width:980px;">
+  <h1>내 기록</h1>
+  <p class="doc-meta">이 브라우저에 저장된 연습 기록입니다. 다른 기기에서는 보이지 않아요.</p>
+  <div id="root"></div>
+</main>
+
+<div class="divider"></div>
+
+<footer class="site-footer">
+  <div class="footer-left">
+    <strong>🍇 포도알줍줍</strong><br>
+    티켓팅 연습 플랫폼
+    <p class="footer-disclaimer">이 사이트는 연습용으로 제작되었습니다. 실제 티켓 구매는 불가하며, 각 예매처와 관련이 없습니다.</p>
+  </div>
+  <ul class="footer-links">
+    <li><a href="about.html">소개</a></li>
+    <li><a href="privacy.html">개인정보처리방침</a></li>
+    <li><a href="guide/checklist.html">체크리스트</a></li>
+  </ul>
+</footer>
+
+<script type="module">
+  import { loadRecords, clearRecords, bestRecord } from './assets/js/records.js';
+  import { TEAMS } from './assets/js/data/teams.js';
+  import { PLATFORMS, LEVELS } from './assets/js/data/platforms.js';
+  import { sec, esc } from './assets/js/practice/ui.js';
+
+  const root = document.getElementById('root');
+  const REASON = { soldout: '매진', timeout: '시간 초과' };
+
+  function render() {
+    const list = loadRecords();
+    if (!list.length) {
+      root.innerHTML = `
+        <div class="empty">
+          <div style="font-size:36px">⏱</div>
+          <p>아직 연습 기록이 없어요.</p>
+          <a class="btn-primary" href="index.html#platforms">첫 연습 시작하기</a>
+        </div>`;
+      return;
+    }
+    const ok = list.filter(r => r.success);
+    const reactions = list.map(r => r.reaction).filter(v => v != null && v >= 0);
+    const avgReaction = reactions.length ? reactions.reduce((a, b) => a + b, 0) / reactions.length : null;
+    const bestTiles = Object.entries(LEVELS).map(([id, l]) => {
+      const b = bestRecord(list, 'tl', id);
+      return `<div class="tile"><span>${l.label} 최고 기록</span><b>${b ? sec(b.total) : '—'}</b></div>`;
+    }).join('');
+
+    const rows = list.map(r => {
+      const d = new Date(r.date);
+      const when = `${d.getMonth() + 1}.${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      return `<tr>
+        <td>${when}</td>
+        <td>${esc(PLATFORMS[r.platform]?.name || r.platform)} · ${esc(TEAMS[r.team]?.name || r.team)}</td>
+        <td>${esc(LEVELS[r.level]?.label || r.level)} · ${r.device === 'pc' ? 'PC' : '모바일'}</td>
+        <td>${r.success ? '<span class="ok">성공</span>' : `<span class="fail">실패 · ${REASON[r.reason] || ''}</span>`}</td>
+        <td>${sec(r.reaction)}</td>
+        <td>${sec(r.queue)}</td>
+        <td>${sec(r.captcha)}${r.captchaWrong ? ` <small>(오답 ${r.captchaWrong})</small>` : ''}</td>
+        <td>${sec(r.seat)}${r.conflict ? ` <small>(이선좌 ${r.conflict})</small>` : ''}</td>
+        <td>${sec(r.pay)}</td>
+        <td class="total">${sec(r.total)}</td>
+      </tr>`;
+    }).join('');
+
+    root.innerHTML = `
+      <div class="tiles">
+        <div class="tile"><span>연습 횟수</span><b>${list.length}회</b><small>성공 ${ok.length}회 · 성공률 ${Math.round(ok.length / list.length * 100)}%</small></div>
+        ${bestTiles}
+      </div>
+      <div class="tiles" style="grid-template-columns:1fr;">
+        <div class="tile"><span>평균 반응 속도 (오픈 → 예매하기 클릭)</span><b>${sec(avgReaction)}</b></div>
+      </div>
+      <div class="rec-head">
+        <h2>연습 내역</h2>
+        <button class="btn-clear" id="clearBtn">기록 모두 지우기</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="rec-tbl">
+          <thead><tr>
+            <th>날짜</th><th>예매처 · 구단</th><th>난이도</th><th>결과</th>
+            <th>반응</th><th>대기열</th><th>보안문자</th><th>좌석</th><th>권종·결제</th><th>총 소요</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+    document.getElementById('clearBtn').onclick = () => {
+      if (confirm('연습 기록을 모두 지울까요? 되돌릴 수 없습니다.')) { clearRecords(); render(); }
+    };
+  }
+  render();
+</script>
+</body>
+</html>

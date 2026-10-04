@@ -3,357 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포도알줍줍 — 야구 티켓팅 연습 플랫폼</title>
-<meta name="description" content="정각에 실패하지 않게. 대기열, 보안문자, 좌석 선택, 결제까지 실제 예매 화면과 같은 순서로 야구 티켓팅을 미리 연습하세요.">
-<meta property="og:title" content="포도알줍줍 — 야구 티켓팅 연습">
-<meta property="og:description" content="대기열부터 결제까지, 실전 같은 티켓팅 연습.">
+<title>포도알줍줍 — 티켓팅 연습 플랫폼</title>
+<meta name="description" content="정각에 실패하지 않게. 정각 오픈, 대기열, 보안문자, 좌석 선택, 결제까지 실제 예매 순서대로 야구 티켓팅을 연습하고 기록을 줄여보세요.">
+<meta property="og:title" content="포도알줍줍 — 티켓팅 연습 플랫폼">
+<meta property="og:description" content="정각 오픈부터 결제까지, 실전 같은 티켓팅 연습.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://podoaljubjub.com/">
 <link rel="canonical" href="https://podoaljubjub.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/base.css">
-
+<link rel="stylesheet" href="assets/css/home.css">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9627798603529985"
      crossorigin="anonymous"></script>
-
-<style>
-  /* ── HERO ── */
-  .hero {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 132px 24px 56px;
-  }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent2);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 5px 12px;
-    border-radius: 100px;
-    margin-bottom: 22px;
-  }
-  .hero h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(43px, 7.2vw, 79px);
-    font-weight: 400;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 14px;
-  }
-  .hero h1 em { font-style: italic; color: var(--accent2); }
-  .hero-ko {
-    font-size: clamp(18px, 2.9vw, 25px);
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 12px;
-    letter-spacing: -0.02em;
-  }
-  .hero-desc {
-    max-width: 520px;
-    font-size: 15px;
-    line-height: 1.75;
-    color: var(--muted);
-    margin-bottom: 36px;
-  }
-  .hero-cta {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  /* ── 구단 선택 ── */
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .team-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px 18px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: all 0.25s;
-  }
-  .team-card:hover {
-    border-color: rgba(0,0,0,0.18);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(108,92,231,0.12);
-  }
-  .team-emoji {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    margin-bottom: 12px;
-  }
-  .team-name { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
-  .team-venue { font-size: 12px; color: var(--muted); margin: 2px 0 14px; }
-  .team-btns { display: flex; gap: 6px; width: 100%; }
-  .team-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px 4px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: none;
-    color: var(--accent2);
-    background: rgba(108,92,231,0.08);
-    border: 1px solid rgba(108,92,231,0.22);
-    transition: background 0.15s;
-  }
-  .team-btn:hover { background: rgba(108,92,231,0.18); }
-  .team-note {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 14px;
-  }
-
-  /* ── 플랫폼 ── */
-  .platforms {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .platform-card {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 18px;
-  }
-  .platform-card.soon { opacity: 0.55; }
-  .platform-dot { width: 10px; height: 10px; border-radius: 50%; margin-bottom: 12px; }
-  .tl .platform-dot { background: #378ADD; }
-  .ml .platform-dot { background: #EF9F27; }
-  .y2 .platform-dot { background: #7F77DD; }
-  .ip .platform-dot { background: #D85A30; }
-  .platform-name { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
-  .platform-sub { font-size: 12px; color: var(--muted); }
-  .platform-status {
-    position: absolute;
-    top: 16px; right: 14px;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 100px;
-  }
-  .status-ready { background: rgba(0,210,160,0.12); color: var(--green); border: 1px solid rgba(0,210,160,0.25); }
-  .status-soon { background: rgba(255,169,77,0.12); color: var(--amber); border: 1px solid rgba(255,169,77,0.25); }
-
-  /* ── 연습 순서 ── */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    counter-reset: step;
-  }
-  .step {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px 20px;
-  }
-  .step-num {
-    font-family: 'DM Serif Display', serif;
-    font-size: 30px;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 10px;
-  }
-  .step-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.01em; }
-  .step-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
-  .step a { color: var(--accent2); font-weight: 600; text-decoration: none; }
-  .step a:hover { text-decoration: underline; }
-
-  /* ── 흐름 ── */
-  .flow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-  }
-  .flow-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 500;
-  }
-  .flow-arrow { color: var(--muted); font-size: 12px; }
-  .flow-desc { font-size: 14px; color: var(--muted); margin-top: 18px; line-height: 1.8; }
-
-  /* ── 체크리스트 배너 ── */
-  .check-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    background: linear-gradient(135deg, #4c1d95 0%, #6c5ce7 100%);
-    color: #fff;
-    border-radius: 20px;
-    padding: 28px 32px;
-    text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .check-banner:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(76,29,149,0.35); }
-  .check-banner-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
-  .check-banner-sub { font-size: 13px; opacity: 0.85; }
-  .check-banner-go {
-    flex-shrink: 0;
-    background: #fff;
-    color: var(--accent2);
-    font-weight: 700;
-    font-size: 13px;
-    padding: 10px 18px;
-    border-radius: 10px;
-  }
-
-  /* ── FAQ ── */
-  .faq details {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0 20px;
-  }
-  .faq details + details { margin-top: 8px; }
-  .faq summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 16px 0;
-    font-size: 15px;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
-  .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::after { content: '+'; color: var(--muted); font-size: 20px; font-weight: 300; }
-  .faq details[open] summary::after { content: '−'; }
-  .faq p { font-size: 14px; color: var(--muted); line-height: 1.8; padding-bottom: 18px; }
-
-  @media (max-width: 760px) {
-    .team-grid, .platforms { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .steps { grid-template-columns: 1fr; gap: 8px; }
-  }
-  @media (max-width: 600px) {
-    .hero { padding: 104px 16px 40px; }
-    .hero h1 { font-size: clamp(36px, 11vw, 52px); }
-    .hero-desc { font-size: 14px; }
-    .hero-cta { flex-direction: column; align-items: stretch; width: 100%; max-width: 300px; }
-    .team-card { padding: 18px 12px 14px; }
-    .platform-card { padding: 16px 12px; }
-    .check-banner { flex-direction: column; align-items: flex-start; padding: 22px 20px; }
-  }
-  @media (max-width: 360px) {
-    .team-grid, .platforms { grid-template-columns: 1fr; }
-  }
-</style>
 </head>
 <body>
 
 <div class="bg-glow"></div>
 
-<!-- NAV -->
 <nav class="site-nav">
   <a href="index.html" class="logo">
     <span class="logo-grape">🍇</span>
     <span class="logo-text">포도알<span>줍줍</span></span>
   </a>
   <ul class="nav-links">
-    <li><a href="#teams">연습하기</a></li>
-    <li><a href="guide/checklist.html">준비 체크리스트</a></li>
+    <li><a href="#platforms">연습하기</a></li>
+    <li><a href="records.html">내 기록</a></li>
+    <li><a href="guide/checklist.html">체크리스트</a></li>
     <li class="nav-hide-xs"><a href="about.html">소개</a></li>
   </ul>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <span class="hero-badge">⚾ 2026 KBO 홈경기 예매 연습</span>
+  <span class="hero-badge">⚾ 야구 예매 연습 오픈</span>
   <h1>Ticket<br><em>Practice</em></h1>
   <p class="hero-ko">정각에 실패하지 않게.</p>
   <p class="hero-desc">
-    대기열, 보안문자, 좌석 선택, 결제까지.<br>
-    실제 예매 화면과 같은 순서로 미리 연습하고 실전에서 성공하세요.
+    정각 오픈, 대기열, 보안문자, 좌석 선택, 결제까지.<br>
+    실제 예매와 같은 순서로 연습하고 내 기록을 줄여보세요.
   </p>
   <div class="hero-cta">
-    <a href="ticketlink/pc/index.html" class="btn-primary">🖥 PC로 연습하기</a>
-    <a href="ticketlink/mobile/index.html" class="btn-secondary">📱 모바일로 연습하기</a>
+    <a href="#platforms" class="btn-primary">연습 시작하기</a>
+    <a href="guide/checklist.html" class="btn-secondary">🗒 전날 체크리스트</a>
   </div>
 </section>
 
-<!-- 구단 선택 -->
-<section class="section" id="teams" style="padding-top:24px;">
-  <p class="section-label">Teams</p>
-  <h2 class="section-title ko">응원하는 구단으로 바로 연습</h2>
-  <div class="team-grid">
-    <div class="team-card fade-up">
-      <div class="team-emoji">❤️</div>
-      <div class="team-name">LG 트윈스</div>
-      <div class="team-venue">서울 잠실야구장</div>
-      <div class="team-btns">
-        <a class="team-btn" href="ticketlink/pc/sports.html?team=lg">🖥 PC</a>
-        <a class="team-btn" href="ticketlink/mobile/sports.html?team=lg">📱 모바일</a>
+<!-- 예매처별 연습 -->
+<section class="section" id="platforms" style="padding-top:16px;">
+  <p class="section-label">Platforms</p>
+  <h2 class="section-title ko">예매처별로 연습하기</h2>
+
+  <article class="pf fade-up">
+    <div class="pf-head">
+      <span class="pf-dot" style="background:#378ADD"></span>
+      <h3 class="pf-name">T켓링크</h3>
+      <span class="pf-status ready">연습 가능</span>
+      <div class="pf-tags">
+        <span class="pf-tag">야구</span><span class="pf-tag">PC</span><span class="pf-tag">모바일</span>
       </div>
     </div>
-    <div class="team-card fade-up">
-      <div class="team-emoji">🦅</div>
-      <div class="team-name">한화 이글스</div>
-      <div class="team-venue">대전 한화생명이글스파크</div>
-      <div class="team-btns">
-        <a class="team-btn" href="ticketlink/pc/sports.html?team=hanwha">🖥 PC</a>
-        <a class="team-btn" href="ticketlink/mobile/sports.html?team=hanwha">📱 모바일</a>
+    <p class="pf-desc">구단을 고르면 경기 목록에서 정각 오픈을 기다리는 것부터 시작해요. PC는 예매창이 팝업으로, 모바일은 한 화면씩 넘어갑니다.</p>
+    <ul class="pf-tips">
+      <li>정각이 되면 예매하기 버튼이 바로 켜져요.</li>
+      <li>대기열 창을 닫거나 새로고침하면 순번이 처음으로 돌아가요.</li>
+      <li>클린예매 경기는 보안문자를 입력해야 좌석 화면으로 들어가요.</li>
+      <li>좌석 배치도는 새로고침해야 최신 상태가 보여요.</li>
+    </ul>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-emoji">❤️</div>
+        <div class="team-name">LG 트윈스</div>
+        <div class="team-venue">서울 잠실야구장</div>
+        <div class="team-btns">
+          <a class="team-btn" href="practice/?p=tl&amp;team=lg&amp;device=pc">🖥 PC</a>
+          <a class="team-btn" href="practice/?p=tl&amp;team=lg&amp;device=mobile">📱 모바일</a>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-emoji">🦅</div>
+        <div class="team-name">한화 이글스</div>
+        <div class="team-venue">대전 한화생명 볼파크</div>
+        <div class="team-btns">
+          <a class="team-btn" href="practice/?p=tl&amp;team=hanwha&amp;device=pc">🖥 PC</a>
+          <a class="team-btn" href="practice/?p=tl&amp;team=hanwha&amp;device=mobile">📱 모바일</a>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-emoji">🦁</div>
+        <div class="team-name">삼성 라이온즈</div>
+        <div class="team-venue">대구 삼성라이온즈파크</div>
+        <div class="team-btns">
+          <a class="team-btn" href="practice/?p=tl&amp;team=samsung&amp;device=pc">🖥 PC</a>
+          <a class="team-btn" href="practice/?p=tl&amp;team=samsung&amp;device=mobile">📱 모바일</a>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-emoji">🖤</div>
+        <div class="team-name">kt wiz</div>
+        <div class="team-venue">수원 kt위즈파크</div>
+        <div class="team-btns">
+          <a class="team-btn" href="practice/?p=tl&amp;team=kt&amp;device=pc">🖥 PC</a>
+          <a class="team-btn" href="practice/?p=tl&amp;team=kt&amp;device=mobile">📱 모바일</a>
+        </div>
       </div>
     </div>
-    <div class="team-card fade-up">
-      <div class="team-emoji">🦁</div>
-      <div class="team-name">삼성 라이온즈</div>
-      <div class="team-venue">대구 삼성라이온즈파크</div>
-      <div class="team-btns">
-        <a class="team-btn" href="ticketlink/pc/sports.html?team=samsung">🖥 PC</a>
-        <a class="team-btn" href="ticketlink/mobile/sports.html?team=samsung">📱 모바일</a>
+    <p class="pf-note">다른 구단도 차례대로 추가할 예정입니다. 연습 화면 위쪽에서 난이도를 바꿀 수 있어요.</p>
+  </article>
+
+  <div class="pf-soon-grid">
+    <article class="pf pf-soon fade-up">
+      <div class="pf-head">
+        <span class="pf-dot" style="background:#D85A30"></span>
+        <h3 class="pf-name">N0L (인터P크)</h3>
+        <span class="pf-status soon">준비 중</span>
       </div>
-    </div>
-    <div class="team-card fade-up">
-      <div class="team-emoji">🖤</div>
-      <div class="team-name">kt wiz</div>
-      <div class="team-venue">수원 KT 위즈파크</div>
-      <div class="team-btns">
-        <a class="team-btn" href="ticketlink/pc/sports.html?team=kt">🖥 PC</a>
-        <a class="team-btn" href="ticketlink/mobile/sports.html?team=kt">📱 모바일</a>
+      <p class="pf-desc">예매하기 버튼 위 타이머, 한 계정 한 기기 접속</p>
+      <div class="pf-tags"><span class="pf-tag">야구</span><span class="pf-tag">공연</span></div>
+    </article>
+    <article class="pf pf-soon fade-up">
+      <div class="pf-head">
+        <span class="pf-dot" style="background:#EF9F27"></span>
+        <h3 class="pf-name">멜론T켓</h3>
+        <span class="pf-status soon">준비 중</span>
       </div>
-    </div>
+      <p class="pf-desc">오픈 시각에 예매 화면으로 자동 이동</p>
+      <div class="pf-tags"><span class="pf-tag">공연</span></div>
+    </article>
+    <article class="pf pf-soon fade-up">
+      <div class="pf-head">
+        <span class="pf-dot" style="background:#7F77DD"></span>
+        <h3 class="pf-name">Y스24</h3>
+        <span class="pf-status soon">준비 중</span>
+      </div>
+      <p class="pf-desc">정각에 새로고침해야 예매하기 버튼이 열림</p>
+      <div class="pf-tags"><span class="pf-tag">공연</span></div>
+    </article>
   </div>
-  <p class="team-note">다른 구단도 순서대로 추가할 예정입니다.</p>
+
+  <div class="rec-box" id="recBox" hidden></div>
 </section>
 
 <!-- 광고 -->
 <div class="ad-slot">
   <script src="https://ads-partners.coupang.com/g.js"></script>
   <script>
-    new PartnersCoupang.G({"id":935037,"template":"carousel","trackingCode":"AF9566167","width":"420","height":"140","tsource":""});
+    if (window.PartnersCoupang) new PartnersCoupang.G({"id":935037,"template":"carousel","trackingCode":"AF9566167","width":"420","height":"140","tsource":""});
   </script>
   <p class="ad-disclosure">이 배너는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
 </div>
@@ -370,13 +165,45 @@
     </div>
     <div class="step fade-up">
       <div class="step-num">2</div>
-      <div class="step-title">실제 순서대로 연습</div>
-      <div class="step-desc">예매하기 버튼부터 대기열, 보안문자, 좌석, 권종, 결제까지 실제 예매와 같은 순서로 눌러봅니다.</div>
+      <div class="step-title">정각에 맞춰 연습</div>
+      <div class="step-desc">연습을 시작하면 10초 뒤 예매가 열려요. 서버시간을 보며 정각에 예매하기를 누르고, 대기열부터 결제까지 끝까지 진행해보세요.</div>
     </div>
     <div class="step fade-up">
       <div class="step-num">3</div>
       <div class="step-title">기록 줄이기</div>
-      <div class="step-desc">완료 화면에서 단계별 소요 시간을 확인하고, 오래 걸린 단계를 반복해서 시간을 줄여보세요.</div>
+      <div class="step-desc">결과 화면에서 단계별 시간을 확인하고, 느렸던 단계를 반복하세요. 기록은 <a href="records.html">내 기록</a>에 쌓입니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 난이도 -->
+<section class="section" style="padding-top:0;">
+  <p class="section-label">Levels</p>
+  <h2 class="section-title ko">난이도는 3단계예요</h2>
+  <div class="levels">
+    <div class="level fade-up">
+      <div class="level-name">😊 쉬움</div>
+      <ul>
+        <li>동시 접속 <b>약 4천 명</b></li>
+        <li>좌석이 <b>천천히</b> 팔려요</li>
+        <li>결제 제한시간 <b>10분</b></li>
+      </ul>
+    </div>
+    <div class="level fade-up">
+      <div class="level-name">😤 보통</div>
+      <ul>
+        <li>동시 접속 <b>약 3만 명</b></li>
+        <li>인기 좌석은 <b>몇 분 안에</b> 사라져요</li>
+        <li>결제 제한시간 <b>7분</b></li>
+      </ul>
+    </div>
+    <div class="level fade-up">
+      <div class="level-name">🔥 어려움</div>
+      <ul>
+        <li>동시 접속 <b>약 12만 명</b></li>
+        <li>망설이면 <b>이미 선택된 좌석</b></li>
+        <li>결제 제한시간 <b>4분</b></li>
+      </ul>
     </div>
   </div>
 </section>
@@ -386,50 +213,20 @@
   <p class="section-label">Flow</p>
   <h2 class="section-title ko">야구 예매는 이 순서로 진행돼요</h2>
   <div class="flow fade-up">
-    <span class="flow-item">구단 · 경기 선택</span><span class="flow-arrow">→</span>
+    <span class="flow-item">정각 오픈</span><span class="flow-arrow">→</span>
     <span class="flow-item">예매하기</span><span class="flow-arrow">→</span>
     <span class="flow-item">접속 대기열</span><span class="flow-arrow">→</span>
     <span class="flow-item">보안문자</span><span class="flow-arrow">→</span>
-    <span class="flow-item">등급 · 좌석 선택</span><span class="flow-arrow">→</span>
+    <span class="flow-item">등급 · 구역 · 좌석</span><span class="flow-arrow">→</span>
     <span class="flow-item">권종 · 매수</span><span class="flow-arrow">→</span>
+    <span class="flow-item">수령방법</span><span class="flow-arrow">→</span>
     <span class="flow-item">결제</span>
   </div>
   <p class="flow-desc">
-    인기 경기는 예매가 열리는 순간 수만 명이 동시에 접속합니다. 대기열을 통과한 뒤에도 보안문자를 틀리거나,
-    좌석을 고르다 망설이면 그 사이에 원하는 자리가 사라집니다. 화면 순서와 버튼 위치를 손에 익혀두면 실전에서 망설이는 시간이 줄어듭니다.
+    인기 경기는 예매가 열리는 순간 수만 명이 동시에 접속합니다. 1초 늦게 누르면 대기순번이 수천 번 뒤로 밀리고,
+    대기열을 통과한 뒤에도 보안문자를 틀리거나 좌석을 고르다 망설이면 그 사이에 원하는 자리가 사라집니다.
+    화면 순서와 버튼 위치를 손에 익혀두면 실전에서 망설이는 시간이 줄어듭니다.
   </p>
-</section>
-
-<!-- 플랫폼 -->
-<section class="section" id="platforms" style="padding-top:0;">
-  <p class="section-label">Platforms</p>
-  <h2 class="section-title ko">연습할 수 있는 예매처</h2>
-  <div class="platforms">
-    <a class="platform-card tl" href="ticketlink/pc/index.html" style="text-decoration:none;">
-      <span class="platform-status status-ready">연습 가능</span>
-      <div class="platform-dot"></div>
-      <div class="platform-name">T켓링크</div>
-      <div class="platform-sub">야구 · PC / 모바일</div>
-    </a>
-    <div class="platform-card ml soon">
-      <span class="platform-status status-soon">준비 중</span>
-      <div class="platform-dot"></div>
-      <div class="platform-name">멜론T켓</div>
-      <div class="platform-sub">공연</div>
-    </div>
-    <div class="platform-card y2 soon">
-      <span class="platform-status status-soon">준비 중</span>
-      <div class="platform-dot"></div>
-      <div class="platform-name">Y스24</div>
-      <div class="platform-sub">공연</div>
-    </div>
-    <div class="platform-card ip soon">
-      <span class="platform-status status-soon">준비 중</span>
-      <div class="platform-dot"></div>
-      <div class="platform-name">N0L (인터P크)</div>
-      <div class="platform-sub">공연 · 야구</div>
-    </div>
-  </div>
 </section>
 
 <!-- 체크리스트 배너 -->
@@ -437,7 +234,7 @@
   <a class="check-banner fade-up" href="guide/checklist.html">
     <div>
       <div class="check-banner-title">🗒 티켓팅 전날, 이것만은 꼭</div>
-      <div class="check-banner-sub">계정 · 결제수단 · 브라우저 설정 15가지 체크리스트와 반응속도 테스트</div>
+      <div class="check-banner-sub">계정 · 결제수단 · 브라우저 설정 체크리스트와 반응속도 테스트</div>
     </div>
     <span class="check-banner-go">체크리스트 열기 →</span>
   </a>
@@ -453,25 +250,28 @@
   </details>
   <details>
     <summary>T켓링크, 멜론T켓은 실제 서비스와 관련이 있나요?</summary>
-    <p>관련이 없습니다. 실제 예매처의 화면 순서를 참고해 만든 연습용 화면이며, 실제 서비스와 혼동하지 않도록 이름을 다르게 표기하고 있습니다.</p>
+    <p>관련이 없습니다. 실제 예매처의 진행 순서를 참고해 만든 연습용 화면이며, 실제 서비스와 혼동하지 않도록 이름을 다르게 표기하고 있습니다.</p>
+  </details>
+  <details>
+    <summary>대기순번은 어떻게 정해지나요?</summary>
+    <p>예매가 열린 뒤 예매하기를 누르기까지 걸린 시간으로 정해집니다. 늦게 누를수록 앞에 선 사람이 많아지고, 대기를 취소하고 다시 누르면 그만큼 뒤로 밀립니다.</p>
+  </details>
+  <details>
+    <summary>좌석이 분명 비어 있었는데 "이미 선택된 좌석"이라고 나와요.</summary>
+    <p>실제 예매처처럼 좌석 배치도는 불러온 순간의 모습입니다. 좌석을 고르는 동안에도 다른 사람들이 계속 예매하기 때문에, 망설인 시간이 길수록 이런 일이 자주 생깁니다. 빠르게 고르거나, 새로고침해서 최신 상태를 보세요.</p>
   </details>
   <details>
     <summary>PC와 모바일 중 어디서 연습해야 하나요?</summary>
-    <p>실전에서 쓸 기기로 연습하는 것이 가장 좋습니다. PC와 모바일은 버튼 위치와 좌석 선택 방식이 다르기 때문에, 실전에 두 기기를 함께 쓸 계획이라면 둘 다 연습해두세요.</p>
+    <p>실전에서 쓸 기기로 연습하는 것이 가장 좋습니다. PC와 모바일은 화면 배치와 버튼 위치가 다르니, 두 기기를 함께 쓸 계획이라면 둘 다 연습해두세요.</p>
   </details>
   <details>
-    <summary>보안문자를 자꾸 틀려요.</summary>
-    <p>보안문자는 비슷하게 생긴 글자가 섞여 나옵니다. 연습 화면에서 반복하며 입력 속도와 정확도를 함께 올려보세요. 틀리면 새 문자가 나오는 것도 실제와 같습니다.</p>
-  </details>
-  <details>
-    <summary>연습 기록이 저장되나요?</summary>
-    <p>지금은 완료 화면에서 단계별 소요 시간을 보여드립니다. 기록을 저장하고 지난 기록과 비교하는 기능을 준비하고 있습니다.</p>
+    <summary>연습 기록은 어디에 저장되나요?</summary>
+    <p>지금 쓰는 브라우저에만 저장됩니다. 다른 기기나 다른 브라우저에서는 보이지 않고, 브라우저의 사이트 데이터를 지우면 함께 지워집니다.</p>
   </details>
 </section>
 
 <div class="divider"></div>
 
-<!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-left">
     <strong>🍇 포도알줍줍</strong><br>
@@ -482,24 +282,29 @@
   <ul class="footer-links">
     <li><a href="about.html">소개</a></li>
     <li><a href="privacy.html">개인정보처리방침</a></li>
+    <li><a href="records.html">내 기록</a></li>
     <li><a href="guide/checklist.html">체크리스트</a></li>
   </ul>
 </footer>
 
-<script>
-  // scroll fade
-  const obs = new IntersectionObserver(els => {
-    els.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
-
-  // smooth scroll
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const t = document.querySelector(a.getAttribute('href'));
-      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    });
-  });
+<script src="assets/js/site.js"></script>
+<script type="module">
+  import { loadRecords } from './assets/js/records.js';
+  import { TEAMS } from './assets/js/data/teams.js';
+  import { sec } from './assets/js/practice/ui.js';
+  const list = loadRecords();
+  if (list.length) {
+    const ok = list.filter(r => r.success);
+    const best = ok.slice().sort((a, b) => a.total - b.total)[0];
+    const box = document.getElementById('recBox');
+    box.innerHTML = `
+      <span class="rec-ico">⏱</span>
+      <div class="rec-main">${best
+        ? `최고 기록 <b>${sec(best.total)}</b> · ${TEAMS[best.team]?.name || ''} · 연습 ${list.length}회 중 ${ok.length}회 성공`
+        : `연습 ${list.length}회 · 아직 성공 기록이 없어요`}</div>
+      <a href="records.html">내 기록 보기 →</a>`;
+    box.hidden = false;
+  }
 </script>
 </body>
 </html>

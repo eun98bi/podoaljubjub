@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>페이지를 찾을 수 없어요 — 포도알줍줍</title>
+<meta name="robots" content="noindex">
+<script>
+  // 예전 주소로 들어오면 새 연습 화면으로 보낸다.
+  (function () {
+    var path = location.pathname;
+    var q = new URLSearchParams(location.search);
+    if (/^\/ticketlink\//.test(path)) {
+      var team = q.get('team') || '';
+      var device = /\/mobile\//.test(path) ? 'mobile' : 'pc';
+      location.replace(team ? '/practice/?p=tl&team=' + encodeURIComponent(team) + '&device=' + device : '/#platforms');
+    } else if (/^\/(melon|yes24|interpark)(\/|$)/.test(path)) {
+      location.replace('/#platforms');
+    }
+  })();
+</script>
+<link rel="stylesheet" href="/assets/css/base.css">
+</head>
+<body>
+<div class="bg-glow"></div>
+<main class="doc" style="text-align:center;">
+  <div style="font-size:48px;">🍇</div>
+  <h1>페이지를 찾을 수 없어요</h1>
+  <p class="doc-meta">주소가 바뀌었거나 없는 페이지예요.</p>
+  <p><a class="btn-primary" href="/">메인으로 가기</a></p>
+</main>
+</body>
+</html>
